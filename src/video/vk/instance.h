@@ -1,10 +1,11 @@
 #pragma once
 
-#include <graphics/vk/vulkan_types.h>
-namespace Plusnx::Graphics::Vk {
+#include <video/vk/vulkan_types.h>
+namespace Plusnx::Video::Vk {
     class Instance {
-        public:
+    public:
         Instance();
+        ~Instance();
 
         std::optional<vk::Instance> context;
     };

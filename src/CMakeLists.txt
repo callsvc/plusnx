@@ -4,11 +4,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(plusnx)
 target_sources(plusnx PRIVATE
-    graphics/gpu.cpp
-    graphics/gpu.h
-    graphics/vk/vulkan_types.h
-    graphics/vk/instance.cpp
-    graphics/vk/instance.h
+    video/gpu.cpp
+    video/gpu.h
+    video/vk/vulkan_types.h
+    video/vk/instance.cpp
+    video/vk/instance.h
     sys_fs/provider.cpp
     sys_fs/provider.h
     sys_fs/assets.cpp
@@ -21,4 +21,4 @@ target_sources(plusnx PRIVATE
     types.h
 )
 
-target_link_libraries(plusnx PRIVATE Vulkan::Headers)
+target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2)

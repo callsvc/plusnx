@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <graphics/vk/instance.h>
-namespace Plusnx::Graphics {
+#include <video/vk/instance.h>
+namespace Plusnx::Video {
     class GPU {
     public:
         GPU();

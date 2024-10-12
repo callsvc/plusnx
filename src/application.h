@@ -8,7 +8,7 @@ namespace Plusnx {
 
     class Application {
     public:
-        explicit Application(const std::shared_ptr<Context>& ctx);
+        Application();
 
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;

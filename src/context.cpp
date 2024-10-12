@@ -3,15 +3,13 @@
 namespace Plusnx {
     Context::Context() :
         provider(std::make_shared<SysFs::Provider>()),
-        gpu(std::make_shared<Graphics::GPU>()) {
-
-        rootDir = provider->GetRoot();
+        gpu(std::make_shared<Video::GPU>()) {
     }
 
-    std::filesystem::path Context::GetSystemPath(const SystemPaths tagged) {
+    std::filesystem::path Context::GetSystemPath(const SystemPaths tagged) const {
         switch (tagged) {
             case BaseDirectoryFs:
-                return rootDir;
+                return provider->GetRoot();
             default:
                 assert(0);
         }
