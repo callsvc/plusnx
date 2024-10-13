@@ -6,6 +6,7 @@ add_executable(plusnx)
 target_sources(plusnx PRIVATE
     video/gpu.cpp
     video/gpu.h
+    video/vk/vulkan_types.cpp
     video/vk/vulkan_types.h
     video/vk/instance.cpp
     video/vk/instance.h
@@ -13,11 +14,16 @@ target_sources(plusnx PRIVATE
     sys_fs/provider.h
     sys_fs/assets.cpp
     sys_fs/assets.h
+    nogui/sdl_vulkan_backing.cpp
+    nogui/sdl_vulkan_backing.h
     main.cpp
+    driver.cpp
+
     application.cpp
     application.h
     context.cpp
     context.h
+    container.h
     types.h
 )
 

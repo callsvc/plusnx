@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 
+#include <container.h>
 namespace Plusnx {
     using u64 = std::uint64_t;
 

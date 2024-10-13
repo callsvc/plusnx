@@ -1,4 +1,16 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include <types.h>
+
+namespace Plusnx::NoGui {
+    class SdlVulkanBacking;
+}
+
+namespace Plusnx::Video::Vk {
+
+    class VkSupport {
+    public:
+        explicit VkSupport(const NoGui::SdlVulkanBacking& sdlvk);
+        std::vector<const char*> enableExt;
+    };
+}

@@ -1,10 +1,9 @@
 #include <print>
 
 #include <video/vk/instance.h>
+#include <types.h>
 namespace Plusnx::Video::Vk {
-    Instance::Instance() {
-        std::vector<const char*> layerNames;
-
+    void Instance::EnumerateSupportLayers() {
         u32 layersCount;
 
         if (vk::enumerateInstanceLayerProperties(&layersCount, nullptr) != vk::Result::eSuccess)
@@ -17,23 +16,37 @@ namespace Plusnx::Video::Vk {
 
             for (const auto& layer : availableLayers) {
                 if (layer.layerName == "VK_LAYER_KHRONOS_validation")
-                    layerNames.emplace_back("VK_LAYER_KHRONOS_validation");
+                    layers.emplace_back("VK_LAYER_KHRONOS_validation");
             }
         }
+    }
+    void Instance::EnumerateRequiredExtensions(const std::vector<std::string_view>& required) {
+        u32 count;
+        assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, nullptr) == vk::Result::eSuccess);
+        std::vector<vk::ExtensionProperties> properties(count);
+        assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, properties.data()) == vk::Result::eSuccess);
+
+        for (const auto& property : properties) {
+            if (ContainsValue(required, std::string_view(property.extensionName)))
+                extensions.emplace_back(property.extensionName);
+        }
+    }
+
+
+    Instance::Instance(const std::vector<std::string_view>& required) {
+        EnumerateSupportLayers();
+        EnumerateRequiredExtensions(required);
 
         vk::ApplicationInfo applicationInfo{"Plusnx", VK_MAKE_VERSION(1, 3, 0)};
         const vk::InstanceCreateInfo instanceCreateInfo{
-            {},
-            &applicationInfo,
-            static_cast<u32>(layerNames.size()),
-            layerNames.data()
+            {}, &applicationInfo, static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data()
         };
 
-        context.emplace(createInstance(instanceCreateInfo));
+        holder.emplace(createInstance(instanceCreateInfo));
     }
 
     Instance::~Instance() {
-        if (context)
-            vkDestroyInstance(context.value(), nullptr);
+        if (holder)
+            vkDestroyInstance(*holder, nullptr);
     }
 }
