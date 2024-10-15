@@ -7,20 +7,18 @@
 #include <nogui/sdl_vulkan_backing.h>
 #include <video/vk/vulkan_types.h>
 
-namespace Plusnx {
-    bool IsWaylandPresent();
-}
+using namespace Plusnx;
 
-Plusnx::i32 main() {
+i32 main() {
     SDL_Init(SDL_INIT_VIDEO);
     std::print("SDL2 driver name {}\n", SDL_GetCurrentVideoDriver());
-    if (Plusnx::IsWaylandPresent())
+    if (IsWaylandPresent())
         assert(std::string_view(SDL_GetCurrentVideoDriver()) == "wayland");
 
-    const Plusnx::NoGui::SdlVulkanBacking sdlContext;
-    const Plusnx::Video::Vk::VkSupport support(sdlContext);
+    const NoGui::SdlVulkanBacking sdlContext;
+    const Video::Vk::VkSupport support(sdlContext);
 
-    const auto app{std::make_unique<Plusnx::Application>()};
+    const auto app{std::make_unique<Application>()};
     app->Initialize(support);
 
     SDL_Quit();

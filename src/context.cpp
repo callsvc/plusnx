@@ -6,7 +6,7 @@ namespace Plusnx {
         gpu(std::make_shared<Video::GPU>()) {
     }
 
-    std::filesystem::path Context::GetSystemPath(const SystemPaths tagged) const {
+    SysFs::SysPath Context::GetSystemPath(const SystemPaths tagged) const {
         switch (tagged) {
             case BaseDirectoryFs:
                 return provider->GetRoot();

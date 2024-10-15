@@ -6,19 +6,15 @@ namespace Plusnx {
             if (std::string_view(session) == "wayland")
                 return true;
 
-        const auto pipe{popen("loginctl show-session 2 -p Type", "r")};
-        if (!pipe)
-            return {};
+        std::array<char, 24> line{};
+        {
+            const auto pipe{popen("loginctl show-session 2 -p Type", "r")};
+            if (!pipe)
+                return {};
+            fgets(line.data(), sizeof(line), pipe);
 
-        bool result{};
-        std::array<char, 24> line;
-
-        fgets(line.data(), sizeof(line), pipe);
-        if (std::string_view(line).contains("wayland"))
-            result = true;
-
-        pclose(pipe);
-
-        return result;
+            pclose(pipe);
+        }
+        return std::string_view(line).contains("wayland");
     }
 }

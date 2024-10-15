@@ -13,7 +13,7 @@ namespace Plusnx {
     class Context {
     public:
         Context();
-        std::filesystem::path GetSystemPath(SystemPaths tagged) const;
+        [[nodiscard]] SysFs::SysPath GetSystemPath(SystemPaths tagged) const;
 
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Video::GPU> gpu;

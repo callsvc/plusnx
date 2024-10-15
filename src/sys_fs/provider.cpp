@@ -14,13 +14,13 @@ namespace Plusnx::SysFs {
         barrier >> fileMax;
     }
 
-    std::filesystem::path Provider::GetRoot() const {
+    SysPath Provider::GetRoot() const {
         if (dirs.contains(rootPathId))
             return dirs.at(rootPathId);
         return std::filesystem::current_path();
     }
 
-    void Provider::RegisterSystemPath(const std::filesystem::path& directory) {
+    void Provider::RegisterSystemPath(const SysPath& directory) {
         assert(directory.has_root_directory());
         if (!exists(directory))
             if (!create_directory(directory))

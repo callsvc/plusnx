@@ -18,7 +18,7 @@ namespace Plusnx::SysFs {
         CheckDir(cache);
     }
 
-    void Assets::CheckDir(const std::filesystem::path& path) const {
+    void Assets::CheckDir(const SysPath& path) const {
         provider->RegisterSystemPath(path);
     }
 }

@@ -7,7 +7,6 @@
 namespace Plusnx::NoGui {
     SdlVulkanBacking::SdlVulkanBacking() :
         window(SDL_CreateWindow("Plusnx", 0, 0, 800, 800, SDL_WINDOW_VULKAN)) {
-
         u32 count;
         SDL_Vulkan_GetInstanceExtensions(window, &count, nullptr);
         required.resize(count);
@@ -17,7 +16,6 @@ namespace Plusnx::NoGui {
         for (const auto& supported : required) {
             std::print("SDL Vulkan: Extension supported by the layer {}\n", supported);
         }
-
     }
 
     SdlVulkanBacking::~SdlVulkanBacking() {

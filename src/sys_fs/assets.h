@@ -11,7 +11,7 @@ namespace Plusnx::SysFs {
     class Assets {
         public:
         explicit Assets(const std::shared_ptr<Context>& context);
-        void CheckDir(const std::filesystem::path& path) const;
+        void CheckDir(const SysPath& path) const;
 
         std::filesystem::path logs;
         std::filesystem::path games;
