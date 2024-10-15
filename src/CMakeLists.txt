@@ -4,6 +4,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(plusnx)
 target_sources(plusnx PRIVATE
+    audio/speaker.cpp
+    audio/speaker.h
     video/gpu.cpp
     video/gpu.h
     video/vk/vulkan_types.cpp
@@ -18,7 +20,6 @@ target_sources(plusnx PRIVATE
     nogui/sdl_vulkan_backing.h
     main.cpp
     driver.cpp
-
     application.cpp
     application.h
     context.cpp

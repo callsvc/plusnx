@@ -1,6 +1,15 @@
+#include <format>
 #include <iostream>
 
+#include <SDL2/SDL.h>
+
 namespace Plusnx {
+    std::string GetSDLVersion() {
+        SDL_version version;
+        SDL_GetVersion(&version);
+
+        return std::format("{}.{}.{}", version.major, version.minor, version.patch);
+    }
     bool IsWaylandPresent() {
         if (const auto session{getenv("XDG_SESSION_TYPE")})
             if (std::string_view(session) == "wayland")

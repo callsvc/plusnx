@@ -9,11 +9,18 @@
 
 using namespace Plusnx;
 
-i32 main() {
-    SDL_Init(SDL_INIT_VIDEO);
-    std::print("SDL2 driver name {}\n", SDL_GetCurrentVideoDriver());
+void ChecksDriverVersion() {
+    std::print("SDL version: {}\n", GetSDLVersion());
+    std::print("SDL driver name {}\n", SDL_GetCurrentVideoDriver());
+
     if (IsWaylandPresent())
         assert(std::string_view(SDL_GetCurrentVideoDriver()) == "wayland");
+}
+
+i32 main() {
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+    ChecksDriverVersion();
 
     const NoGui::SdlVulkanBacking sdlContext;
     const Video::Vk::VkSupport support(sdlContext);

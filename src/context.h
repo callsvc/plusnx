@@ -5,6 +5,7 @@
 
 #include <sys_fs/provider.h>
 #include <video/gpu.h>
+#include <audio/speaker.h>
 namespace Plusnx {
     enum SystemPaths {
         BaseDirectoryFs
@@ -17,5 +18,6 @@ namespace Plusnx {
 
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Video::GPU> gpu;
+        std::shared_ptr<Audio::Speaker> speaker;
     };
 }
