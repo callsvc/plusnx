@@ -9,21 +9,23 @@ namespace Plusnx::Video::Vk {
         if (vk::enumerateInstanceLayerProperties(&layersCount, nullptr) != vk::Result::eSuccess)
             throw std::runtime_error("VK: Failed to capture the supported layers");
 
-        if (layersCount) {
-            std::vector<vk::LayerProperties> availableLayers(layersCount);
-            if (enumerateInstanceLayerProperties(&layersCount, availableLayers.data()) == vk::Result::eSuccess)
-                std::print("{} layers found", availableLayers.size());
+        if (!layersCount)
+            return;
+        std::vector<vk::LayerProperties> availableLayers(layersCount);
+        if (enumerateInstanceLayerProperties(&layersCount, availableLayers.data()) == vk::Result::eSuccess)
+            std::print("{} layers found", availableLayers.size());
 
-            for (const auto& layer : availableLayers) {
-                if (layer.layerName == "VK_LAYER_KHRONOS_validation")
-                    layers.emplace_back("VK_LAYER_KHRONOS_validation");
-            }
+        for (const auto& layer : availableLayers) {
+            if (layer.layerName == "VK_LAYER_KHRONOS_validation")
+                layers.emplace_back("VK_LAYER_KHRONOS_validation");
         }
     }
     void Instance::EnumerateRequiredExtensions(const std::vector<std::string_view>& required) {
         u32 count;
         assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, nullptr) == vk::Result::eSuccess);
         std::vector<vk::ExtensionProperties> properties(count);
+        std::print("Number of extensions supported by Vulkan 1.3: {}\n", count);
+
         assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, properties.data()) == vk::Result::eSuccess);
 
         for (const auto& property : properties) {
@@ -37,16 +39,16 @@ namespace Plusnx::Video::Vk {
         EnumerateSupportLayers();
         EnumerateRequiredExtensions(required);
 
-        vk::ApplicationInfo applicationInfo{"Plusnx", VK_MAKE_VERSION(1, 3, 0)};
+        vk::ApplicationInfo applicationInfo{"Plusnx", VK_API_VERSION_1_3};
         const vk::InstanceCreateInfo instanceCreateInfo{
             {}, &applicationInfo, static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data()
         };
 
-        holder.emplace(createInstance(instanceCreateInfo));
+        instance.emplace(createInstance(instanceCreateInfo));
     }
 
     Instance::~Instance() {
-        if (holder)
-            vkDestroyInstance(*holder, nullptr);
+        if (instance)
+            vkDestroyInstance(instance.value(), nullptr);
     }
 }

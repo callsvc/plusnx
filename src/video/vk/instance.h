@@ -7,7 +7,7 @@ namespace Plusnx::Video::Vk {
         explicit Instance(const std::vector<std::string_view>& required);
         ~Instance();
 
-        std::optional<vk::Instance> holder;
+        std::optional<vk::Instance> instance;
 
     private:
         std::vector<const char*> extensions;

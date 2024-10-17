@@ -37,7 +37,7 @@ namespace Plusnx::Audio {
 
     void Speaker::MigrateDriver() {
         const auto drivers{SDL_GetNumAudioDrivers()};
-        for (i32 drv{}; drv < drivers && !audio; drv++) {
+        for (i32 drv{}; drv < drivers && !driver; drv++) {
             const auto name{SDL_GetAudioDriver(drv)};
             if (ContainsValue(desired, std::string_view(name))) {
                 SDL_SetHintWithPriority("SDL_AUDIO_DRIVER", name, SDL_HINT_OVERRIDE);
