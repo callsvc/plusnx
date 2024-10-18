@@ -6,6 +6,9 @@
 #include <sys_fs/provider.h>
 #include <video/gpu.h>
 #include <audio/speaker.h>
+
+// Kernel-related types
+#include <kmo/types/kprocess.h>
 namespace Plusnx::Core {
     enum SystemPaths {
         BaseDirectoryFs
@@ -19,5 +22,9 @@ namespace Plusnx::Core {
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Video::GPU> gpu;
         std::shared_ptr<Audio::Speaker> speaker;
+
+        // The main kernel object, necessary to run applications,
+        // must live as long as the Application() class is still alive
+        std::weak_ptr<Kmo::Types::KProcess> process;
     };
 }

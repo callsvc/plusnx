@@ -27,6 +27,12 @@ target_sources(plusnx PRIVATE
     core/application.h
     core/context.cpp
     core/context.h
+    kmo/types/kprocess.cpp
+    kmo/types/kprocess.h
+    kmo/types/kthread.cpp
+    kmo/types/kthread.h
+    kmo/kernel.cpp
+    kmo/kernel.h
     main.cpp
     driver.cpp
     container.h
