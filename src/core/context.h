@@ -6,7 +6,7 @@
 #include <sys_fs/provider.h>
 #include <video/gpu.h>
 #include <audio/speaker.h>
-namespace Plusnx {
+namespace Plusnx::Core {
     enum SystemPaths {
         BaseDirectoryFs
     };

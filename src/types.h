@@ -5,7 +5,7 @@
 #include <container.h>
 namespace Plusnx {
     bool IsWaylandPresent();
-    std::string GetSDLVersion();
+    std::string GetSdlVersion();
 
     using u64 = std::uint64_t;
 

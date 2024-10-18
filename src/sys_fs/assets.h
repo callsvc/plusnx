@@ -3,21 +3,22 @@
 #include <memory>
 
 #include <sys_fs/provider.h>
-namespace Plusnx {
+#include <sys_fs/fsys/rigid_directory.h>
+namespace Plusnx::Core {
     class Context;
 }
 
 namespace Plusnx::SysFs {
     class Assets {
         public:
-        explicit Assets(const std::shared_ptr<Context>& context);
+        explicit Assets(const std::shared_ptr<Core::Context>& context);
         void CheckDir(const SysPath& path) const;
 
-        std::filesystem::path logs;
-        std::filesystem::path games;
-        std::filesystem::path keys;
-        std::filesystem::path nand;
-        std::filesystem::path cache;
+        Fsys::RigidDirectory logs;
+        Fsys::RigidDirectory games;
+        Fsys::RigidDirectory keys;
+        Fsys::RigidDirectory nand;
+        Fsys::RigidDirectory cache;
 
         std::shared_ptr<Provider> provider;
     };

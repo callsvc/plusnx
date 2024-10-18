@@ -3,8 +3,8 @@
 #include <unordered_map>
 
 #include <types.h>
+#include <sys_fs/fs_types.h>
 namespace Plusnx::SysFs {
-    using SysPath = std::filesystem::path;
 
     constexpr std::string rootPathId{"system"};
     class Provider {

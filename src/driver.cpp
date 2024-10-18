@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 namespace Plusnx {
-    std::string GetSDLVersion() {
+    std::string GetSdlVersion() {
         SDL_version version;
         SDL_GetVersion(&version);
 

@@ -1,16 +1,15 @@
 #include <print>
 #include <SDL2/SDL.h>
 
-#include <types.h>
-#include <application.h>
+#include <core/application.h>
 
 #include <nogui/sdl_vulkan_backing.h>
 #include <video/vk/vulkan_types.h>
 
 using namespace Plusnx;
 
-void ChecksDriverVersion() {
-    std::print("SDL version: {}\n", GetSDLVersion());
+void CheckDriversVersion() {
+    std::print("SDL version: {}\n", GetSdlVersion());
     std::print("SDL driver name {}\n", SDL_GetCurrentVideoDriver());
 
     if (IsWaylandPresent())
@@ -20,12 +19,12 @@ void ChecksDriverVersion() {
 i32 main() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
-    ChecksDriverVersion();
+    CheckDriversVersion();
 
     const NoGui::SdlVulkanBacking sdlContext;
     const Video::Vk::VkSupport support(sdlContext);
 
-    const auto app{std::make_unique<Application>()};
+    const auto app{std::make_unique<Core::Application>()};
     app->Initialize(support);
 
     SDL_Quit();

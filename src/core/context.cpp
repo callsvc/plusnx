@@ -1,6 +1,6 @@
-#include <context.h>
+#include <core/context.h>
 
-namespace Plusnx {
+namespace Plusnx::Core {
     Context::Context() :
         provider(std::make_shared<SysFs::Provider>()),
         gpu(std::make_shared<Video::GPU>()),

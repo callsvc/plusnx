@@ -4,7 +4,7 @@
 
 #include <sys_fs/assets.h>
 #include <video/vk/vulkan_types.h>
-namespace Plusnx {
+namespace Plusnx::Core {
     class Context;
 
     class Application {

@@ -1,10 +1,10 @@
 #include <print>
 #include <unistd.h>
 
-#include <application.h>
-#include <context.h>
+#include <core/application.h>
+#include <core/context.h>
 
-namespace Plusnx {
+namespace Plusnx::Core {
     Application::Application() : context(std::make_shared<Context>()) {
 
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());

@@ -16,7 +16,7 @@ namespace Plusnx::Video::Vk {
             std::print("{} layers found", availableLayers.size());
 
         for (const auto& layer : availableLayers) {
-            if (layer.layerName == "VK_LAYER_KHRONOS_validation")
+            if (std::string_view(layer.layerName) == "VK_LAYER_KHRONOS_validation")
                 layers.emplace_back("VK_LAYER_KHRONOS_validation");
         }
     }

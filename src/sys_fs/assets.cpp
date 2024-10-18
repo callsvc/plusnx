@@ -1,9 +1,9 @@
 #include <sys_fs/assets.h>
 
-#include <context.h>
+#include <core/context.h>
 namespace Plusnx::SysFs {
-    Assets::Assets(const std::shared_ptr<Context>& context) : provider(context->provider) {
-        const auto root{context->GetSystemPath(BaseDirectoryFs)};
+    Assets::Assets(const std::shared_ptr<Core::Context>& context) : provider(context->provider) {
+        const auto root{context->GetSystemPath(Core::BaseDirectoryFs)};
 
         logs = root / "logs";
         games = root / "games";

@@ -16,14 +16,19 @@ target_sources(plusnx PRIVATE
     sys_fs/provider.h
     sys_fs/assets.cpp
     sys_fs/assets.h
+    sys_fs/fs_types.h
+    sys_fs/fsys/rigid_directory.cpp
+    sys_fs/fsys/rigid_directory.h
+    sys_fs/nx/partition_filesystem.cpp
+    sys_fs/nx/partition_filesystem.h
     nogui/sdl_vulkan_backing.cpp
     nogui/sdl_vulkan_backing.h
+    core/application.cpp
+    core/application.h
+    core/context.cpp
+    core/context.h
     main.cpp
     driver.cpp
-    application.cpp
-    application.h
-    context.cpp
-    context.h
     container.h
     types.h
 )
