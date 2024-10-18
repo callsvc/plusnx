@@ -1,6 +1,11 @@
 #pragma once
 
+#include <memory>
+
 #include <atomic>
+
+#include <cpu/core_container.h>
+#include <cpu/unit_types.h>
 #include <types.h>
 namespace Plusnx::Kmo {
     enum class KType {
@@ -9,10 +14,13 @@ namespace Plusnx::Kmo {
     };
     class Kernel {
     public:
-        Kernel() = default;
+        Kernel();
+        ~Kernel();
         u64 CreateProcessId();
     private:
         std::atomic<u64> pitch;
+
+        std::array<Cpu::CoreContainer, Cpu::totalCoresCount> cpuCores;
     };
 
     class KBaseType {

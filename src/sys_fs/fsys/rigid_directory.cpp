@@ -16,6 +16,7 @@ namespace Plusnx::SysFs::Fsys {
                 content.emplace_back(entry);
             }
         };
+        DiscoverDirectory(path);
         return content;
     }
 }
