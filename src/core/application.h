@@ -1,7 +1,6 @@
 #pragma once
-
 #include <memory>
-
+#include <core/games_lists.h>
 #include <sys_fs/assets.h>
 #include <video/vk/vulkan_types.h>
 
@@ -19,5 +18,7 @@ namespace Plusnx::Core {
         std::shared_ptr<Kmo::Types::KProcess> entity;
 
         std::shared_ptr<Kmo::Kernel> kernel;
+    private:
+        std::unique_ptr<GamesLists> games;
     };
 }

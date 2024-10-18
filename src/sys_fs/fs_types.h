@@ -29,7 +29,7 @@ namespace Plusnx::SysFs {
             return path;
         }
 
-        virtual std::vector<SysPath> ListAllFiles() = 0;
+        virtual std::vector<SysPath> ListAllFiles() const = 0;
     protected:
         SysPath path;
     };

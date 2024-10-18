@@ -1,7 +1,7 @@
 #include <functional>
 #include <sys_fs/fsys/rigid_directory.h>
 namespace Plusnx::SysFs::Fsys {
-    std::vector<SysPath> RigidDirectory::ListAllFiles() {
+    std::vector<SysPath> RigidDirectory::ListAllFiles() const {
         std::vector<SysPath> content;
         std::function<void(const SysPath&)> DiscoverDirectory = [&](const SysPath& subdir) {
             std::filesystem::directory_iterator walker{subdir};

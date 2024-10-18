@@ -4,6 +4,6 @@
 namespace Plusnx::SysFs::Nx {
     class PartitionFilesystem final : RoDirectoryBacking {
     public:
-        std::vector<SysPath> ListAllFiles() override;
+        std::vector<SysPath> ListAllFiles() const override;
     };
 }

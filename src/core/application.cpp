@@ -23,5 +23,8 @@ namespace Plusnx::Core {
 
         if (const auto process = context->process.lock())
             process->Initialize();
+
+        games = std::make_unique<GamesLists>(assets->games);
+        games->Initialize();
     }
 }

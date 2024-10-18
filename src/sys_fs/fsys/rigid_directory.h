@@ -7,6 +7,6 @@ namespace Plusnx::SysFs::Fsys {
         RigidDirectory() = default;
         RigidDirectory(const SysPath& path) : RoDirectoryBacking(path) {}
 
-        std::vector<SysPath> ListAllFiles() override;
+        std::vector<SysPath> ListAllFiles() const override;
     };
 }

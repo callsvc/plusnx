@@ -27,6 +27,8 @@ target_sources(plusnx PRIVATE
     core/application.h
     core/context.cpp
     core/context.h
+    core/games_lists.cpp
+    core/games_lists.h
     kmo/types/kprocess.cpp
     kmo/types/kprocess.h
     kmo/types/kthread.cpp

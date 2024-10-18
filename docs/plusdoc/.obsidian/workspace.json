@@ -4,19 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "7f596e3578925bb5",
+        "id": "c602af816284de9b",
         "type": "tabs",
         "children": [
           {
-            "id": "1ad3e19d9f686314",
+            "id": "061ff79872a3cd49",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Used libraries.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -85,7 +81,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Used libraries.md",
+                "file": "Filesystem/NCA/Unpacked.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +98,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Used libraries.md",
+                "file": "Filesystem/NCA/Unpacked.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +121,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Used libraries.md"
+                "file": "Filesystem/NCA/Unpacked.md"
               }
             }
           }
@@ -146,10 +142,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "1ad3e19d9f686314",
+  "active": "4906b8d1eec6eccd",
   "lastOpenFiles": [
-    "Welcome.md",
     "Used libraries.md",
+    "Filesystem/NCA/Unpacked.md",
+    "Filesystem/About",
+    "Filesystem/NCA",
+    "Filesystem",
+    "Welcome.md",
     "Audio"
   ]
 }
