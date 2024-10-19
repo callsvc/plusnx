@@ -4,7 +4,7 @@
 #include <sys_fs/assets.h>
 #include <video/vk/vulkan_types.h>
 
-#include <kmo/types/kprocess.h>
+#include <gsk/types/kprocess.h>
 namespace Plusnx::Core {
     class Context;
 
@@ -15,9 +15,9 @@ namespace Plusnx::Core {
 
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;
-        std::shared_ptr<Kmo::Types::KProcess> entity;
+        std::shared_ptr<Gsk::Types::KProcess> pent;
 
-        std::shared_ptr<Kmo::Kernel> kernel;
+        std::shared_ptr<Gsk::Kernel> kernel;
     private:
         std::unique_ptr<GamesLists> games;
     };

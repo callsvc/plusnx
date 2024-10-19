@@ -32,12 +32,12 @@ target_sources(plusnx PRIVATE
     cpu/core_container.cpp
     cpu/core_container.h
     cpu/unit_types.h
-    kmo/types/kprocess.cpp
-    kmo/types/kprocess.h
-    kmo/types/kthread.cpp
-    kmo/types/kthread.h
-    kmo/kernel.cpp
-    kmo/kernel.h
+    gsk/types/kprocess.cpp
+    gsk/types/kprocess.h
+    gsk/types/kthread.cpp
+    gsk/types/kthread.h
+    gsk/kernel.cpp
+    gsk/kernel.h
     main.cpp
     driver.cpp
     container.h

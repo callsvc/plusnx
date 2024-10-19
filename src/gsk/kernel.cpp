@@ -1,5 +1,5 @@
-#include <kmo/kernel.h>
-namespace Plusnx::Kmo {
+#include <gsk/kernel.h>
+namespace Plusnx::Gsk {
     Kernel::Kernel() {
         for (u32 core{}; core < Cpu::totalCoresCount; core++)
             cpuCores[core].Initialize();
@@ -11,7 +11,7 @@ namespace Plusnx::Kmo {
     }
 
     u64 Kernel::CreateProcessId() {
-        return pitch++;
+        return seed.pid++;
     }
 
 }

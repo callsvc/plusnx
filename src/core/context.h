@@ -8,7 +8,7 @@
 #include <audio/speaker.h>
 
 // Kernel-related types
-#include <kmo/types/kprocess.h>
+#include <gsk/types/kprocess.h>
 namespace Plusnx::Core {
     enum SystemPaths {
         BaseDirectoryFs
@@ -25,6 +25,6 @@ namespace Plusnx::Core {
 
         // The main kernel object, necessary to run applications,
         // must live as long as the Application() class is still alive
-        std::weak_ptr<Kmo::Types::KProcess> process;
+        std::weak_ptr<Gsk::Types::KProcess> process;
     };
 }

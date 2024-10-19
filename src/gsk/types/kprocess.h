@@ -1,13 +1,13 @@
 #pragma once
 #include <list>
 
-#include <kmo/kernel.h>
-#include <kmo/types/kthread.h>
+#include <gsk/kernel.h>
+#include <gsk/types/kthread.h>
 
-namespace Plusnx::Kmo::Types {
+namespace Plusnx::Gsk::Types {
     class KProcess : KBaseType {
     public:
-        KProcess(Kernel& kernel) : KBaseType(kernel, KType::KProcess) {}
+        explicit KProcess(Kernel& kernel) : KBaseType(kernel, KType::KProcess) {}
         void Initialize();
         void Destroy();
 

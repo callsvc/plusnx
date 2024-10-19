@@ -14,12 +14,12 @@ namespace Plusnx::Core {
     void Application::Initialize(const Video::Vk::VkSupport& support) {
         context->gpu->InitGraphics(support);
 
-        kernel = std::make_shared<Kmo::Kernel>();
-        entity = std::make_shared<Kmo::Types::KProcess>(*kernel);
+        kernel = std::make_shared<Gsk::Kernel>();
+        pent = std::make_shared<Gsk::Types::KProcess>(*kernel);
         if (const auto process = context->process.lock())
             process->Destroy();
 
-        context->process = entity;
+        context->process = pent;
 
         if (const auto process = context->process.lock())
             process->Initialize();

@@ -1,6 +1,6 @@
-#include <kmo/types/kprocess.h>
+#include <gsk/types/kprocess.h>
 
-namespace Plusnx::Kmo::Types {
+namespace Plusnx::Gsk::Types {
     void KProcess::Initialize() {
         pid = kernel.CreateProcessId();
     }
