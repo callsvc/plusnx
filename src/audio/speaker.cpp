@@ -4,7 +4,7 @@
 
 #include <audio/speaker.h>
 namespace Plusnx::Audio {
-    constexpr std::array<std::string_view, 2> hifiDrivers{
+    constexpr std::array<std::string_view, 2> HifiDrivers{
 #if defined(__linux__)
         "pipewire", "pulseaudio"
 #endif
@@ -12,7 +12,7 @@ namespace Plusnx::Audio {
 
     Speaker::Speaker() {
         const std::string_view driver{SDL_GetCurrentAudioDriver()};
-        if (ContainsValue(hifiDrivers, driver) == false) {
+        if (ContainsValue(HifiDrivers, driver) == false) {
             MigrateDriver();
         }
 
@@ -42,7 +42,7 @@ namespace Plusnx::Audio {
         const auto drivers{SDL_GetNumAudioDrivers()};
         for (i32 drv{}; drv < drivers && !driver; drv++) {
             const auto name{SDL_GetAudioDriver(drv)};
-            if (ContainsValue(hifiDrivers, std::string_view(name))) {
+            if (ContainsValue(HifiDrivers, std::string_view(name))) {
                 SDL_SetHintWithPriority("SDL_AUDIO_DRIVER", name, SDL_HINT_OVERRIDE);
                 driver = SDL_AudioInit(name) == 0;
             }

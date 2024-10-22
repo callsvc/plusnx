@@ -1,3 +1,4 @@
+#include <ranges>
 #include <core/context.h>
 
 namespace Plusnx::Core {
@@ -14,5 +15,14 @@ namespace Plusnx::Core {
             default:
                 assert(0);
         }
+    }
+
+    bool Context::IsFromSystemPath(const SysFs::SysPath& path) const {
+        const auto target{path.parent_path()};
+        for (const auto& directory : std::ranges::views::values(provider->dirs)) {
+            if (ContainsValue(directory, target))
+                return true;
+        }
+        return {};
     }
 }

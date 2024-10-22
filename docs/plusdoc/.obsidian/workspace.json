@@ -4,15 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "c602af816284de9b",
+        "id": "91f618a61200e7f6",
         "type": "tabs",
         "children": [
           {
-            "id": "061ff79872a3cd49",
+            "id": "4a71c216aec3c52a",
             "type": "leaf",
             "state": {
               "type": "empty",
-              "state": {}
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -35,7 +37,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
             }
           },
           {
@@ -50,7 +54,9 @@
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical"
-              }
+              },
+              "icon": "lucide-search",
+              "title": "Search"
             }
           },
           {
@@ -58,14 +64,16 @@
             "type": "leaf",
             "state": {
               "type": "bookmarks",
-              "state": {}
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 262.5
   },
   "right": {
     "id": "564dc8bddf05f7f6",
@@ -81,7 +89,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Filesystem/NCA/Unpacked.md",
+                "file": "System and firmware support.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -89,7 +97,9 @@
                 "searchQuery": "",
                 "backlinkCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for System and firmware support"
             }
           },
           {
@@ -98,10 +108,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Filesystem/NCA/Unpacked.md",
+                "file": "System and firmware support.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
-              }
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from System and firmware support"
             }
           },
           {
@@ -112,7 +124,9 @@
               "state": {
                 "sortOrder": "frequency",
                 "useHierarchy": true
-              }
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
             }
           },
           {
@@ -121,8 +135,10 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Filesystem/NCA/Unpacked.md"
-              }
+                "file": "System and firmware support.md"
+              },
+              "icon": "lucide-list",
+              "title": "Outline of System and firmware support"
             }
           }
         ]
@@ -142,8 +158,9 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "4906b8d1eec6eccd",
+  "active": "4a71c216aec3c52a",
   "lastOpenFiles": [
+    "System and firmware support.md",
     "Used libraries.md",
     "Filesystem/NCA/Unpacked.md",
     "Filesystem/About",

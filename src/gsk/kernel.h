@@ -22,7 +22,7 @@ namespace Plusnx::Gsk {
             std::atomic<u64> pid;
         } seed;
 
-        std::array<Cpu::CoreContainer, Cpu::totalCoresCount> cpuCores;
+        std::array<Cpu::CoreContainer, Cpu::TotalCoresCount> cpuCores;
     };
 
     class KBaseType {

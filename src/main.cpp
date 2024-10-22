@@ -26,6 +26,7 @@ i32 main() {
 
     const auto app{std::make_unique<Core::Application>()};
     app->Initialize(support);
+    app->LoadAGameByIndex();
 
     SDL_Quit();
 }

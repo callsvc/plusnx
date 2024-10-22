@@ -1,9 +1,51 @@
 #pragma once
 
+#include <vector>
+
 #include <sys_fs/fs_types.h>
+#include <types.h>
+#include <unordered_map>
+
 namespace Plusnx::SysFs::Nx {
-    class PartitionFilesystem final : RoDirectoryBacking {
+#pragma pack(push, 1)
+    struct FileEntry {
+        u64 offset;
+        u64 size;
+        u32 nameOffset;
+    };
+    struct ContentEntry : FileEntry {
+        u32 pad0;
+    };
+    struct HashableContentEntry : FileEntry {
+        u32 regionSize;
+        u64 zeroed;
+        std::array<u8, 0x20> hash;
+    };
+#pragma pack(pop)
+
+    class PartitionFilesystem final : public RoDirectoryBacking {
     public:
+        PartitionFilesystem(const FileBackingPtr& pfs);
         std::vector<SysPath> ListAllFiles() const override;
+        FileBackingPtr OpenFile(const SysPath &path) override;
+
+        struct SuperBlock {
+            u32 magic;
+            u32 entries;
+            u32 strTableSize;
+            u32 pad0;
+        };
+
+    private:
+        std::pmr::unordered_map<SysPath, FileEntry> entries;
+        SuperBlock pfsSuper;
+    };
+
+    class StringTable {
+    public:
+        explicit StringTable(u32 offset, u32 size, const FileBackingPtr& pfs);
+        std::string ReadString(u32 offset) const;
+    private:
+        std::vector<char> table;
     };
 }

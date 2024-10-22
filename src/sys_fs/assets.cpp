@@ -19,6 +19,6 @@ namespace Plusnx::SysFs {
     }
 
     void Assets::CheckDir(const SysPath& path) const {
-        provider->RegisterSystemPath(path);
+        provider->RegisterSystemPath(RootId, path);
     }
 }

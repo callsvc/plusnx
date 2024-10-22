@@ -19,6 +19,8 @@ target_sources(plusnx PRIVATE
     sys_fs/fs_types.h
     sys_fs/fsys/rigid_directory.cpp
     sys_fs/fsys/rigid_directory.h
+    sys_fs/fsys/regular_file.cpp
+    sys_fs/fsys/regular_file.h
     sys_fs/nx/partition_filesystem.cpp
     sys_fs/nx/partition_filesystem.h
     nogui/sdl_vulkan_backing.cpp
@@ -38,6 +40,14 @@ target_sources(plusnx PRIVATE
     gsk/types/kthread.h
     gsk/kernel.cpp
     gsk/kernel.h
+    loader/app_loader.cpp
+    loader/app_loader.h
+    loader/eshop_title.cpp
+    loader/eshop_title.h
+    loader/cartridge.cpp
+    loader/cartridge.h
+    os/nx_sys.cpp
+    os/nx_sys.h
     main.cpp
     driver.cpp
     container.h
