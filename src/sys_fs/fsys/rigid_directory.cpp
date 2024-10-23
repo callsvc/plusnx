@@ -2,7 +2,7 @@
 #include <sys_fs/fsys/rigid_directory.h>
 #include <sys_fs/fsys/regular_file.h>
 namespace Plusnx::SysFs::Fsys {
-    FileBackingPtr RigidDirectory::OpenFile(const SysPath& path) {
+    FileBackingPtr RigidDirectory::OpenFile(const SysPath& path) const {
         if (!ContainsValue(ListAllFiles(), path))
             return {};
         return std::make_shared<FSys::RegularFile>(path);

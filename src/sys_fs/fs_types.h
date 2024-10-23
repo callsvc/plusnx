@@ -20,6 +20,12 @@ namespace Plusnx::SysFs {
         void Read(T& object) {
             ReadImpl(reinterpret_cast<void*>(&object), sizeof(object));
         }
+        template <typename T> requires (std::is_trivial_v<T>)
+        T Read(const u32 offset = 0) {
+            T object;
+            ReadImpl(reinterpret_cast<void*>(&object), sizeof(object), offset);
+            return object;
+        }
         template <typename T> requires (sizeof(T) == 1)
         std::vector<T> GetBytes(const u64 requested, const u64 offset = 0) {
             if (requested > GetSize())
@@ -48,7 +54,7 @@ namespace Plusnx::SysFs {
             return path;
         }
 
-        virtual FileBackingPtr OpenFile(const SysPath& path) = 0;
+        virtual FileBackingPtr OpenFile(const SysPath& path) const = 0;
         virtual std::vector<SysPath> ListAllFiles() const = 0;
         SysPath path;
     };

@@ -2,10 +2,9 @@
 
 namespace Plusnx::Loader {
     bool AppLoader::CheckHeader(const SysFs::FileBackingPtr& file) const {
-        auto magic{upperMagic};
-        file->Read(magic);
+        const auto magic{file->Read<u32>()};
         const auto result = [&] -> bool {
-            if (file->GetSize() < 1024 * 1024 * 1) {
+            if (file->GetSize() < MinimumAppSize) {
                 return {};
             }
             return magic == upperMagic;

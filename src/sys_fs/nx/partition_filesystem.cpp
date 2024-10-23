@@ -3,23 +3,22 @@
 
 namespace Plusnx::SysFs::Nx {
     PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) {
-        pfs->Read(pfsSuper);
-        bool shaFs{};
-        if (pfsSuper.magic == ConstMagic<u32>("HFS0"))
-            shaFs = true;
+        const auto super{pfs->Read<SuperBlock>()};
+        if (super.magic == ConstMagic<u32>("HFS0"))
+            hashable = true;
 
-        const auto entrySize{shaFs ? sizeof(HashableContentEntry) : sizeof(ContentEntry)};
-        const auto totalSize{entrySize * pfsSuper.entries};
-        const StringTable strings(totalSize + sizeof(pfsSuper), pfsSuper.strTableSize, pfs);
+        entrySize = hashable ? sizeof(HashableContentEntry) : sizeof(ContentEntry);
+        const auto totalSize{entrySize * super.entries};
+        const StringTable strings(totalSize + sizeof(super), super.strTableSize, pfs);
 
-        const auto content{pfs->GetBytes<u8>(totalSize, sizeof(pfsSuper))};
+        content = pfs->GetBytes<u8>(totalSize, sizeof(super));
         FileEntry header{};
-        for (u32 index{}; index < pfsSuper.entries; index++) {
+        for (u32 index{}; index < super.entries; index++) {
             assert(content.size() - entrySize * index >= sizeof(header));
             std::memcpy(&header, &content[entrySize * index], sizeof(header));
 
             SysPath filename(strings.ReadString(header.nameOffset));
-            entries.emplace(filename, header);
+            entries.emplace(std::move(filename), header);
         }
 
         u64 total{};
@@ -36,7 +35,7 @@ namespace Plusnx::SysFs::Nx {
         }
         return content;
     }
-    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) {
+    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) const {
         if (!entries.contains(path))
             return {};
         return {};

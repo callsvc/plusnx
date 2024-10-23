@@ -20,7 +20,6 @@ namespace Plusnx::Core {
 
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;
-        std::shared_ptr<Gsk::Types::KProcess> kproc;
 
         std::shared_ptr<Os::NxSys> nos;
 

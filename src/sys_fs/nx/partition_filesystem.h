@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include <sys_fs/fs_types.h>
 #include <types.h>
-#include <unordered_map>
-
 namespace Plusnx::SysFs::Nx {
 #pragma pack(push, 1)
     struct FileEntry {
@@ -27,7 +26,7 @@ namespace Plusnx::SysFs::Nx {
     public:
         PartitionFilesystem(const FileBackingPtr& pfs);
         std::vector<SysPath> ListAllFiles() const override;
-        FileBackingPtr OpenFile(const SysPath &path) override;
+        FileBackingPtr OpenFile(const SysPath &path) const override;
 
         struct SuperBlock {
             u32 magic;
@@ -37,8 +36,11 @@ namespace Plusnx::SysFs::Nx {
         };
 
     private:
-        std::pmr::unordered_map<SysPath, FileEntry> entries;
-        SuperBlock pfsSuper;
+        std::unordered_map<SysPath, FileEntry> entries;
+        bool hashable{};
+        u64 entrySize;
+
+        std::vector<u8> content;
     };
 
     class StringTable {

@@ -12,10 +12,10 @@ namespace Plusnx::SysFs {
         [[nodiscard]] SysPath GetRoot() const;
 
         void RegisterSystemPath(const std::string& card, const SysPath& directory);
-        RegularFilePtr OpenSystemFile(const std::string& card, const SysPath& fullpath);
+        FileBackingPtr OpenSystemFile(const std::string& card, const SysPath& fullpath);
 
         std::unordered_map<std::string, std::vector<SysPath>> dirs;
-        std::vector<RegularFilePtr> cachedFiles;
+        std::vector<FileBackingPtr> cachedFiles;
     private:
         u64 opened{};
         u64 fileMax{};

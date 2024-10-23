@@ -4,6 +4,6 @@
 namespace Plusnx::Loader {
     class Cartridge final : public AppLoader {
     public:
-        Cartridge(const SysFs::RegularFilePtr& xci);
+        Cartridge(const SysFs::FileBackingPtr& xci);
     };
 }

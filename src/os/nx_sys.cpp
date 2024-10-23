@@ -16,7 +16,7 @@ namespace Plusnx::Os {
         assert(std::filesystem::exists(path));
         std::error_code err;
 
-        backing = [&] {
+        backing = [&] -> SysFs::FileBackingPtr {
             if (context->IsFromSystemPath(path)) {
                 const auto target{absolute(path, err)};
                 if (!err.value())
@@ -37,5 +37,9 @@ namespace Plusnx::Os {
                 application = std::make_shared<Loader::EShopTitle>(backing);
             default: {}
         }
+
+#if 1
+        application->Load(context);
+#endif
     }
 }

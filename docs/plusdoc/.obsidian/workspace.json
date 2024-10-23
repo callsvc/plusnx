@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "91f618a61200e7f6",
+        "id": "b850bc8981fd49a1",
         "type": "tabs",
         "children": [
           {
-            "id": "4a71c216aec3c52a",
+            "id": "8ef5f8648a12a329",
             "type": "leaf",
             "state": {
               "type": "empty",
@@ -158,9 +158,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "4a71c216aec3c52a",
+  "active": "8ef5f8648a12a329",
   "lastOpenFiles": [
-    "System and firmware support.md",
+    "Environment/How to compile homebrew software.md",
+    "Environment",
+    "System version support.md",
     "Used libraries.md",
     "Filesystem/NCA/Unpacked.md",
     "Filesystem/About",

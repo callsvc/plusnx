@@ -2,6 +2,7 @@
 #include <thread>
 
 #include <types.h>
+#include <cpu/unit_types.h>
 namespace Plusnx::Cpu {
     class CoreContainer {
     public:

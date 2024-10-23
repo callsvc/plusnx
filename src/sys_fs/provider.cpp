@@ -32,8 +32,8 @@ namespace Plusnx::SysFs {
         paths.emplace_back(directory);
     }
 
-    RegularFilePtr Provider::OpenSystemFile(const std::string& card, const SysPath& fullpath) {
-        for (std::weak_ptr<FSys::RegularFile> file : cachedFiles) {
+    FileBackingPtr Provider::OpenSystemFile(const std::string& card, const SysPath& fullpath) {
+        for (std::weak_ptr file : cachedFiles) {
             if (auto aliveFile = file.lock())
                 if (aliveFile->path == fullpath)
                     return aliveFile;
@@ -43,11 +43,8 @@ namespace Plusnx::SysFs {
         for (const auto& directory : dirs[card]) {
             const Fsys::RigidDirectory dir(directory);
 
-            for (const auto& entry : dir.ListAllFiles()) {
-                if (entry != fullpath)
-                    continue;
-
-                cachedFiles.emplace_back(std::make_shared<FSys::RegularFile>(fullpath));
+            if (auto file{dir.OpenFile(fullpath)}; file != nullptr) {
+                cachedFiles.emplace_back(file);
                 return cachedFiles.back();
             }
         }

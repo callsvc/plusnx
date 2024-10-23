@@ -14,7 +14,7 @@ namespace Plusnx::Os {
         NxSys(const std::shared_ptr<Core::Context>& ctx) : context(ctx) {}
 
         void LoadApplicationFile(const SysFs::SysPath& path);
-        SysFs::RegularFilePtr backing;
+        SysFs::FileBackingPtr backing;
 
         std::shared_ptr<Loader::AppLoader> application;
     private:

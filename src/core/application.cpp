@@ -12,7 +12,6 @@ namespace Plusnx::Core {
 
         assets = std::make_shared<SysFs::Assets>(context);
         kernel = std::make_shared<Gsk::Kernel>();
-        kproc = std::make_shared<Gsk::Types::KProcess>(*kernel);
 
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();
@@ -22,11 +21,12 @@ namespace Plusnx::Core {
         context->gpu->InitGraphics(support);
 
         context->process = [&] {
-            if (const auto process = context->process.lock())
-                process->Destroy();
+            if (const auto last = context->process.lock())
+                last->Destroy();
 
-            kproc->Initialize();
-            return kproc;
+            auto process{kernel->CreateNewProcess()};
+            process->Initialize();
+            return process;
         }();
         nos = std::make_shared<Os::NxSys>(context);
     }
