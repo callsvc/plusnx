@@ -3,7 +3,9 @@
 
 namespace Plusnx::SysFs::Nx {
     PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) {
-        const auto super{pfs->Read<SuperBlock>()};
+        if (pfs->Read(super) != sizeof(super)) {
+            return;
+        }
         if (super.magic == ConstMagic<u32>("HFS0"))
             hashable = true;
 

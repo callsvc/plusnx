@@ -4,7 +4,7 @@ namespace Plusnx::Loader {
         AppLoader(AppType::Nsp, ConstMagic<u32>("PFS0")),
         pfs(std::make_unique<SysFs::Nx::PartitionFilesystem>(nsp)) {
 
-        if (!CheckHeader(nsp))
+        if (!CheckHeader(nsp) || status != LoaderStatus::None)
             return;
     }
 

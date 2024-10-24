@@ -5,23 +5,44 @@
 #include <core/context.h>
 
 namespace Plusnx::Loader {
-    constexpr auto MinimumAppSize{1024 * 1024 * 1};
+    constexpr auto MinimumAppSize{1024 * 256};
     enum class AppType {
         Invalid,
         Nsp,
-        Xci
+        Xci,
+        Nro
+    };
+
+    enum class SectionType {
+        Text,
+        Ro,
+        Data,
+        Bss
+    };
+
+    enum class LoaderStatus {
+        None,
+        InvalidMagicValue
     };
 
     class AppLoader {
     public:
         virtual ~AppLoader() = default;
 
-        AppLoader(const AppType app, const u32 magic = 0) : type(app), upperMagic(magic) {}
+        AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
         virtual void Load(std::shared_ptr<Core::Context>& process) {}
 
         AppType type;
-        u32 upperMagic;
+        u32 validMagic;
+        LoaderStatus status{};
+
+        std::span<u8> text;
+        std::span<u8> data;
+        std::span<u8> ro;
+
     protected:
-        bool CheckHeader(const SysFs::FileBackingPtr& file) const;
+        bool CheckHeader(const SysFs::FileBackingPtr& file);
+        void DisplaySection(SectionType type) const;
+        static void DisplayRomFsContent(const SysFs::FileBackingPtr& romFs);
     };
 }

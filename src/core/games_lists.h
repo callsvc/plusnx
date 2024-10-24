@@ -8,7 +8,7 @@ namespace Plusnx::Core {
             lists.emplace_back(dir);
         }
         std::vector<SysFs::SysPath> GetAllGames() const;
-        std::optional<SysFs::SysPath> SortAGame() const;
+        std::optional<SysFs::SysPath> SortAGame(const std::vector<std::string>& sorting) const;
 
         std::optional<SysFs::SysPath> first;
         u64 count{};

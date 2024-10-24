@@ -23,6 +23,8 @@ target_sources(plusnx PRIVATE
     sys_fs/fsys/regular_file.h
     sys_fs/nx/partition_filesystem.cpp
     sys_fs/nx/partition_filesystem.h
+    sys_fs/bounded.cpp
+    sys_fs/bounded.h
     nogui/sdl_vulkan_backing.cpp
     nogui/sdl_vulkan_backing.h
     core/application.cpp
@@ -46,6 +48,8 @@ target_sources(plusnx PRIVATE
     loader/eshop_title.h
     loader/cartridge.cpp
     loader/cartridge.h
+    loader/nx_executable.cpp
+    loader/nx_executable.h
     os/nx_sys.cpp
     os/nx_sys.h
     main.cpp

@@ -11,7 +11,7 @@ namespace Plusnx::SysFs::FSys {
 
         u64 GetSize() const override;
     private:
-        void ReadImpl(void* output, u64 size, u64 offset) override;
+        u64 ReadImpl(void* output, u64 size, u64 offset) override;
 
         i32 descriptor{};
     };

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstring>
+#include <span>
 #include <vector>
 
 namespace Plusnx {
@@ -14,5 +15,10 @@ namespace Plusnx {
         T value;
         std::memcpy(&value, string.data(), sizeof(value));
         return value;
+    }
+
+    template <typename T>
+    auto StringViewBuilder(const std::span<T>& string) {
+        return std::string_view(reinterpret_cast<const char*>(string.data()), string.size());
     }
 }

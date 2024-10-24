@@ -31,7 +31,7 @@ namespace Plusnx::SysFs::FSys {
         return details.st_size;
     }
 
-    void RegularFile::ReadImpl(void* output, const u64 size, const u64 offset) {
+    u64 RegularFile::ReadImpl(void* output, const u64 size, const u64 offset) {
         u64 falling{offset};
         u64 copied{};
 #if defined(_NDEBUG)
@@ -42,7 +42,7 @@ namespace Plusnx::SysFs::FSys {
         while (copied < size) {
             const u64 stride{size - copied > 4096 ? 4096 : size - copied};
             if (!stride || copied + stride > GetSize() - offset) {
-                return;
+                return stride;
             }
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};
@@ -51,6 +51,6 @@ namespace Plusnx::SysFs::FSys {
             copied += result;
             falling += result;
         }
-
+        return copied;
     }
 }
