@@ -55,6 +55,8 @@ target_sources(plusnx PRIVATE
     loader/nx_executable.h
     os/nx_sys.cpp
     os/nx_sys.h
+    os/process_creator.cpp
+    os/process_creator.h
     main.cpp
     driver.cpp
     container.h

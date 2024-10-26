@@ -31,33 +31,30 @@ namespace Plusnx::SysFs::Nx {
             if (entry.firstFileOffset != RomFsEmptyEntry)
                 VisitFiles(romfs, path, header.fileMetaOffset + entry.firstFileOffset);
         };
-        bool process{};
+        DirectoryEntryMeta entry{};
         do {
-            const auto entry{romfs->Read<DirectoryEntryMeta>(offset)};
+            romfs->Read(entry, offset);
+
             PopulateSubdirectory(entry);
             if (path.has_parent_path())
                 path = path.parent_path();
 
-            if ((process = entry.nextDirSiblingOffset != RomFsEmptyEntry))
-                offset += entry.nextDirSiblingOffset - sizeof(entry);
-            if (process)
-                assert(offset < header.dirMetaOffset + header.dirMetaSize);
-        } while (process);
+            offset += entry.nextDirSiblingOffset - sizeof(entry);
+        } while (entry.nextDirSiblingOffset != RomFsEmptyEntry);
     }
 
     void ReadOnlyFilesystem::VisitFiles(const FileBackingPtr& romfs, SysPath& path, u64 offset) {
-        bool process{};
+        FileEntryMeta file{};
         do {
-            const auto file{romfs->Read<FileEntryMeta>(offset)};
+            romfs->Read(file, offset);
             AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
 
             AddFile(path, std::make_shared<FileBounded>(romfs, path, header.fileDataOffset + file.dataOffset, file.size));
             path = path.parent_path();
 
-            if ((process = file.nextFileSiblingOffset != RomFsEmptyEntry))
-                offset += file.nextFileSiblingOffset;
+            offset += file.nextFileSiblingOffset - sizeof(file);
 
-        } while (process);
+        } while (file.nextFileSiblingOffset != RomFsEmptyEntry);
     }
 
     FileBackingPtr ReadOnlyFilesystem::OpenFile(const SysPath& path) {
@@ -70,8 +67,8 @@ namespace Plusnx::SysFs::Nx {
             }
             return result != nullptr;
         };
-        SysPath iterator{};
-        FileSystemTraverser(filesystem->second, iterator, path.parent_path(), OpenFileWithin);
+
+        WalkDirectories(filesystem->second, {}, path.parent_path(), OpenFileWithin);
         return result;
     }
     std::vector<SysPath> ReadOnlyFilesystem::ListAllFiles() const {
@@ -89,6 +86,18 @@ namespace Plusnx::SysFs::Nx {
         return files;
     }
 
+    void ReadOnlyFilesystem::EmplaceContent(const SysPath& path, const std::string& error, BaseDirCallback&& callback) {
+        bool result{};
+        WalkDirectories(filesystem->second, {}, path, [&](Directory& target, const SysPath& directory) {
+            if (directory == path.parent_path())
+                result = callback(target, directory);
+            return result;
+        });
+
+        if (!result)
+            throw std::runtime_error(error);
+    }
+
     void ReadOnlyFilesystem::AddDirectory(const SysPath& path) {
         if (!filesystem) {
             filesystem.emplace(".", [&] {
@@ -97,30 +106,16 @@ namespace Plusnx::SysFs::Nx {
                 return placeholder;
             }());
         }
-        bool result{};
-        SysPath iterator{};
-
-        FileSystemTraverser(filesystem->second, iterator, path, [&](Directory& target, const SysPath& directory) {
-            if ((result = directory == path.parent_path()))
-                target.subdirs.emplace(path.filename(), Directory{});
-            return result;
+        EmplaceContent(path, "Nonexistent subdirectory, unable to create the new directory", [&](Directory& target, [[maybe_unused]] const SysPath& directory) {
+            target.subdirs.emplace(path.filename(), Directory{});
+            return true;
         });
-
-        if (!result)
-            throw std::runtime_error("Nonexistent subdirectory, unable to create the new directory");
     }
 
     void ReadOnlyFilesystem::AddFile(const SysPath& path, const FileBackingPtr& file) {
-        SysPath iterator{};
-        bool result{};
-
-        FileSystemTraverser(filesystem->second, iterator, path, [&](Directory& target, const SysPath& directory) {
-            if ((result = directory == path.parent_path()))
-                target.files.emplace(directory / path.filename(), file);
-            return result;
+        EmplaceContent(path, "Failed to add the file", [&](Directory& target, const SysPath& directory) {
+            target.files.emplace(directory / path.filename(), file);
+            return true;
         });
-
-        if (!result)
-            throw std::runtime_error("Failed to add the file");
     }
 }

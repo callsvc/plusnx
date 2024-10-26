@@ -3,10 +3,10 @@
 #include <sys_fs/fsys/regular_file.h>
 
 namespace Plusnx::SysFs {
-    bool FileSystem::FileSystemTraverser(Directory& directory, SysPath& iterator, const SysPath& target, BaseDirCallback&& callback) {
+    bool FileSystem::WalkDirectories(Directory& directory, SysPath& iterator, const SysPath& target, BaseDirCallback&& callback) {
         for (auto& [path, dir] : directory.subdirs) {
             iterator += path;
-            if (FileSystemTraverser(dir, iterator, target, std::move(callback)))
+            if (WalkDirectories(dir, iterator, target, std::move(callback)))
                 return true;
             if (callback(dir, iterator))
                 return true;

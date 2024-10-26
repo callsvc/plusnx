@@ -50,6 +50,7 @@ namespace Plusnx::SysFs::Nx {
     private:
         void AddDirectory(const SysPath& path);
         void AddFile(const SysPath& path, const FileBackingPtr& file);
+        void EmplaceContent(const SysPath& path, const std::string& error, BaseDirCallback&& callback);
 
         void VisitFiles(const FileBackingPtr& romfs, SysPath& path, u64 offset);
         void VisitSubdirectories(const FileBackingPtr& romfs, SysPath& path, u64 offset);

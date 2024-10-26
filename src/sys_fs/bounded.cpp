@@ -15,6 +15,6 @@ Plusnx::u64 Plusnx::SysFs::FileBounded::ReadImpl(void* output, const u64 size, c
     return result;
 }
 
-Plusnx::u64 Plusnx::SysFs::FileBounded::WriteImpl([[maybe_unused]] const void* output, [[maybe_unused]] u64 size, u64 offset) {
+Plusnx::u64 Plusnx::SysFs::FileBounded::WriteImpl([[maybe_unused]] const void* output, [[maybe_unused]] u64 size, [[maybe_unused]] u64 offset) {
     throw std::runtime_error("It is not possible to write data to virtual files");
 }
