@@ -6,6 +6,8 @@ namespace Plusnx::Loader {
 
         if (!CheckHeader(nsp) || status != LoaderStatus::None)
             return;
+
+        [[maybe_unused]] auto files{pfs->ListAllFiles()};
     }
 
     void EShopTitle::Load(std::shared_ptr<Core::Context>& process) {

@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include <optional>
 
 #include <sys_fs/fs_types.h>
@@ -39,8 +38,6 @@ namespace Plusnx::SysFs::Nx {
         u32 nameLength;
     };
 #pragma pack(pop)
-
-    using BaseDirCb = std::function<bool(Directory&, const SysPath& path)>;
 
     // https://github.com/switchbrew/switch-examples/tree/master/fs/romfs/romfs
     // https://www.3dbrew.org/wiki/RomFS

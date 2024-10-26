@@ -54,6 +54,7 @@ namespace Plusnx::Loader {
 
         std::span<u8> ReadSectionContent(const SysFs::FileBackingPtr& nro, SectionType type, u32 fileOffset);
         void Load(std::shared_ptr<Core::Context> &process) override;
+        SysFs::FileBackingPtr GetMainRomFs() override;
 
         std::optional<SysFs::FileBackingPtr> icon;
         std::optional<SysFs::FileBackingPtr> nacp;

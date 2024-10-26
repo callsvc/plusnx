@@ -2,6 +2,8 @@
 #include <loader/nx_executable.h>
 #include <core/context.h>
 
+#include <sys_fs/nx/readonly_filesystem.h>
+
 #include <os/nx_sys.h>
 namespace Plusnx::Os {
     Loader::AppType GetAppTypeByFilename(const SysFs::SysPath& filename) {
@@ -45,7 +47,11 @@ namespace Plusnx::Os {
             }
         }();
 #if 1
-        application->Load(context);
+        const auto romFs{application->GetMainRomFs()};
+        const auto tempDir{std::filesystem::temp_directory_path()};
+        if (romFs)
+            SysFs::Nx::ReadOnlyFilesystem(romFs).ExtractAllFiles(tempDir);
 #endif
+        application->Load(context);
     }
 }

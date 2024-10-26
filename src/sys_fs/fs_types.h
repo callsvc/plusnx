@@ -1,16 +1,21 @@
 #pragma once
 #include <filesystem>
+#include <functional>
 #include <map>
 
 #include <types.h>
 
 namespace Plusnx::SysFs {
     using SysPath = std::filesystem::path;
+    enum class FileMode {
+        Read,
+        Write,
+    };
 
     class FileBacking {
     public:
         FileBacking() = default;
-        FileBacking(const SysPath& file) : path(file) {}
+        FileBacking(const SysPath& file, const FileMode type) : path(file), mode(type) {}
         virtual ~FileBacking() = default;
 
         template <typename T> requires (std::is_trivial_v<T>)
@@ -27,7 +32,7 @@ namespace Plusnx::SysFs {
             return ReadImpl(output, size, offset);
         }
 
-        template <typename T> requires (sizeof(T) == 1)
+        template <typename T = char> requires (sizeof(T) == 1)
         std::vector<T> GetBytes(const u64 requested, const u64 offset = 0) {
             if (requested > GetSize())
                 return {};
@@ -36,10 +41,17 @@ namespace Plusnx::SysFs {
             return content;
         }
 
+        template <typename T = char> requires (sizeof(T) == 1)
+        u64 WriteBytes(const std::vector<T>& content, const u64 offset = 0) {
+            return WriteImpl(content.data(), content.size(), offset);
+        }
+
         SysPath path;
+        FileMode mode;
         virtual u64 GetSize() const = 0;
     protected:
         virtual u64 ReadImpl(void* output, u64 size, u64 offset = 0) = 0;
+        virtual u64 WriteImpl(const void* output, u64 size, u64 offset = 0) = 0;
     };
     using FileBackingPtr = std::shared_ptr<FileBacking>;
 
@@ -66,9 +78,14 @@ namespace Plusnx::SysFs {
         std::map<SysPath, Directory> subdirs;
     };
 
+    using BaseDirCallback = std::function<bool(Directory&, const SysPath& path)>;
+
     class FileSystem : public RoDirectoryBacking {
     public:
         FileSystem() = default;
-    };
 
+        virtual void ExtractAllFiles(const SysPath& output);
+    protected:
+        static bool FileSystemTraverser(Directory& directory, SysPath& iterator, const SysPath& target, BaseDirCallback&& callback);
+    };
 }

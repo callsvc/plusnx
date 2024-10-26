@@ -17,6 +17,7 @@ target_sources(plusnx PRIVATE
     sys_fs/assets.cpp
     sys_fs/assets.h
     sys_fs/fs_types.h
+    sys_fs/fs_types.cpp
     sys_fs/fsys/rigid_directory.cpp
     sys_fs/fsys/rigid_directory.h
     sys_fs/fsys/regular_file.cpp
@@ -57,6 +58,7 @@ target_sources(plusnx PRIVATE
     main.cpp
     driver.cpp
     container.h
+    types.cpp
     types.h
 )
 

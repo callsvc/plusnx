@@ -3,20 +3,7 @@
 
 #include <sys_fs/bounded.h>
 #include <sys_fs/nx/readonly_filesystem.h>
-
 namespace Plusnx::SysFs::Nx {
-    std::function<bool(Directory&, SysPath&, const SysPath&, BaseDirCb&&)> FileSystemTraverser = [](auto& directory, auto& walker, const auto& target, auto&& callback) {
-        for (auto& [dirName, dir] : directory.subdirs) {
-            walker += dirName;
-            if (FileSystemTraverser(dir, walker, target, std::move(callback)))
-                return true;
-            if (callback(dir, walker))
-                return true;
-            walker = walker.parent_path();
-        }
-        return callback(directory, walker);
-    };
-
     ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) {
         if (romfs->Read(header) != sizeof(RomFsHeader))
             return;
@@ -83,8 +70,8 @@ namespace Plusnx::SysFs::Nx {
             }
             return result != nullptr;
         };
-        SysPath walker{};
-        FileSystemTraverser(filesystem->second, walker, path.parent_path(), OpenFileWithin);
+        SysPath iterator{};
+        FileSystemTraverser(filesystem->second, iterator, path.parent_path(), OpenFileWithin);
         return result;
     }
     std::vector<SysPath> ReadOnlyFilesystem::ListAllFiles() const {
@@ -104,16 +91,16 @@ namespace Plusnx::SysFs::Nx {
 
     void ReadOnlyFilesystem::AddDirectory(const SysPath& path) {
         if (!filesystem) {
-            filesystem.emplace("romfs:", [&] {
+            filesystem.emplace(".", [&] {
                 Directory placeholder{};
                 placeholder.subdirs.emplace("/", Directory{});
                 return placeholder;
             }());
         }
-        bool result;
-        SysPath walker{};
+        bool result{};
+        SysPath iterator{};
 
-        FileSystemTraverser(filesystem->second, walker, path, [&](Directory& target, const SysPath& directory) {
+        FileSystemTraverser(filesystem->second, iterator, path, [&](Directory& target, const SysPath& directory) {
             if ((result = directory == path.parent_path()))
                 target.subdirs.emplace(path.filename(), Directory{});
             return result;
@@ -124,10 +111,10 @@ namespace Plusnx::SysFs::Nx {
     }
 
     void ReadOnlyFilesystem::AddFile(const SysPath& path, const FileBackingPtr& file) {
-        SysPath walker{};
-        bool result;
+        SysPath iterator{};
+        bool result{};
 
-        FileSystemTraverser(filesystem->second, walker, path, [&](Directory& target, const SysPath& directory) {
+        FileSystemTraverser(filesystem->second, iterator, path, [&](Directory& target, const SysPath& directory) {
             if ((result = directory == path.parent_path()))
                 target.files.emplace(directory / path.filename(), file);
             return result;

@@ -31,6 +31,7 @@ namespace Plusnx::Loader {
 
         AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
         virtual void Load(std::shared_ptr<Core::Context>& process) {}
+        virtual SysFs::FileBackingPtr GetMainRomFs() { return {}; }
 
         AppType type;
         u32 validMagic;

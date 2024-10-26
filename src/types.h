@@ -7,6 +7,7 @@
 namespace Plusnx {
     bool IsWaylandPresent();
     std::string GetSdlVersion();
+    std::string GetOsErrorString();
 
     using u64 = std::uint64_t;
 

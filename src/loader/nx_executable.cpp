@@ -78,4 +78,10 @@ namespace Plusnx::Loader {
     }
 
     void NxExecutable::Load(std::shared_ptr<Core::Context>& process) {}
+
+    SysFs::FileBackingPtr NxExecutable::GetMainRomFs() {
+        if (romfs)
+            return romfs.value();
+        return {};
+    }
 }

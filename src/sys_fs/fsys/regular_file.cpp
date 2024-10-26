@@ -9,12 +9,23 @@
 namespace Plusnx::SysFs::FSys {
     using Stat64 = struct stat64;
 
-    RegularFile::RegularFile(const SysPath& path) : FileBacking(path) {
-        if (!exists(path))
-            if (auto stream{std::fstream(path, std::ios::in | std::ios::out)})
-                stream.close();
+    RegularFile::RegularFile(const SysPath& path, const FileMode mode) : FileBacking(path, mode) {
+        if (!exists(path)) {
+            create_directories(path.parent_path());
+            if (auto stream{std::fstream(path, std::ios::out | std::ios::trunc)}) {
+                if (stream.is_open())
+                    stream.close();
+            }
+        }
+        auto parameter = [&] {
+            if (mode == FileMode::Read)
+                return O_RDONLY;
+            if (mode == FileMode::Write)
+                return O_RDWR;
 
-        descriptor = open(path.c_str(), O_RDONLY);
+            throw std::runtime_error("Invalid file mode");
+        }();
+        descriptor = open(path.c_str(), parameter);
         if (descriptor < 2)
             std::exchange(descriptor, 0);
     }
@@ -52,5 +63,12 @@ namespace Plusnx::SysFs::FSys {
             falling += result;
         }
         return copied;
+    }
+
+    u64 RegularFile::WriteImpl(const void* output, const u64 size, const u64 offset) {
+        if (fallocate64(descriptor, 0, offset, size) != 0)
+            if (errno)
+                throw std::runtime_error(GetOsErrorString());
+        return pwrite64(descriptor, output, size, offset);
     }
 }
