@@ -46,7 +46,7 @@ namespace Plusnx::Loader {
                 const auto offset{header.size + section.offset};
                 if (index == 0)
                     assert(section.offset == sizeof(AssetHeader));
-                return std::make_shared<SysFs::FileBounded>(nro, offset, section.size);
+                return std::make_shared<SysFs::FileBounded>(nro, "", offset, section.size);
             }();
             const auto content = [&] {
                 if (!index)

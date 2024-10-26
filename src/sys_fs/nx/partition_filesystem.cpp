@@ -37,7 +37,7 @@ namespace Plusnx::SysFs::Nx {
         }
         return content;
     }
-    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) const {
+    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) {
         if (!entries.contains(path))
             return {};
         return {};

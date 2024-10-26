@@ -1,7 +1,8 @@
 
 
 #include <sys_fs/bounded.h>
-Plusnx::SysFs::FileBounded::FileBounded(const FileBackingPtr& backing, const u64 base, const u64 bound) : parent(backing), starts(base), ends(bound) {}
+Plusnx::SysFs::FileBounded::FileBounded(const FileBackingPtr& backing, const SysPath& name, const u64 base, const u64 bound) :
+    FileBacking(name), parent(backing), starts(base), ends(bound) {}
 Plusnx::u64 Plusnx::SysFs::FileBounded::GetSize() const {
     assert(parent->GetSize() >= ends);
     return ends;

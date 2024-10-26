@@ -1,6 +1,7 @@
 #include <print>
-#include <loader/app_loader.h>
 
+#include <sys_fs/nx/readonly_filesystem.h>
+#include <loader/app_loader.h>
 #include <loader/nx_executable.h>
 namespace Plusnx::Loader {
     bool AppLoader::CheckHeader(const SysFs::FileBackingPtr& file) {
@@ -40,6 +41,9 @@ namespace Plusnx::Loader {
     }
 
     void AppLoader::DisplayRomFsContent(const SysFs::FileBackingPtr& romFs) {
-        auto content(romFs->GetBytes<u8>(romFs->GetSize()));
+        const SysFs::Nx::ReadOnlyFilesystem readOnly(romFs);
+        for (const auto& filename : readOnly.ListAllFiles()) {
+            std::print("File name from this RomFS: {}\n", filename.string());
+        }
     }
 }

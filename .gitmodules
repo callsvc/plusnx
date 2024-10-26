@@ -1,3 +1,6 @@
 [submodule "externals/Vulkan-Headers"]
 	path = externals/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "externals/boost"]
+	path = externals/boost
+	url = https://github.com/callsvc/boost.git

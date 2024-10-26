@@ -41,7 +41,7 @@ namespace Plusnx::SysFs {
         if (!dirs.contains(card))
             return {};
         for (const auto& directory : dirs[card]) {
-            const Fsys::RigidDirectory dir(directory);
+            Fsys::RigidDirectory dir(directory);
 
             if (auto file{dir.OpenFile(fullpath)}; file != nullptr) {
                 cachedFiles.emplace_back(file);

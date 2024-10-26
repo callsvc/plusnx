@@ -23,6 +23,8 @@ target_sources(plusnx PRIVATE
     sys_fs/fsys/regular_file.h
     sys_fs/nx/partition_filesystem.cpp
     sys_fs/nx/partition_filesystem.h
+    sys_fs/nx/readonly_filesystem.cpp
+    sys_fs/nx/readonly_filesystem.h
     sys_fs/bounded.cpp
     sys_fs/bounded.h
     nogui/sdl_vulkan_backing.cpp
@@ -58,4 +60,4 @@ target_sources(plusnx PRIVATE
     types.h
 )
 
-target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2)
+target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align)

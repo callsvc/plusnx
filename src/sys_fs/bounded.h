@@ -4,7 +4,7 @@
 namespace Plusnx::SysFs {
     class FileBounded final : public FileBacking {
     public:
-        FileBounded(const FileBackingPtr& backing, u64 base, u64 bound);
+        FileBounded(const FileBackingPtr& backing, const SysPath&, u64 base, u64 bound);
 
         u64 GetSize() const override;
     private:

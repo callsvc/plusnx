@@ -7,3 +7,4 @@ if(NOT TARGET Vulkan::Headers)
 	add_subdirectory(Vulkan-Headers)
 endif()
 
+add_subdirectory(boost)

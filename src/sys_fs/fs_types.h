@@ -1,6 +1,6 @@
 #pragma once
 #include <filesystem>
-#include <vector>
+#include <map>
 
 #include <types.h>
 
@@ -54,9 +54,21 @@ namespace Plusnx::SysFs {
             return path;
         }
 
-        virtual FileBackingPtr OpenFile(const SysPath& path) const = 0;
+        virtual FileBackingPtr OpenFile(const SysPath& path) = 0;
         virtual std::vector<SysPath> ListAllFiles() const = 0;
         SysPath path;
+    };
+
+    using FileLists = std::map<SysPath, FileBackingPtr>;
+
+    struct Directory {
+        FileLists files;
+        std::map<SysPath, Directory> subdirs;
+    };
+
+    class FileSystem : public RoDirectoryBacking {
+    public:
+        FileSystem() = default;
     };
 
 }
