@@ -39,7 +39,7 @@ namespace Plusnx::SysFs::Nx {
         std::unordered_map<SysPath, FileEntry> entries;
         bool hashable{};
         u64 entrySize;
-        SuperBlock super;
+        SuperBlock superBlock;
 
         std::vector<u8> content;
     };

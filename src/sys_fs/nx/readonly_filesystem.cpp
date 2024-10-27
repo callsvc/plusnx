@@ -5,12 +5,12 @@
 #include <sys_fs/nx/readonly_filesystem.h>
 namespace Plusnx::SysFs::Nx {
     ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) {
-        if (romfs->Read(header) != sizeof(RomFsHeader))
+        if (romfs->Read(content) != sizeof(RomFsHeader))
             return;
-        assert(sizeof(RomFsHeader) == header.size);
+        assert(sizeof(RomFsHeader) == content.size);
 
         SysPath root{"/"};
-        VisitSubdirectories(romfs, root, header.dirMetaOffset);
+        VisitSubdirectories(romfs, root, content.dirMetaOffset);
     }
 
     void AppendEntryName(const FileBackingPtr& romfs, SysPath& path, const u64 length, const u64 offset) {
@@ -29,7 +29,7 @@ namespace Plusnx::SysFs::Nx {
             }
 
             if (entry.firstFileOffset != RomFsEmptyEntry)
-                VisitFiles(romfs, path, header.fileMetaOffset + entry.firstFileOffset);
+                VisitFiles(romfs, path, content.fileMetaOffset + entry.firstFileOffset);
         };
         DirectoryEntryMeta entry{};
         do {
@@ -49,7 +49,7 @@ namespace Plusnx::SysFs::Nx {
             romfs->Read(file, offset);
             AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
 
-            AddFile(path, std::make_shared<FileBounded>(romfs, path, header.fileDataOffset + file.dataOffset, file.size));
+            AddFile(path, std::make_shared<FileBounded>(romfs, path, content.fileDataOffset + file.dataOffset, file.size));
             path = path.parent_path();
 
             offset += file.nextFileSiblingOffset - sizeof(file);
@@ -68,7 +68,7 @@ namespace Plusnx::SysFs::Nx {
             return result != nullptr;
         };
 
-        WalkDirectories(filesystem->second, {}, path.parent_path(), OpenFileWithin);
+        WalkDirectories(filesystem->second, path.parent_path(), OpenFileWithin);
         return result;
     }
     std::vector<SysPath> ReadOnlyFilesystem::ListAllFiles() const {
@@ -88,7 +88,7 @@ namespace Plusnx::SysFs::Nx {
 
     void ReadOnlyFilesystem::EmplaceContent(const SysPath& path, const std::string& error, BaseDirCallback&& callback) {
         bool result{};
-        WalkDirectories(filesystem->second, {}, path, [&](Directory& target, const SysPath& directory) {
+        WalkDirectories(filesystem->second, path, [&](Directory& target, const SysPath& directory) {
             if (directory == path.parent_path())
                 result = callback(target, directory);
             return result;

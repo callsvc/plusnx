@@ -55,7 +55,7 @@ namespace Plusnx::SysFs::Nx {
         void VisitFiles(const FileBackingPtr& romfs, SysPath& path, u64 offset);
         void VisitSubdirectories(const FileBackingPtr& romfs, SysPath& path, u64 offset);
 
-        RomFsHeader header;
+        RomFsHeader content;
 
         std::optional<std::pair<SysPath, Directory>> filesystem;
     };

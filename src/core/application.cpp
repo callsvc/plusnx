@@ -18,7 +18,7 @@ namespace Plusnx::Core {
     }
 
     void Application::Initialize(const Video::Vk::VkSupport& support) {
-        context->gpu->InitGraphics(support);
+        context->gpu->Initialize(support);
 
         context->process = [&] {
             if (const auto last = context->process.lock())

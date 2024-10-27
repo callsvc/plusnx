@@ -8,15 +8,15 @@ namespace Plusnx::Loader {
 
         u64 offset{},
             assets{};
-        if (offset = nro->Read(header); offset != sizeof(header))
+        if (offset = nro->Read(content); offset != sizeof(content))
             return;
         if (!CheckHeader(nro) || status != LoaderStatus::None)
             return;
 
-        assert(nro->GetSize() > header.size);
-        program.resize(header.size);
+        assert(nro->GetSize() > content.size);
+        program.resize(content.size);
 
-        nro->Read(assetHeader, header.size);
+        nro->Read(assetHeader, content.size);
         if (assetHeader.magic == ConstMagic<u32>("ASET")) {
             ReadAssets(nro);
             for (const auto& [_, size] : assetHeader.assets) {
@@ -28,7 +28,7 @@ namespace Plusnx::Loader {
             if (romfs)
                 DisplayRomFsContent(romfs.value());
         }
-        assert(assets + header.size == nro->GetSize());
+        assert(assets + content.size == nro->GetSize());
 
         text = ReadSectionContent(nro, SectionType::Text, offset);
         ro = ReadSectionContent(nro, SectionType::Ro, offset + text.size());
@@ -43,7 +43,7 @@ namespace Plusnx::Loader {
                 continue;
 
             auto assetFile = [&] {
-                const auto offset{header.size + section.offset};
+                const auto offset{content.size + section.offset};
                 if (index == 0)
                     assert(section.offset == sizeof(AssetHeader));
                 return std::make_shared<SysFs::FileBounded>(nro, "", offset, section.size);
@@ -52,7 +52,7 @@ namespace Plusnx::Loader {
                 if (!index)
                     return &icon;
                 if (index == 1)
-                    return &nacp;
+                    return &control;
                 return &romfs;
             }();
             content->emplace(assetFile);
@@ -62,11 +62,11 @@ namespace Plusnx::Loader {
     std::span<u8> NxExecutable::ReadSectionContent(const SysFs::FileBackingPtr& nro, const SectionType type, const u32 fileOffset) {
         const auto [offset, size] = [&] {
             if (type == SectionType::Text)
-                return header.text;
+                return content.text;
             if (type == SectionType::Ro)
-                return header.ro;
+                return content.ro;
             if (type == SectionType::Data)
-                return header.data;
+                return content.data;
             throw std::runtime_error("Invalid section type");
         }();
 
@@ -78,10 +78,4 @@ namespace Plusnx::Loader {
     }
 
     void NxExecutable::Load(std::shared_ptr<Core::Context>& process) {}
-
-    SysFs::FileBackingPtr NxExecutable::GetMainRomFs() {
-        if (romfs)
-            return romfs.value();
-        return {};
-    }
 }

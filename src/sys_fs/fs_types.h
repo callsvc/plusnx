@@ -87,8 +87,8 @@ namespace Plusnx::SysFs {
         virtual void ExtractAllFiles(const SysPath& output);
     protected:
         static bool WalkDirectories(Directory& directory, SysPath& iterator, const SysPath& target, BaseDirCallback&& callback);
-        static bool WalkDirectories(Directory& directory, const SysPath& iterator, const SysPath& target, BaseDirCallback&& callback) {
-            SysPath super{iterator};
+        static bool WalkDirectories(Directory& directory, const SysPath& target, BaseDirCallback&& callback) {
+            SysPath super{};
             return WalkDirectories(directory, super, target, std::move(callback));
         }
     };

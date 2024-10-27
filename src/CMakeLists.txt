@@ -57,6 +57,10 @@ target_sources(plusnx PRIVATE
     os/nx_sys.h
     os/process_creator.cpp
     os/process_creator.h
+    os/sdk/control_property.cpp
+    os/sdk/control_property.h
+    services/settings/languages.cpp
+    services/settings/languages.h
     main.cpp
     driver.cpp
     container.h

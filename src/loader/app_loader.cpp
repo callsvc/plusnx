@@ -40,9 +40,9 @@ namespace Plusnx::Loader {
         std::print("{}\n", ss.str());
     }
 
-    void AppLoader::DisplayRomFsContent(const SysFs::FileBackingPtr& romFs) {
-        const SysFs::Nx::ReadOnlyFilesystem readOnly(romFs);
-        for (const auto& filename : readOnly.ListAllFiles()) {
+    void AppLoader::DisplayRomFsContent(const SysFs::FileBackingPtr& content) {
+        const auto backing{std::make_unique<SysFs::Nx::ReadOnlyFilesystem>(content)};
+        for (const auto& filename : backing->ListAllFiles()) {
             std::print("File name from this RomFS: {}\n", filename.string());
         }
     }

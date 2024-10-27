@@ -8,8 +8,8 @@ namespace Plusnx::SysFs {
 
         u64 GetSize() const override;
     private:
-        u64 ReadImpl(void *output, u64 size, u64 offset) override;
-        u64 WriteImpl(const void *output, u64 size, u64 offset) override;
+        u64 ReadImpl(void* output, u64 size, u64 offset) override;
+        u64 WriteImpl(const void* output, u64 size, u64 offset) override;
 
         FileBackingPtr parent;
 

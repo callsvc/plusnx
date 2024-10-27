@@ -31,13 +31,14 @@ namespace Plusnx::Loader {
 
         AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
         virtual void Load(std::shared_ptr<Core::Context>& context) {}
-        virtual SysFs::FileBackingPtr GetMainRomFs() {
-            return {};
-        }
 
         AppType type;
         u32 validMagic;
         LoaderStatus status{};
+
+        std::optional<SysFs::FileBackingPtr> icon;
+        std::optional<SysFs::FileBackingPtr> control;
+        std::optional<SysFs::FileBackingPtr> romfs;
 
         std::span<u8> text;
         std::span<u8> data;
@@ -46,6 +47,6 @@ namespace Plusnx::Loader {
     protected:
         bool CheckHeader(const SysFs::FileBackingPtr& file);
         void DisplaySection(SectionType type) const;
-        static void DisplayRomFsContent(const SysFs::FileBackingPtr& romFs);
+        static void DisplayRomFsContent(const SysFs::FileBackingPtr& content);
     };
 }

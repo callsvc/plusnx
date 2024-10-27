@@ -3,7 +3,7 @@
 namespace Plusnx::Video {
     GPU::GPU() = default;
 
-    void GPU::InitGraphics(const Vk::VkSupport& support) {
+    void GPU::Initialize(const Vk::VkSupport& support) {
         std::vector<std::string_view> ext;
         ext.reserve(support.enableExt.size());
         for (const auto extension : support.enableExt) {

@@ -7,6 +7,8 @@
 #include <video/gpu.h>
 #include <audio/speaker.h>
 
+#include <services/settings/languages.h>
+
 // Kernel-related types
 #include <gsk/types/kprocess.h>
 namespace Plusnx::Os {
@@ -26,6 +28,9 @@ namespace Plusnx::Core {
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Video::GPU> gpu;
         std::shared_ptr<Audio::Speaker> speaker;
+
+        // User-selected language
+        Services::Settings::LanguageType language;
 
         std::weak_ptr<Os::NxSys> nxOs;
 
