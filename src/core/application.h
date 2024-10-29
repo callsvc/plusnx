@@ -4,7 +4,7 @@
 #include <sys_fs/assets.h>
 #include <video/vk/vulkan_types.h>
 
-#include <gsk/types/kprocess.h>
+#include <generic_kernel/types/kprocess.h>
 namespace Plusnx::Os {
     class NxSys;
 };
@@ -23,7 +23,7 @@ namespace Plusnx::Core {
 
         std::shared_ptr<Os::NxSys> nos;
 
-        std::shared_ptr<Gsk::Kernel> kernel;
+        std::shared_ptr<GenericKernel::Kernel> kernel;
     private:
         std::unique_ptr<GamesLists> games;
     };

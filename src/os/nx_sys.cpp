@@ -1,8 +1,11 @@
 #include <loader/eshop_title.h>
 #include <loader/nx_executable.h>
 
+#include <generic_kernel/user_space.h>
 #include <os/nx_sys.h>
 namespace Plusnx::Os {
+    using AddrType = GenericKernel::AddressSpaceType;
+
     Loader::AppType GetAppTypeByFilename(const SysFs::SysPath& filename) {
         if (filename.extension() == ".nsp")
             return Loader::AppType::Nsp;
@@ -43,6 +46,15 @@ namespace Plusnx::Os {
                     return nullptr;
             }
         }();
+
+        if (const auto& process{context->process.lock()}) {
+            const auto& npdm{process->npdm};
+#if 1
+            assert(npdm.environment == AddrType::Guest64Bit);
+            npdm.DisplayBinaryInformation();
+#endif
+            process->memory->CreateProcessMemory(npdm.environment);
+        }
 
         creator.emplace(*this);
         creator->Initialize();

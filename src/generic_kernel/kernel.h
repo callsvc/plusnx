@@ -6,7 +6,9 @@
 #include <atomic>
 
 #include <cpu/core_container.h>
-namespace Plusnx::Gsk {
+#include <generic_kernel/user_space.h>
+
+namespace Plusnx::GenericKernel {
     namespace Types {
         class KProcess;
     }
@@ -22,6 +24,8 @@ namespace Plusnx::Gsk {
 
         std::shared_ptr<Types::KProcess> CreateNewProcess();
         u64 CreateProcessId();
+
+        std::unique_ptr<UserSpace> memory;
     private:
         struct {
             std::atomic<u64> pid, tid;
@@ -33,7 +37,7 @@ namespace Plusnx::Gsk {
 
     class KBaseType {
     protected:
-        KBaseType(Kernel& gsk, const KType base) : kernel(gsk), type(base) {}
+        KBaseType(Kernel& generic, const KType base) : kernel(generic), type(base) {}
         Kernel& kernel;
         KType type;
     };

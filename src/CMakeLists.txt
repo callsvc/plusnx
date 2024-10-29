@@ -28,6 +28,10 @@ target_sources(plusnx PRIVATE
     sys_fs/nx/readonly_filesystem.h
     sys_fs/bounded.cpp
     sys_fs/bounded.h
+    sys_fs/continuous_block.cpp
+    sys_fs/continuous_block.h
+    sys_fs/npdm.cpp
+    sys_fs/npdm.h
     nogui/sdl_vulkan_backing.cpp
     nogui/sdl_vulkan_backing.h
     core/application.cpp
@@ -39,12 +43,16 @@ target_sources(plusnx PRIVATE
     cpu/core_container.cpp
     cpu/core_container.h
     cpu/unit_types.h
-    gsk/types/kprocess.cpp
-    gsk/types/kprocess.h
-    gsk/types/kthread.cpp
-    gsk/types/kthread.h
-    gsk/kernel.cpp
-    gsk/kernel.h
+    generic_kernel/types/kprocess.cpp
+    generic_kernel/types/kprocess.h
+    generic_kernel/types/kthread.cpp
+    generic_kernel/types/kthread.h
+    generic_kernel/kernel.cpp
+    generic_kernel/kernel.h
+    generic_kernel/user_space.cpp
+    generic_kernel/user_space.h
+    generic_kernel/address_space.cpp
+    generic_kernel/address_space.h
     loader/app_loader.cpp
     loader/app_loader.h
     loader/eshop_title.cpp

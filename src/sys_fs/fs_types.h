@@ -31,19 +31,22 @@ namespace Plusnx::SysFs {
         u64 Read(void* output, const u64 size, const u64 offset = 0) {
             return ReadImpl(output, size, offset);
         }
+        u64 Write(const void* output, const u64 size, const u64 offset = 0) {
+            return WriteImpl(output, size, offset);
+        }
 
-        template <typename T = char> requires (sizeof(T) == 1)
+        template <typename T = char> requires std::is_trivial_v<T>
         std::vector<T> GetBytes(const u64 requested, const u64 offset = 0) {
             if (requested > GetSize())
                 return {};
             std::vector<T> content(requested);
-            ReadImpl(content.data(), content.size(), offset);
+            ReadImpl(content.data(), content.size() * sizeof(T), offset);
             return content;
         }
 
-        template <typename T = char> requires (sizeof(T) == 1)
-        u64 WriteBytes(const std::vector<T>& content, const u64 offset = 0) {
-            return WriteImpl(content.data(), content.size(), offset);
+        template <typename T = char> requires std::is_trivial_v<T>
+        u64 PutBytes(const std::vector<T>& content, const u64 offset = 0) {
+            return WriteImpl(content.data(), content.size() * sizeof(T), offset);
         }
 
         SysPath path;

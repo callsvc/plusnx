@@ -9,7 +9,13 @@ namespace Plusnx::Os::Sdk {
             if (content.supportedLanguages & 1 << lang)
                 languages.emplace_back(lang);
         }
-        titleId = content.presenceGroup;
+        // All these fields may be zeroed
+        if (const auto presence = content.presenceGroup)
+            titleId = presence;
+        else if (const auto owner = content.saveDataOwnerId)
+            titleId = owner;
+        else if (const auto update = content.addonContentBaseId)
+            titleId = update - 0x1000;
     }
 
     std::string ControlProperty::GetApplicationName(Services::Settings::LanguageType type) const {

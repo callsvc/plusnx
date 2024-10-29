@@ -16,6 +16,8 @@ namespace Plusnx::Os {
         std::string title;
         std::string publisher;
         std::string version;
+
+        u64 programId{};
     private:
         NxSys& nxOs;
     };

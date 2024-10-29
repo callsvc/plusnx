@@ -22,6 +22,9 @@ namespace Plusnx::Os {
             publisher = nacp->GetApplicationPublisher(context->language);
             version = nacp->GetDisplayVersion();
         }
+        if (nacp && nacp->titleId)
+            programId = nacp->titleId;
+
 #if 1
         DumpRomContent();
 #endif

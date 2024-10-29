@@ -1,9 +1,11 @@
-#include <gsk/types/kprocess.h>
-#include <gsk/kernel.h>
-namespace Plusnx::Gsk {
+#include <generic_kernel/types/kprocess.h>
+#include <generic_kernel/kernel.h>
+namespace Plusnx::GenericKernel {
     Kernel::Kernel() {
         for (u32 core{}; core < Cpu::TotalCoresCount; core++)
             cpuCores[core].Initialize();
+
+        memory = std::make_unique<UserSpace>();
     }
 
     Kernel::~Kernel() {

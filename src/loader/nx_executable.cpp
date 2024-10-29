@@ -77,5 +77,7 @@ namespace Plusnx::Loader {
         return result;
     }
 
-    void NxExecutable::Load(std::shared_ptr<Core::Context>& process) {}
+    void NxExecutable::Load(std::shared_ptr<Core::Context>& context) {
+        [[maybe_unused]] auto& process{context->process};
+    }
 }

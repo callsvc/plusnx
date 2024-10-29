@@ -11,7 +11,7 @@ namespace Plusnx::Core {
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
         assets = std::make_shared<SysFs::Assets>(context);
-        kernel = std::make_shared<Gsk::Kernel>();
+        kernel = std::make_shared<GenericKernel::Kernel>();
 
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();

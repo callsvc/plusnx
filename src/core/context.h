@@ -10,7 +10,7 @@
 #include <services/settings/languages.h>
 
 // Kernel-related types
-#include <gsk/types/kprocess.h>
+#include <generic_kernel/types/kprocess.h>
 namespace Plusnx::Os {
     class NxSys;
 }
@@ -36,6 +36,6 @@ namespace Plusnx::Core {
 
         // The main kernel object, necessary to run applications,
         // must live as long as the Application() class is still alive
-        std::weak_ptr<Gsk::Types::KProcess> process;
+        std::weak_ptr<GenericKernel::Types::KProcess> process;
     };
 }

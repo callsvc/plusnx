@@ -11,6 +11,17 @@ namespace Plusnx::SysFs::Nx {
 
         SysPath root{"/"};
         VisitSubdirectories(romfs, root, content.dirMetaOffset);
+
+        const auto filesTable(romfs->GetBytes<u32>(content.dirHashSize / sizeof(u32), content.dirHashOffset));
+        const auto countOfFiles = [&] {
+            u32 count{};
+            for (const auto& file : filesTable)
+                if (file != RomFsEmptyEntry)
+                    count++;
+            return count;
+        }();
+
+        assert(ListAllFiles().size() == countOfFiles);
     }
 
     void AppendEntryName(const FileBackingPtr& romfs, SysPath& path, const u64 length, const u64 offset) {

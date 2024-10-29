@@ -17,6 +17,8 @@ namespace Plusnx::Os::Sdk {
         u64 presenceGroup;
         std::array<u8, 0x20> pad2;
         std::array<char, 0x10> displayVersion;
+        u64 addonContentBaseId;
+        u64 saveDataOwnerId; // Describes the ID of the directory containing the application's dynamic data
 
         static_assert(sizeof(title) == 0x300 * 0x10);
     };

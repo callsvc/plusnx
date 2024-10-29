@@ -22,7 +22,7 @@ namespace Plusnx::SysFs {
             const auto outputFile(std::make_unique<FSys::RegularFile>(output / filename.relative_path(), FileMode::Write));
 
             auto content(file->GetBytes(file->GetSize()));
-            outputFile->WriteBytes(content);
+            outputFile->PutBytes(content);
         }
     }
 }

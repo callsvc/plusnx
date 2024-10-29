@@ -53,7 +53,7 @@ namespace Plusnx::Loader {
         void ReadAssets(const SysFs::FileBackingPtr& nro);
 
         std::span<u8> ReadSectionContent(const SysFs::FileBackingPtr& nro, SectionType type, u32 fileOffset);
-        void Load(std::shared_ptr<Core::Context> &process) override;
+        void Load(std::shared_ptr<Core::Context>& context) override;
     private:
         NroHeader content;
         AssetHeader assetHeader;
