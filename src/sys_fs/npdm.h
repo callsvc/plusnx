@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sys_fs/fs_types.h>
+#include <sys_fs/continuous_block.h>
+
 #include <generic_kernel/address_space.h>
 namespace Plusnx::SysFs {
 #pragma pack(push, 1)
@@ -8,7 +10,7 @@ namespace Plusnx::SysFs {
     };
     struct ProcFlags {
         u32 is64BitInstruction : 1;
-        GenericKernel::AddressSpaceType processAs : 3;
+        GenericKernel::AddressSpaceType addressSpace : 3;
         u32 optimizeMemoryAllocation : 1;
         u32 disableDeviceAsMerge : 1;
         u32 enableAliasRegionExtraSize : 1;
@@ -34,6 +36,15 @@ namespace Plusnx::SysFs {
         u32 acidOffset;
         u32 acidSize;
     };
+
+    struct AcidHeader {
+        std::array<u8, 0x200> pad0;
+        u32 magic;
+        u32 size;
+    };
+    struct Aci0Header {
+        u32 magic;
+    };
 #pragma pack(pop)
 
     class Npdm {
@@ -45,6 +56,10 @@ namespace Plusnx::SysFs {
 
         GenericKernel::AddressSpaceType environment{GenericKernel::AddressSpaceType::Guest64Bit};
     private:
+        std::unique_ptr<ContinuousBlock> infos;
+
         MetaHeader content{};
+        AcidHeader acid{};
+        Aci0Header aci0{};
     };
 }
