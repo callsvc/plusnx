@@ -1,9 +1,9 @@
 #include <print>
 
-#include <video/vk/instance.h>
+#include <video/vk/app_instance.h>
 #include <types.h>
 namespace Plusnx::Video::Vk {
-    void Instance::EnumerateSupportLayers() {
+    void AppInstance::EnumerateSupportLayers() {
         u32 layersCount;
 
         if (vk::enumerateInstanceLayerProperties(&layersCount, nullptr) != vk::Result::eSuccess)
@@ -20,7 +20,7 @@ namespace Plusnx::Video::Vk {
                 layers.emplace_back("VK_LAYER_KHRONOS_validation");
         }
     }
-    void Instance::EnumerateRequiredExtensions(const std::vector<std::string_view>& required) {
+    void AppInstance::EnumerateRequiredExtensions(const std::vector<std::string_view>& required) {
         u32 count;
         assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, nullptr) == vk::Result::eSuccess);
         std::vector<vk::ExtensionProperties> properties(count);
@@ -35,7 +35,7 @@ namespace Plusnx::Video::Vk {
     }
 
 
-    Instance::Instance(const std::vector<std::string_view>& required) {
+    AppInstance::AppInstance(const std::vector<std::string_view>& required) {
         EnumerateSupportLayers();
         EnumerateRequiredExtensions(required);
 
@@ -44,11 +44,11 @@ namespace Plusnx::Video::Vk {
             {}, &applicationInfo, static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data()
         };
 
-        instance.emplace(createInstance(instanceCreateInfo));
+        vkInstance = createInstance(instanceCreateInfo);
     }
 
-    Instance::~Instance() {
-        if (instance)
-            vkDestroyInstance(instance.value(), nullptr);
+    AppInstance::~AppInstance() {
+        if (vkInstance)
+            vkDestroyInstance(vkInstance, nullptr);
     }
 }

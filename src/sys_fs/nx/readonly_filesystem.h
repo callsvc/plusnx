@@ -39,7 +39,6 @@ namespace Plusnx::SysFs::Nx {
     };
 #pragma pack(pop)
 
-    // https://github.com/switchbrew/switch-examples/tree/master/fs/romfs/romfs
     // https://www.3dbrew.org/wiki/RomFS
     class ReadOnlyFilesystem final : public FileSystem {
     public:

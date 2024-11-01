@@ -10,18 +10,18 @@ namespace Plusnx::Loader {
                 return offsetof(NroHeader, magic);
             return {};
         }();
-        const auto result = [&] -> bool {
-            u64 requested{MinimumAppSize};
-            if (type == AppType::Nsp)
-                requested *= 1'000;
+        u64 requested{MinimumAppSize};
+        if (type == AppType::Nsp)
+            requested *= 1'000;
 
-            if (file->GetSize() < requested) {
-                return {};
-            }
-            return file->Read<u32>(offset) == validMagic;
-        }();
-        if (!result)
+        bool result{};
+        if (file->GetSize() < requested) {
+            status = LoaderStatus::BrokenFile;
+            return result;
+        }
+        if (result = file->Read<u32>(offset) == validMagic; !result)
             status = LoaderStatus::InvalidMagicValue;
+
         return result;
     }
 

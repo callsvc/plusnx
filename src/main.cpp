@@ -4,7 +4,7 @@
 #include <core/application.h>
 
 #include <nogui/sdl_vulkan_backing.h>
-#include <video/vk/vulkan_types.h>
+#include <video/vk/api_types.h>
 
 using namespace Plusnx;
 

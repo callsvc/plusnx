@@ -20,7 +20,6 @@ namespace Plusnx::SysFs {
             return dirs.at(RootId).front();
         return std::filesystem::current_path();
     }
-
     void Provider::RegisterSystemPath(const std::string& card, const SysPath& directory) {
         assert(directory.has_root_directory());
         if (!exists(directory))

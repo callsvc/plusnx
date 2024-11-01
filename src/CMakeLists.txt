@@ -8,10 +8,12 @@ target_sources(plusnx PRIVATE
     audio/speaker.h
     video/gpu.cpp
     video/gpu.h
-    video/vk/vulkan_types.cpp
-    video/vk/vulkan_types.h
-    video/vk/instance.cpp
-    video/vk/instance.h
+    video/vk/api_types.cpp
+    video/vk/api_types.h
+    video/vk/app_instance.cpp
+    video/vk/app_instance.h
+    video/vk/graphics_device.cpp
+    video/vk/graphics_device.h
     sys_fs/provider.cpp
     sys_fs/provider.h
     sys_fs/assets.cpp

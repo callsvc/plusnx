@@ -2,7 +2,7 @@
 #include <memory>
 #include <core/games_lists.h>
 #include <sys_fs/assets.h>
-#include <video/vk/vulkan_types.h>
+#include <video/vk/api_types.h>
 
 #include <generic_kernel/types/kprocess.h>
 namespace Plusnx::Os {

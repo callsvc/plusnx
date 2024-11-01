@@ -5,7 +5,7 @@
 #include <core/context.h>
 
 namespace Plusnx::Loader {
-    constexpr auto MinimumAppSize{1024 * 256};
+    constexpr auto MinimumAppSize{1024 * 200};
     enum class AppType {
         Invalid,
         Nsp,
@@ -22,7 +22,8 @@ namespace Plusnx::Loader {
 
     enum class LoaderStatus {
         None,
-        InvalidMagicValue
+        InvalidMagicValue,
+        BrokenFile
     };
 
     class AppLoader {
@@ -34,7 +35,7 @@ namespace Plusnx::Loader {
 
         AppType type;
         u32 validMagic;
-        LoaderStatus status{};
+        LoaderStatus status{LoaderStatus::None};
 
         std::optional<SysFs::FileBackingPtr> icon;
         std::optional<SysFs::FileBackingPtr> control;

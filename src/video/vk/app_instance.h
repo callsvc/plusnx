@@ -1,14 +1,13 @@
 #pragma once
 
-#include <video/vk/vulkan_types.h>
+#include <video/vk/api_types.h>
 namespace Plusnx::Video::Vk {
-    class Instance {
+    class AppInstance {
     public:
-        explicit Instance(const std::vector<std::string_view>& required);
-        ~Instance();
+        explicit AppInstance(const std::vector<std::string_view>& required);
+        ~AppInstance();
 
-        std::optional<vk::Instance> instance;
-
+        vk::Instance vkInstance;
     private:
         std::vector<const char*> extensions;
         std::vector<const char*> layers;

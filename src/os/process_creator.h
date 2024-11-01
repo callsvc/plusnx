@@ -13,9 +13,9 @@ namespace Plusnx::Os {
         std::optional<SysFs::Nx::ReadOnlyFilesystem> romfs;
         std::optional<Sdk::ControlProperty> nacp;
 
-        std::string title;
-        std::string publisher;
-        std::string version;
+        std::string title{"Application"};
+        std::string publisher{"None"};
+        std::string version{"0"};
 
         u64 programId{};
     private:
