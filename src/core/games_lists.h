@@ -4,7 +4,7 @@
 namespace Plusnx::Core {
     class GamesLists {
     public:
-        GamesLists(const SysFs::Fsys::RigidDirectory& dir) {
+        GamesLists(const SysFs::FSys::RigidDirectory& dir) {
             lists.emplace_back(dir);
         }
         std::vector<SysFs::SysPath> GetAllGames() const;
@@ -15,6 +15,6 @@ namespace Plusnx::Core {
 
         void Initialize();
     private:
-        std::vector<SysFs::Fsys::RigidDirectory> lists;
+        std::vector<SysFs::FSys::RigidDirectory> lists;
     };
 }

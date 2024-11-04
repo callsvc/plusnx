@@ -1,7 +1,16 @@
 #include <functional>
 #include <sys_fs/fsys/rigid_directory.h>
 #include <sys_fs/fsys/regular_file.h>
-namespace Plusnx::SysFs::Fsys {
+namespace Plusnx::SysFs::FSys {
+    RigidDirectory::RigidDirectory(const SysPath& path, const bool create) : RoDirectoryBacking(path) {
+        if (create) {
+            if (path.has_parent_path())
+                create_directories(path);
+            else
+                create_directory(path);
+        }
+    }
+
     FileBackingPtr RigidDirectory::OpenFile(const SysPath& path) {
         if (!ContainsValue(ListAllFiles(), path))
             return {};

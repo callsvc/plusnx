@@ -4,8 +4,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(plusnx)
 target_sources(plusnx PRIVATE
-    audio/speaker.cpp
-    audio/speaker.h
+        audio/output_devices.cpp
+        audio/output_devices.h
     video/gpu.cpp
     video/gpu.h
     video/vk/api_types.cpp
@@ -28,12 +28,16 @@ target_sources(plusnx PRIVATE
     sys_fs/nx/partition_filesystem.h
     sys_fs/nx/readonly_filesystem.cpp
     sys_fs/nx/readonly_filesystem.h
-    sys_fs/bounded.cpp
-    sys_fs/bounded.h
+    sys_fs/layered_fs.cpp
+    sys_fs/layered_fs.h
     sys_fs/continuous_block.cpp
     sys_fs/continuous_block.h
     sys_fs/npdm.cpp
     sys_fs/npdm.h
+    sys_fs/nx/content_archive.cpp
+    sys_fs/nx/content_archive.h
+    sys_fs/nx/content_metadata.cpp
+    sys_fs/nx/content_metadata.h
     nogui/sdl_vulkan_backing.cpp
     nogui/sdl_vulkan_backing.h
     core/application.cpp
@@ -63,14 +67,20 @@ target_sources(plusnx PRIVATE
     loader/cartridge.h
     loader/nx_executable.cpp
     loader/nx_executable.h
+    loader/game_fs.cpp
+    loader/game_fs.h
     os/nx_sys.cpp
     os/nx_sys.h
     os/process_creator.cpp
     os/process_creator.h
     os/sdk/control_property.cpp
     os/sdk/control_property.h
+    os/make_loader.cpp
+    os/make_loader.h
     services/settings/languages.cpp
     services/settings/languages.h
+    security/checksum.cpp
+    security/checksum.h
     main.cpp
     driver.cpp
     container.h
@@ -78,4 +88,4 @@ target_sources(plusnx PRIVATE
     types.h
 )
 
-target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align)
+target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto)

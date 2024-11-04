@@ -14,11 +14,11 @@ namespace Plusnx::SysFs {
         explicit Assets(const std::shared_ptr<Core::Context>& context);
         void CheckDir(const SysPath& path) const;
 
-        Fsys::RigidDirectory logs;
-        Fsys::RigidDirectory games;
-        Fsys::RigidDirectory keys;
-        Fsys::RigidDirectory nand;
-        Fsys::RigidDirectory cache;
+        FSys::RigidDirectory logs;
+        FSys::RigidDirectory games;
+        FSys::RigidDirectory keys;
+        FSys::RigidDirectory nand;
+        FSys::RigidDirectory cache;
 
         std::shared_ptr<Provider> provider;
     };

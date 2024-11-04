@@ -15,7 +15,7 @@ namespace Plusnx::SysFs {
     class FileBacking {
     public:
         FileBacking() = default;
-        FileBacking(const SysPath& file, const FileMode type) : path(file), mode(type) {}
+        FileBacking(const SysPath& file, const FileMode type = FileMode::Read) : path(file), mode(type) {}
         virtual ~FileBacking() = default;
 
         template <typename T> requires (std::is_trivial_v<T>)

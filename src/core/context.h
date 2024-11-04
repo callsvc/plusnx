@@ -5,7 +5,7 @@
 
 #include <sys_fs/provider.h>
 #include <video/gpu.h>
-#include <audio/speaker.h>
+#include <audio/output_devices.h>
 
 #include <services/settings/languages.h>
 

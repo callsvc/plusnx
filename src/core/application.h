@@ -18,6 +18,11 @@ namespace Plusnx::Core {
         void Initialize(const Video::Vk::VkSupport& support);
         void LoadAGameByIndex(u64 index = 0) const;
 
+        // Only selects a game from the collection (does not load it yet)
+        void PickByName(const std::string& game);
+        // Convert various file formats into a GameFS
+        bool ExtractIntoGameFs();
+
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;
 
@@ -25,6 +30,9 @@ namespace Plusnx::Core {
 
         std::shared_ptr<GenericKernel::Kernel> kernel;
     private:
+        std::string declared;
+        SysFs::SysPath chosen;
+
         std::unique_ptr<GamesLists> games;
     };
 }

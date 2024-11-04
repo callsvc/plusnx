@@ -1,5 +1,5 @@
 #include <ranges>
-#include <sys_fs/bounded.h>
+#include <sys_fs/layered_fs.h>
 
 #include <loader/nx_executable.h>
 namespace Plusnx::Loader {
@@ -46,7 +46,7 @@ namespace Plusnx::Loader {
                 const auto offset{content.size + section.offset};
                 if (index == 0)
                     assert(section.offset == sizeof(AssetHeader));
-                return std::make_shared<SysFs::FileBounded>(nro, "", offset, section.size);
+                return std::make_shared<SysFs::FileLayered>(nro, "", offset, section.size);
             }();
             const auto content = [&] {
                 if (!index)

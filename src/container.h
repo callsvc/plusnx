@@ -21,4 +21,13 @@ namespace Plusnx {
     auto StringViewBuilder(const std::span<T>& string) {
         return std::string_view(reinterpret_cast<const char*>(string.data()), string.size());
     }
+
+    template <typename T>
+    bool IsEmpty(const T& container) {
+        return std::ranges::empty(container);
+    }
+    template <typename T, typename B>
+    bool IsEqual(const T& left, const B& right) {
+        return std::ranges::equal(left, right);
+    }
 }

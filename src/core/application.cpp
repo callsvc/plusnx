@@ -1,10 +1,12 @@
 #include <print>
 #include <unistd.h>
+#include <boost/regex.hpp>
 
 #include <core/application.h>
 #include <core/context.h>
 
 #include <os/nx_sys.h>
+#include <os/make_loader.h>
 namespace Plusnx::Core {
     Application::Application() :
         context(std::make_shared<Context>()) {
@@ -38,5 +40,34 @@ namespace Plusnx::Core {
             if (const auto collection = games->GetAllGames(); !collection.empty())
                 if (collection.size() < index)
                     nos->LoadApplicationFile(collection[index]);
+    }
+
+    void Application::PickByName(const std::string& game) {
+        const auto& pack{games->GetAllGames()};
+        declared = game;
+
+        const boost::regex regex(game);
+        std::vector<SysFs::SysPath> filter;
+        for (const auto& disc : pack) {
+            if (regex_match(disc.string(), regex))
+                filter.emplace_back(disc);
+        }
+        if (!filter.empty())
+            chosen = filter.front();
+    }
+
+    bool Application::ExtractIntoGameFs() {
+        if (chosen.empty())
+            return {};
+
+        const auto type{Os::GetAppTypeByFilename(chosen)};
+        if (type != Loader::AppType::Nsp && type != Loader::AppType::Xci)
+            return {};
+
+        const auto loader{Os::MakeLoader(std::make_shared<SysFs::FSys::RegularFile>(chosen))};
+        if (!loader)
+            return {};
+
+        return loader->ExtractFilesInto(SysFs::SysPath(declared).filename());
     }
 }

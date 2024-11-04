@@ -16,6 +16,10 @@ namespace Plusnx::SysFs {
         return type == CounterType::Read ? rcnt : wcnt;
     }
 
+    u64 ContinuousBlock::RemainBytes(const CounterType type) const {
+        return GetSize() - GetCursor(type);
+    }
+
     u64 ContinuousBlock::ReadImpl(void* output, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
         if (rcnt + offset > GetSize()) {

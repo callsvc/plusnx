@@ -1,7 +1,7 @@
 #include <ranges>
 #include <boost/align/align_up.hpp>
 
-#include <sys_fs/bounded.h>
+#include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/readonly_filesystem.h>
 namespace Plusnx::SysFs::Nx {
     ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) {
@@ -60,7 +60,7 @@ namespace Plusnx::SysFs::Nx {
             romfs->Read(file, offset);
             AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
 
-            AddFile(path, std::make_shared<FileBounded>(romfs, path, content.fileDataOffset + file.dataOffset, file.size));
+            AddFile(path, std::make_shared<FileLayered>(romfs, path, content.fileDataOffset + file.dataOffset, file.size));
             path = path.parent_path();
 
             offset += file.nextFileSiblingOffset - sizeof(file);

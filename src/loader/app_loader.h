@@ -6,11 +6,21 @@
 
 namespace Plusnx::Loader {
     constexpr auto MinimumAppSize{1024 * 200};
+
+    enum class ContainedFormat {
+        Invalid,
+        Nca,
+        Ticket,
+        Cnmt
+    };
+    ContainedFormat GetEntryFormat(const SysFs::SysPath& filename);
+
     enum class AppType {
         Invalid,
         Nsp,
         Xci,
-        Nro
+        Nro,
+        GameFs
     };
 
     enum class SectionType {
@@ -31,6 +41,9 @@ namespace Plusnx::Loader {
         virtual ~AppLoader() = default;
 
         AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
+        virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const {
+            return {};
+        }
         virtual void Load(std::shared_ptr<Core::Context>& context) {}
 
         AppType type;

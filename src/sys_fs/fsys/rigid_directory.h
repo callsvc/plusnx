@@ -1,11 +1,11 @@
 #pragma once
 
 #include <sys_fs/fs_types.h>
-namespace Plusnx::SysFs::Fsys {
+namespace Plusnx::SysFs::FSys {
     class RigidDirectory final : public RoDirectoryBacking {
     public:
         RigidDirectory() = default;
-        RigidDirectory(const SysPath& path) : RoDirectoryBacking(path) {}
+        RigidDirectory(const SysPath& path, bool create = false);
 
         FileBackingPtr OpenFile(const SysPath& path) override;
         std::vector<SysPath> ListAllFiles() const override;

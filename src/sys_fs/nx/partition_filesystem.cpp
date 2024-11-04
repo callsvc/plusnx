@@ -1,8 +1,9 @@
 #include <ranges>
-#include <sys_fs/nx/partition_filesystem.h>
 
+#include <sys_fs/layered_fs.h>
+#include <sys_fs/nx/partition_filesystem.h>
 namespace Plusnx::SysFs::Nx {
-    PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) {
+    PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) : backing(pfs) {
         if (pfs->Read(superBlock) != sizeof(superBlock)) {
             return;
         }
@@ -31,7 +32,8 @@ namespace Plusnx::SysFs::Nx {
     }
 
     std::vector<SysPath> PartitionFilesystem::ListAllFiles() const {
-        std::vector<SysPath> content(entries.size());
+        std::vector<SysPath> content;
+        content.reserve(entries.size());
         for (const auto& filename : std::ranges::views::keys(entries)) {
             content.emplace_back(filename);
         }
@@ -40,7 +42,7 @@ namespace Plusnx::SysFs::Nx {
     FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) {
         if (!entries.contains(path))
             return {};
-        return {};
+        return std::make_shared<FileLayered>(backing, path, entries[path].offset, entries[path].size);
     }
 
     StringTable::StringTable(const u32 offset, const u32 size, const FileBackingPtr& pfs) {

@@ -8,3 +8,7 @@ if(NOT TARGET Vulkan::Headers)
 endif()
 
 add_subdirectory(boost)
+
+set(ENABLE_PROGRAMS OFF CACHE BOOL "Build Mbed TLS programs." FORCE)
+set(MBEDTLS_FATAL_WARNINGS OFF CACHE BOOL "Compiler warnings treated as errors" FORCE)
+add_subdirectory(mbedtls)

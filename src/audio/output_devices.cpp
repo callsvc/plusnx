@@ -2,11 +2,11 @@
 
 #include <SDL2/SDL.h>
 
-#include <audio/speaker.h>
+#include <audio/output_devices.h>
 namespace Plusnx::Audio {
     static std::vector<std::string_view> soundDrivers{};
 
-    Speaker::Speaker() {
+    OutputDevices::OutputDevices() {
         const std::string_view driver{SDL_GetCurrentAudioDriver()};
 #if defined(__linux__)
         soundDrivers.emplace_back("pipewire");
@@ -32,14 +32,14 @@ namespace Plusnx::Audio {
         audio = SDL_OpenAudioDevice(device, 0, &current, nullptr, 0);
     }
 
-    Speaker::~Speaker() {
+    OutputDevices::~OutputDevices() {
         SDL_CloseAudioDevice(audio);
         SDL_free(device);
         if (driver)
             SDL_AudioQuit();
     }
 
-    void Speaker::MigrateDriver() {
+    void OutputDevices::MigrateDriver() {
         const auto drivers{SDL_GetNumAudioDrivers()};
         for (i32 drv{}; drv < drivers && !driver; drv++) {
             const auto name{SDL_GetAudioDriver(drv)};

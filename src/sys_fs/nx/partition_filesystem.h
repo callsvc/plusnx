@@ -42,6 +42,7 @@ namespace Plusnx::SysFs::Nx {
         SuperBlock superBlock;
 
         std::vector<u8> content;
+        const FileBackingPtr& backing;
     };
 
     class StringTable {

@@ -4,10 +4,10 @@
 
 #include <types.h>
 namespace Plusnx::Audio {
-    class Speaker {
+    class OutputDevices {
     public:
-        Speaker();
-        ~Speaker();
+        OutputDevices();
+        ~OutputDevices();
 
         void MigrateDriver();
 
