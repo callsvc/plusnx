@@ -15,14 +15,14 @@ namespace Plusnx::Os {
         return Loader::AppType::Invalid;
     }
 
-    std::shared_ptr<Loader::AppLoader> MakeLoader(const SysFs::FileBackingPtr& file) {
+    std::shared_ptr<Loader::AppLoader> MakeLoader(const std::shared_ptr<Core::Context>& context, const SysFs::FileBackingPtr& file) {
         const auto type{GetAppTypeByFilename(file->path)};
 
         auto result = [&] -> std::shared_ptr<Loader::AppLoader> {
             switch (type) {
                 case Loader::AppType::Nsp:
                 case Loader::AppType::Xci:
-                    return std::make_shared<Loader::EShopTitle>(file);
+                    return std::make_shared<Loader::EShopTitle>(context->keys, file);
                 case Loader::AppType::Nro:
                     return std::make_shared<Loader::NxExecutable>(file);
                 default:

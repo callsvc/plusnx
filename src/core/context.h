@@ -14,6 +14,9 @@
 namespace Plusnx::Os {
     class NxSys;
 }
+namespace Plusnx::Security {
+    class Keyring;
+}
 namespace Plusnx::Core {
     enum SystemPaths {
         BaseDirectoryFs
@@ -26,6 +29,7 @@ namespace Plusnx::Core {
         bool IsFromSystemPath(const SysFs::SysPath& path) const;
 
         std::shared_ptr<SysFs::Provider> provider;
+        std::shared_ptr<Security::Keyring> keys;
         std::shared_ptr<Video::GPU> gpu;
         std::shared_ptr<Audio::Sound> sound;
 

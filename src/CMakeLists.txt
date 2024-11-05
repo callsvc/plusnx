@@ -89,6 +89,12 @@ target_sources(plusnx PRIVATE
     services/settings/languages.h
     security/checksum.cpp
     security/checksum.h
+    security/cipher_cast.cpp
+    security/cipher_cast.h
+    security/key_types.cpp
+    security/key_types.h
+    security/keyring.cpp
+    security/keyring.h
     main.cpp
     driver.cpp
     container.h

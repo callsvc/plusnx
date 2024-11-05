@@ -4,10 +4,10 @@
 #include <sys_fs/continuous_block.h>
 
 #include <generic_kernel/address_space.h>
+#include <security/key_types.h>
 namespace Plusnx::SysFs {
 #pragma pack(push, 1)
-    enum class KeyGeneration : u32 {
-    };
+
     struct ProcFlags {
         u32 is64BitInstruction : 1;
         GenericKernel::AddressSpaceType addressSpace : 3;
@@ -18,7 +18,7 @@ namespace Plusnx::SysFs {
     };
     struct MetaHeader {
         u32 magic; // Always "META"
-        KeyGeneration signatureGen;
+        alignas(4) Security::KeyGeneration generation;
         u32 pad0;
         ProcFlags flags;
         u8 pad1;
@@ -36,6 +36,7 @@ namespace Plusnx::SysFs {
         u32 acidOffset;
         u32 acidSize;
     };
+    static_assert(sizeof(MetaHeader) == 128);
 
     struct AcidHeader {
         std::array<u8, 0x200> pad0;

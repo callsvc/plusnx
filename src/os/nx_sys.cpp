@@ -18,7 +18,7 @@ namespace Plusnx::Os {
             return std::make_shared<SysFs::FSys::RegularFile>(path);
         }();
 
-        application = MakeLoader(backing);
+        application = MakeLoader(context, backing);
         if (!application) {
             backing.reset();
             return;

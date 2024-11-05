@@ -1,6 +1,7 @@
 #pragma once
 #include <loader/app_loader.h>
 
+#include <security/keyring.h>
 #include <sys_fs/fsys/regular_file.h>
 #include <sys_fs/nx/partition_filesystem.h>
 #include <sys_fs/nx/content_archive.h>
@@ -8,7 +9,7 @@
 namespace Plusnx::Loader {
     class EShopTitle final : public AppLoader {
     public:
-        EShopTitle(const SysFs::FileBackingPtr& nsp);
+        EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& nsp);
 
         bool ExtractFilesInto(const SysFs::SysPath& path) const override;
         void Load(std::shared_ptr<Core::Context>& process) override;
@@ -20,5 +21,6 @@ namespace Plusnx::Loader {
 
         std::optional<SysFs::SysPath> ValidateAllFiles(const std::vector<SysFs::SysPath>& files) const;
         std::list<SysFs::Nx::NCA> contents;
+        const std::shared_ptr<Security::Keyring> keys;
     };
 }

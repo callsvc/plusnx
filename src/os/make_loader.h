@@ -5,5 +5,5 @@
 namespace Plusnx::Os {
     Loader::AppType GetAppTypeByFilename(const SysFs::SysPath& filename);
 
-    std::shared_ptr<Loader::AppLoader> MakeLoader(const SysFs::FileBackingPtr& file);
+    std::shared_ptr<Loader::AppLoader> MakeLoader(const std::shared_ptr<Core::Context>& context, const SysFs::FileBackingPtr& file);
 }

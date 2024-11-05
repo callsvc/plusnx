@@ -11,7 +11,7 @@ namespace Plusnx {
     }
 
     template <typename T>
-    auto ConstMagic(const std::string_view& string) {
+    constexpr auto ConstMagic(const std::string_view& string) {
         T value;
         std::memcpy(&value, string.data(), sizeof(value));
         return value;

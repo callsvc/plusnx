@@ -39,6 +39,7 @@ namespace Plusnx::SysFs::Nx {
         std::unordered_map<SysPath, FileEntry> entries;
         bool hashable{};
         u64 entrySize;
+        u64 dataOffset;
         SuperBlock superBlock;
 
         std::vector<u8> content;
@@ -49,6 +50,9 @@ namespace Plusnx::SysFs::Nx {
     public:
         explicit StringTable(u32 offset, u32 size, const FileBackingPtr& pfs);
         std::string ReadString(u32 offset) const;
+
+        u64 offset;
+        u64 size;
     private:
         std::vector<char> table;
     };

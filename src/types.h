@@ -15,9 +15,9 @@ namespace Plusnx {
 
     using u8 = std::uint8_t;
 
-    template <typename T, u64 Size>
-    std::array<T, Size> HexTextToByteArray(const std::string_view& container) {
-        std::array<T, Size> result{};
+    template <u64 Size>
+    std::array<u8, Size> HexTextToByteArray(const std::string_view& container) {
+        std::array<u8, Size> result{};
         assert(container.size() / 2 <= result.size());
 
         try {

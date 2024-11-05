@@ -15,6 +15,7 @@ namespace Plusnx::SysFs::Nx {
         const StringTable strings(totalSize + sizeof(superBlock), superBlock.strTableSize, pfs);
 
         content = pfs->GetBytes<u8>(totalSize, sizeof(superBlock));
+        dataOffset = strings.offset + strings.size;
         FileEntry entry{};
         for (u32 index{}; index < superBlock.entries; index++) {
             assert(content.size() - entrySize * index >= sizeof(entry));
@@ -42,10 +43,10 @@ namespace Plusnx::SysFs::Nx {
     FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) {
         if (!entries.contains(path))
             return {};
-        return std::make_shared<FileLayered>(backing, path, entries[path].offset, entries[path].size);
+        return std::make_shared<FileLayered>(backing, path, dataOffset + entries[path].offset, entries[path].size);
     }
 
-    StringTable::StringTable(const u32 offset, const u32 size, const FileBackingPtr& pfs) {
+    StringTable::StringTable(const u32 offset, const u32 size, const FileBackingPtr& pfs) : offset(offset), size(size) {
         table = pfs->GetBytes<char>(size, offset);
     }
     std::string StringTable::ReadString(const u32 offset) const {

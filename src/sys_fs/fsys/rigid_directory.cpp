@@ -11,10 +11,10 @@ namespace Plusnx::SysFs::FSys {
         }
     }
 
-    FileBackingPtr RigidDirectory::OpenFile(const SysPath& path) {
-        if (!ContainsValue(ListAllFiles(), path))
+    FileBackingPtr RigidDirectory::OpenFile(const SysPath& filename) {
+        if (!ContainsValue(ListAllFiles(), path / filename))
             return {};
-        return std::make_shared<FSys::RegularFile>(path);
+        return std::make_shared<RegularFile>(path / filename);
     }
 
     std::vector<SysPath> RigidDirectory::ListAllFiles() const {

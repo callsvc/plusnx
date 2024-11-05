@@ -2,11 +2,12 @@
 #include <unistd.h>
 #include <boost/regex.hpp>
 
-#include <core/application.h>
+#include <security/keyring.h>
 #include <core/context.h>
 
 #include <os/nx_sys.h>
 #include <os/make_loader.h>
+#include <core/application.h>
 namespace Plusnx::Core {
     Application::Application() :
         context(std::make_shared<Context>()) {
@@ -17,6 +18,8 @@ namespace Plusnx::Core {
 
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();
+
+        context->keys = std::make_shared<Security::Keyring>(context);
     }
 
     void Application::Initialize(const Video::Vk::VkSupport& support) {
@@ -64,7 +67,7 @@ namespace Plusnx::Core {
         if (type != Loader::AppType::Nsp && type != Loader::AppType::Xci)
             return {};
 
-        const auto loader{Os::MakeLoader(std::make_shared<SysFs::FSys::RegularFile>(chosen))};
+        const auto loader{Os::MakeLoader(context, std::make_shared<SysFs::FSys::RegularFile>(chosen))};
         if (!loader)
             return {};
 

@@ -6,9 +6,10 @@
 
 #include <loader/eshop_title.h>
 namespace Plusnx::Loader {
-    EShopTitle::EShopTitle(const SysFs::FileBackingPtr& nsp) :
+    EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& nsp) :
         AppLoader(AppType::Nsp, ConstMagic<u32>("PFS0")),
-        pfs(std::make_unique<SysFs::Nx::PartitionFilesystem>(nsp)) {
+        pfs(std::make_unique<SysFs::Nx::PartitionFilesystem>(nsp)),
+        keys(_keys) {
 
         if (!CheckHeader(nsp) || status != LoaderStatus::None)
             return;
@@ -16,7 +17,6 @@ namespace Plusnx::Loader {
         const auto files{pfs->ListAllFiles()};
 
         std::optional<SysFs::Nx::NCA> cnmt;
-
 #if 1
         if (const auto damaged = ValidateAllFiles(files)) {
             throw Except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
@@ -26,9 +26,9 @@ namespace Plusnx::Loader {
         for (const auto& file : files) {
             const auto type{GetEntryFormat(file)};
             if (type == ContainedFormat::Nca)
-                contents.push_back(pfs->OpenFile(file));
+                contents.emplace_back(keys, pfs->OpenFile(file));
             else if (type == ContainedFormat::Cnmt)
-                cnmt.emplace(pfs->OpenFile(file));
+                cnmt.emplace(keys, pfs->OpenFile(file));
 
             if (type != ContainedFormat::Ticket)
                 continue;
@@ -67,11 +67,11 @@ namespace Plusnx::Loader {
             while (filename.has_extension())
                 filename = filename.replace_extension();
 
-            auto expected{HexTextToByteArray<u8, 16>(filename.string())};
+            auto expected{HexTextToByteArray<16>(filename.string())};
             if (IsEmpty(expected))
                 continue;
 
-            const SysFs::Nx::NCA nca(pfs->OpenFile(path));
+            const SysFs::Nx::NCA nca(keys, pfs->OpenFile(path));
             const auto stream{std::make_unique<SysFs::ContinuousBlock>(nca.backing)};
 
             while (auto remain{stream->RemainBytes()}) {
