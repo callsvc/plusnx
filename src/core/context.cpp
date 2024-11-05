@@ -5,7 +5,7 @@ namespace Plusnx::Core {
     Context::Context() :
         provider(std::make_shared<SysFs::Provider>()),
         gpu(std::make_shared<Video::GPU>()),
-        speaker(std::make_shared<Audio::Speaker>()) {
+        sound(std::make_shared<Audio::Sound>()) {
     }
 
     SysFs::SysPath Context::GetSystemPath(const SystemPaths tagged) const {

@@ -19,8 +19,7 @@ namespace Plusnx::Loader {
 
 #if 1
         if (const auto damaged = ValidateAllFiles(files)) {
-            std::print("The NSP file is apparently corrupted, Damaged file: {}\n", damaged->string());
-            return;
+            throw Except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
         }
 #endif
 

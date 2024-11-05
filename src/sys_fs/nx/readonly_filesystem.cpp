@@ -106,7 +106,7 @@ namespace Plusnx::SysFs::Nx {
         });
 
         if (!result)
-            throw std::runtime_error(error);
+            throw Except("{}", error);
     }
 
     void ReadOnlyFilesystem::AddDirectory(const SysPath& path) {

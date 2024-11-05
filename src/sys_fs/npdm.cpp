@@ -8,7 +8,7 @@ namespace Plusnx::SysFs {
         infos(std::make_unique<ContinuousBlock>(npdm)) {
 
         if (infos->Read(content) != sizeof(content))
-            throw std::runtime_error("Cannot read NPDM content");
+            throw Except("Cannot read NPDM content");
 
         assert(content.magic == ConstMagic<u32>("META"));
         if (std::string_view(content.name) == "Application") {}

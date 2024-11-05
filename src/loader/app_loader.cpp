@@ -40,7 +40,7 @@ namespace Plusnx::Loader {
     void AppLoader::DisplaySection(const SectionType type) const {
         std::stringstream ss;
         if (type == SectionType::Text)
-            throw std::runtime_error("Text sections are not supported");
+            throw Except("Text sections are not supported");
 
         const auto strings = [&] {
             if (type == SectionType::Ro)

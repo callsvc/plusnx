@@ -4,8 +4,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(plusnx)
 target_sources(plusnx PRIVATE
-        audio/output_devices.cpp
-        audio/output_devices.h
+    audio/output_device.cpp
+    audio/output_device.h
+    audio/input_device.cpp
+    audio/input_device.h
+    audio/output_device.cpp
+    audio/output_device.h
+    audio/device.cpp
+    audio/device.h
+    audio/sound.cpp
+    audio/sound.h
     video/gpu.cpp
     video/gpu.h
     video/vk/api_types.cpp
@@ -84,6 +92,7 @@ target_sources(plusnx PRIVATE
     main.cpp
     driver.cpp
     container.h
+    except.h
     types.cpp
     types.h
 )

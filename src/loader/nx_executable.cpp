@@ -67,12 +67,12 @@ namespace Plusnx::Loader {
                 return content.ro;
             if (type == SectionType::Data)
                 return content.data;
-            throw std::runtime_error("Invalid section type");
+            throw Except("Invalid section type");
         }();
 
         const std::span result(&program[offset], size);
         if (nro->Read(result.data(), result.size(), fileOffset) != size)
-            throw std::runtime_error("Cannot read section");
+            throw Except("Cannot read section");
 
         return result;
     }

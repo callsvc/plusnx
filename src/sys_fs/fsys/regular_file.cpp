@@ -23,7 +23,7 @@ namespace Plusnx::SysFs::FSys {
             if (mode == FileMode::Write)
                 return O_RDWR;
 
-            throw std::runtime_error("Invalid file mode");
+            throw Except("Invalid file mode");
         }();
         descriptor = open(path.c_str(), parameter);
         if (descriptor < 2)
@@ -68,7 +68,7 @@ namespace Plusnx::SysFs::FSys {
     u64 RegularFile::WriteImpl(const void* output, const u64 size, const u64 offset) {
         if (fallocate64(descriptor, 0, offset, size) != 0)
             if (errno)
-                throw std::runtime_error(GetOsErrorString());
+                throw Except("{}", GetOsErrorString());
         return pwrite64(descriptor, output, size, offset);
     }
 }

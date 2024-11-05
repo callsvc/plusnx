@@ -5,7 +5,7 @@
 
 #include <sys_fs/provider.h>
 #include <video/gpu.h>
-#include <audio/output_devices.h>
+#include <audio/sound.h>
 
 #include <services/settings/languages.h>
 
@@ -27,10 +27,10 @@ namespace Plusnx::Core {
 
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Video::GPU> gpu;
-        std::shared_ptr<Audio::Speaker> speaker;
+        std::shared_ptr<Audio::Sound> sound;
 
         // User-selected language
-        Services::Settings::LanguageType language;
+        Services::Settings::LanguageType language{};
 
         std::weak_ptr<Os::NxSys> nxOs;
 

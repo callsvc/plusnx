@@ -10,7 +10,7 @@ namespace Plusnx::SysFs {
         if (type == CounterType::Write)
             return wcnt += count;
 
-        throw std::runtime_error("Invalid skip operation");
+        throw Except("Invalid skip operation");
     }
     u64 ContinuousBlock::GetCursor(const CounterType type) const {
         return type == CounterType::Read ? rcnt : wcnt;
@@ -23,7 +23,7 @@ namespace Plusnx::SysFs {
     u64 ContinuousBlock::ReadImpl(void* output, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
         if (rcnt + offset > GetSize()) {
-            throw std::runtime_error("Offset out");
+            throw Except("Offset out");
         }
         const auto result{backing->Read(output, size, rcnt + offset)};
 
