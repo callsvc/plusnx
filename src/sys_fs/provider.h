@@ -13,6 +13,8 @@ namespace Plusnx::SysFs {
 
         void RegisterSystemPath(const std::string& card, const SysPath& directory);
         FileBackingPtr OpenSystemFile(const std::string& card, const SysPath& fullpath);
+        FileBackingPtr CreateSystemFile(const std::string& card, const SysPath& fullpath);
+        void RemoveCachedFile(const SysPath& path) const;
 
         std::unordered_map<std::string, std::vector<SysPath>> dirs;
         std::vector<FileBackingPtr> cachedFiles;

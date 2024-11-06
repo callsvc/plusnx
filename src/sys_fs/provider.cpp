@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <print>
 
 #include <sys_fs/provider.h>
 #include <sys_fs/fsys/rigid_directory.h>
@@ -48,5 +49,26 @@ namespace Plusnx::SysFs {
             }
         }
         return {};
+    }
+
+    FileBackingPtr Provider::CreateSystemFile(const std::string& card, const SysPath& fullpath) {
+        for (const auto& directory : dirs[card]) {
+            if (fullpath.parent_path() != directory)
+                continue;
+            FSys::RigidDirectory dir(directory);
+            if (auto file{dir.CreateFile(fullpath)}; file != nullptr) {
+                cachedFiles.emplace_back(file);
+                return cachedFiles.back();
+            }
+        }
+        return {};
+    }
+
+    void Provider::RemoveCachedFile(const SysPath& path) const {
+        for (const auto& file : cachedFiles) {
+            if (file->path.parent_path() == path) {
+                std::print("Must be removed immediately: {}\n", file->path.string());
+            }
+        }
     }
 }

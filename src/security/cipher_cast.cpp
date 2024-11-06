@@ -1,14 +1,6 @@
 #include <security/cipher_cast.h>
 
 namespace Plusnx::Security {
-    std::string GetMbedError(const i32 error) {
-        switch (error) {
-            case MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA:
-                return "Invalid or malformed parameter";
-            default:
-                return {};
-        }
-    }
     CipherCast::CipherCast(const u8* key, const u64 size, const OperationMode mode, const bool decrypt) : type(mode) {
         mbedtls_cipher_init(&cortex);
 
@@ -18,9 +10,9 @@ namespace Plusnx::Security {
         std::memset(vector.data(), 0, sizeof(vector));
         mbedtls_cipher_setup(&cortex, info);
 
+        assert(mbedtls_cipher_info_get_key_bitlen(info) == size * 8);
         if (const auto result = mbedtls_cipher_setkey(&cortex, key, size * 8, decrypt ? MBEDTLS_DECRYPT : MBEDTLS_ENCRYPT))
             throw Except("{}", GetMbedError(result));
-        assert(mbedtls_cipher_info_get_key_bitlen(info) == size * 8);
     }
     CipherCast::~CipherCast() {
         mbedtls_cipher_reset(&cortex);

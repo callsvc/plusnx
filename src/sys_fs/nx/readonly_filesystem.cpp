@@ -68,7 +68,8 @@ namespace Plusnx::SysFs::Nx {
         } while (file.nextFileSiblingOffset != RomFsEmptyEntry);
     }
 
-    FileBackingPtr ReadOnlyFilesystem::OpenFile(const SysPath& path) {
+    FileBackingPtr ReadOnlyFilesystem::OpenFile(const SysPath& path, const FileMode mode) {
+        assert(mode == FileMode::Read);
         FileBackingPtr result;
         auto OpenFileWithin = [&](const Directory& directory, const auto& parent) {
             for (const auto& file : std::ranges::views::values(directory.files)) {

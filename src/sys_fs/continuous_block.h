@@ -21,7 +21,7 @@ namespace Plusnx::SysFs {
         u64 RemainBytes(CounterType type = CounterType::Read) const;
     private:
         u64 ReadImpl(void* output, u64 size, u64 offset) override;
-        u64 WriteImpl(const void* output, u64 size, u64 offset) override;
+        u64 WriteImpl(const void* input, u64 size, u64 offset) override;
 
         u64 rcnt,
             wcnt;

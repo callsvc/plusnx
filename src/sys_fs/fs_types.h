@@ -31,8 +31,14 @@ namespace Plusnx::SysFs {
         u64 Read(void* output, const u64 size, const u64 offset = 0) {
             return ReadImpl(output, size, offset);
         }
-        u64 Write(const void* output, const u64 size, const u64 offset = 0) {
-            return WriteImpl(output, size, offset);
+        u64 Write(const void* input, const u64 size, const u64 offset = 0) {
+            return WriteImpl(input, size, offset);
+        }
+
+        template <typename T>
+        FileBacking& operator << (const T& data) {
+            Write(&data, sizeof(data));
+            return *this;
         }
 
         template <typename T = char> requires std::is_trivial_v<T>
@@ -54,7 +60,7 @@ namespace Plusnx::SysFs {
         virtual u64 GetSize() const = 0;
     protected:
         virtual u64 ReadImpl(void* output, u64 size, u64 offset = 0) = 0;
-        virtual u64 WriteImpl(const void* output, u64 size, u64 offset = 0) = 0;
+        virtual u64 WriteImpl(const void* input, u64 size, u64 offset = 0) = 0;
     };
     using FileBackingPtr = std::shared_ptr<FileBacking>;
 
@@ -69,9 +75,17 @@ namespace Plusnx::SysFs {
             return path;
         }
 
-        virtual FileBackingPtr OpenFile(const SysPath& path) = 0;
+        virtual FileBackingPtr OpenFile(const SysPath& path, FileMode mode = FileMode::Read) = 0;
         virtual std::vector<SysPath> ListAllFiles() const = 0;
         SysPath path;
+    };
+    class DirectoryBacking : public RoDirectoryBacking {
+    public:
+        DirectoryBacking() = default;
+        DirectoryBacking(const SysPath& path) : RoDirectoryBacking(path) {}
+
+        virtual FileBackingPtr CreateFile(const SysPath& file) = 0;
+        virtual void UnlikeFile(const SysPath& file) = 0;
     };
 
     using FileLists = std::map<SysPath, FileBackingPtr>;

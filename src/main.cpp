@@ -17,7 +17,6 @@ void CheckDriversVersion() {
         assert(std::string_view(SDL_GetCurrentVideoDriver()) == "wayland");
 }
 
-bool extract;
 std::string game;
 po::options_description desc("Plusnx options");
 
@@ -33,14 +32,19 @@ i32 main(const i32 argc, const char** argv) {
     app->Initialize(support);
 
     desc.add_options()
-        ("extract", po::bool_switch(&extract), "extract the content of an NSP/XCI game into a GameFS directory")
+        ("extract", "extract the content of an NSP/XCI game into a GameFS directory")
+        ("collect-metrics", "Collects host system details to assist in bug reporting")
         ("game-name", po::value(&game), "specifies the name of the game to be loaded from the previously specified paths");
 
     po::variables_map vm;
     store(parse_command_line(argc, argv, desc), vm);
     vm.notify();
 
-    if (!game.empty() && extract) {
+    if (vm.contains("collect-metrics")) {
+        app->SaveUserInformation();
+    }
+
+    if (!game.empty() && vm.contains("extract")) {
         app->PickByName(game);
         app->ExtractIntoGameFs();
     } else {

@@ -26,7 +26,7 @@ namespace Plusnx::SysFs::Nx {
     public:
         PartitionFilesystem(const FileBackingPtr& pfs);
         std::vector<SysPath> ListAllFiles() const override;
-        FileBackingPtr OpenFile(const SysPath &path) override;
+        FileBackingPtr OpenFile(const SysPath& path, FileMode = FileMode::Read) override;
 
         struct SuperBlock {
             u32 magic;

@@ -30,9 +30,9 @@ namespace Plusnx::SysFs {
         rcnt += size;
         return result;
     }
-    u64 ContinuousBlock::WriteImpl(const void* output, const u64 size, const u64 offset) {
+    u64 ContinuousBlock::WriteImpl(const void* input, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
-        const auto result{backing->Write(output, size, wcnt + offset)};
+        const auto result{backing->Write(input, size, wcnt + offset)};
         wcnt += size;
         return result;
     }

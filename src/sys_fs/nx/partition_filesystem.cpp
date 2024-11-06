@@ -40,7 +40,8 @@ namespace Plusnx::SysFs::Nx {
         }
         return content;
     }
-    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path) {
+    FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path, const FileMode mode) {
+        assert(mode == FileMode::Read);
         if (!entries.contains(path))
             return {};
         return std::make_shared<FileLayered>(backing, path, dataOffset + entries[path].offset, entries[path].size);

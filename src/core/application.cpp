@@ -7,6 +7,8 @@
 
 #include <os/nx_sys.h>
 #include <os/make_loader.h>
+
+#include <core/device_info_submitter.h>
 #include <core/application.h>
 namespace Plusnx::Core {
     Application::Application() :
@@ -72,5 +74,14 @@ namespace Plusnx::Core {
             return {};
 
         return loader->ExtractFilesInto(SysFs::SysPath(declared).filename());
+    }
+
+    void Application::SaveUserInformation() const {
+        DeviceInfoSubmitter submitter;
+        submitter.Query();
+
+        const auto target{assets->temp.path / "device.enc"};
+        const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
+        submitter.CommitToFile(outputFile);
     }
 }

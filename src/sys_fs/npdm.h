@@ -18,19 +18,22 @@ namespace Plusnx::SysFs {
     };
     struct MetaHeader {
         u32 magic; // Always "META"
-        alignas(4) Security::KeyGeneration generation;
-        u32 pad0;
+        struct {
+            Security::KeyGeneration generation;
+            std::array<u8, 3> pad0;
+        };
+        u32 pad1;
         ProcFlags flags;
-        u8 pad1;
+        u8 pad2;
         u8 mainThreadPriority;
         u8 mainThreadCoreNumber;
-        u32 pad2;
+        u32 pad3;
         u32 systemResource;
         u32 version;
         u32 mainThreadStackSize;
         std::array<char, 0x10> name;
         std::array<char, 0x10> productCode;
-        std::array<u8, 0x30> pad3;
+        std::array<u8, 0x30> pad4;
         u32 aciOffset;
         u32 aciSize;
         u32 acidOffset;

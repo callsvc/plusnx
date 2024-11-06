@@ -42,6 +42,8 @@ target_sources(plusnx PRIVATE
     sys_fs/continuous_block.h
     sys_fs/npdm.cpp
     sys_fs/npdm.h
+    sys_fs/ctr_backing.cpp
+    sys_fs/ctr_backing.h
     sys_fs/nx/content_archive.cpp
     sys_fs/nx/content_archive.h
     sys_fs/nx/content_metadata.cpp
@@ -54,6 +56,8 @@ target_sources(plusnx PRIVATE
     core/context.h
     core/games_lists.cpp
     core/games_lists.h
+    core/device_info_submitter.cpp
+    core/device_info_submitter.h
     cpu/core_container.cpp
     cpu/core_container.h
     cpu/unit_types.h

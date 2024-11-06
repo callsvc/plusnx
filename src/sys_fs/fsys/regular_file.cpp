@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <boost/align/align_up.hpp>
 
 #include <sys_fs/fsys/regular_file.h>
 namespace Plusnx::SysFs::FSys {
@@ -38,7 +39,7 @@ namespace Plusnx::SysFs::FSys {
     u64 RegularFile::GetSize() const {
         Stat64 details;
         fstat64(descriptor, &details);
-        assert(details.st_blocks);
+        assert(details.st_blksize);
         return details.st_size;
     }
 
@@ -65,10 +66,16 @@ namespace Plusnx::SysFs::FSys {
         return copied;
     }
 
-    u64 RegularFile::WriteImpl(const void* output, const u64 size, const u64 offset) {
-        if (fallocate64(descriptor, 0, offset, size) != 0)
-            if (errno)
-                throw Except("{}", GetOsErrorString());
-        return pwrite64(descriptor, output, size, offset);
+    u64 RegularFile::WriteImpl(const void* input, const u64 size, const u64 offset) {
+        Stat64 block;
+        fstat64(descriptor, &block);
+
+        const auto final{boost::alignment::align_up(offset + size, block.st_blksize)};
+        if (GetSize() < final) {
+            if (fallocate64(descriptor, 0, offset, final) != 0)
+                if (errno)
+                    throw Except("{}", GetOsErrorString());
+        }
+        return pwrite64(descriptor, input, size, offset);
     }
 }

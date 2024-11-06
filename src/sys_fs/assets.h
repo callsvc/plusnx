@@ -13,7 +13,9 @@ namespace Plusnx::SysFs {
         public:
         explicit Assets(const std::shared_ptr<Core::Context>& context);
         void CheckDir(const SysPath& path) const;
+        void ResetDir(FSys::RigidDirectory& directory) const;
 
+        FSys::RigidDirectory temp;
         FSys::RigidDirectory logs;
         FSys::RigidDirectory games;
         FSys::RigidDirectory keys;

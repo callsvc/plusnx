@@ -21,6 +21,7 @@ namespace Plusnx::Core {
         void PickByName(const std::string& game);
         // Convert various file formats into a GameFS
         bool ExtractIntoGameFs();
+        void SaveUserInformation() const;
 
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;

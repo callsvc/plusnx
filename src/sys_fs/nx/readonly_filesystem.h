@@ -44,7 +44,7 @@ namespace Plusnx::SysFs::Nx {
     public:
         ReadOnlyFilesystem(const FileBackingPtr& romfs);
 
-        FileBackingPtr OpenFile(const SysPath &path) override;
+        FileBackingPtr OpenFile(const SysPath& path, FileMode = FileMode::Read) override;
         std::vector<SysPath> ListAllFiles() const override;
     private:
         void AddDirectory(const SysPath& path);

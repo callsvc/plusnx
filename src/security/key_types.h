@@ -20,4 +20,5 @@ namespace Plusnx::Security {
     using K256 = std::array<u8, 32>;
 
     std::array<u8, 16> GetSwitchCounter(u64 counter);
+    std::string GetMbedError(i32 error);
 }

@@ -15,6 +15,6 @@ Plusnx::u64 Plusnx::SysFs::FileLayered::ReadImpl(void* output, const u64 size, c
     return result;
 }
 
-Plusnx::u64 Plusnx::SysFs::FileLayered::WriteImpl([[maybe_unused]] const void* output, [[maybe_unused]] u64 size, [[maybe_unused]] u64 offset) {
+Plusnx::u64 Plusnx::SysFs::FileLayered::WriteImpl([[maybe_unused]] const void* input, [[maybe_unused]] u64 size, [[maybe_unused]] u64 offset) {
     throw Except("It is not possible to write data to virtual files");
 }
