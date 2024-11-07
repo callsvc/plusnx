@@ -14,6 +14,7 @@ namespace Plusnx::SysFs::Nx {
             cipher->Decrypt(content, counter, SectorSize);
             if (!ValidateMagic(content.magic))
                 throw Except("Corrupted or invalid NCA");
+
             assert(content.size == nca->GetSize());
         }
 
