@@ -30,7 +30,7 @@ namespace Plusnx::Os {
             assert(npdm.environment == AddrType::Guest64Bit);
             npdm.DisplayBinaryInformation();
 #endif
-            process->memory->CreateProcessMemory(npdm.environment);
+            process->us->CreateProcessMemory(npdm.environment);
         }
 
         creator.emplace(*this);

@@ -20,7 +20,7 @@ namespace Plusnx::GenericKernel::Types {
         u64 pid{};
 
         std::list<KThread> threads;
-        std::unique_ptr<UserSpace>& memory;
+        std::unique_ptr<UserSpace>& us;
         SysFs::Npdm npdm{};
     };
 }

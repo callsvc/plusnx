@@ -16,7 +16,7 @@ namespace Plusnx::GenericKernel {
                 nice(0);
         }
 
-        memory = std::make_unique<UserSpace>();
+        us = std::make_unique<UserSpace>();
     }
 
     Kernel::~Kernel() {
