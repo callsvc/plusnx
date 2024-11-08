@@ -9,6 +9,7 @@ namespace Plusnx::Audio {
     public:
         OutputDevice();
 
+        void HandleAudioEvent(const std::span<u8>& stream) override;
         void Start() override;
     };
 }

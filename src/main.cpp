@@ -4,8 +4,6 @@
 
 #include <core/application.h>
 #include <nogui/sdl_vulkan_backing.h>
-#include <video/vk/api_types.h>
-
 using namespace Plusnx;
 namespace po = boost::program_options;
 
@@ -14,22 +12,19 @@ void CheckDriversVersion() {
     std::print("SDL driver name {}\n", SDL_GetCurrentVideoDriver());
 
     if (IsWaylandPresent())
-        assert(std::string_view(SDL_GetCurrentVideoDriver()) == "wayland");
+        if (std::string_view(SDL_GetCurrentVideoDriver()) == "wayland")
+            std::print("Wayland is still experimental, consider using an X11 session\n");
 }
 
 std::string game;
 po::options_description desc("Plusnx options");
 
 i32 main(const i32 argc, const char** argv) {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-
+    auto sdlVkWindow{std::make_shared<NoGui::SdlVulkanBacking>()};
     CheckDriversVersion();
 
-    const NoGui::SdlVulkanBacking sdlContext;
-    const Video::Vk::VkSupport support(sdlContext);
-
     const auto app{std::make_unique<Core::Application>()};
-    app->Initialize(support);
+    app->Initialize(std::move(sdlVkWindow));
 
     desc.add_options()
         ("extract", "extract the content of an NSP/XCI game into a GameFS directory")
@@ -51,5 +46,19 @@ i32 main(const i32 argc, const char** argv) {
         app->LoadAGameByIndex();
     }
 
-    SDL_Quit();
+    bool quit{};
+    SDL_Event event;
+
+    app->ClearUiEvents();
+
+    while (!quit) {
+        if (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT)
+                quit = true;
+        }
+        app->UpdateFrame();
+
+        SDL_GetPerformanceCounter();
+        SDL_WaitEvent(&event);
+    }
 }

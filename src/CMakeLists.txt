@@ -16,12 +16,11 @@ target_sources(plusnx PRIVATE
     audio/sound.h
     video/gpu.cpp
     video/gpu.h
-    video/vk/api_types.cpp
-    video/vk/api_types.h
     video/vk/app_instance.cpp
     video/vk/app_instance.h
     video/vk/graphics_device.cpp
     video/vk/graphics_device.h
+    video/graphics_types.h
     sys_fs/provider.cpp
     sys_fs/provider.h
     sys_fs/assets.cpp
@@ -50,6 +49,8 @@ target_sources(plusnx PRIVATE
     sys_fs/nx/content_metadata.h
     nogui/sdl_vulkan_backing.cpp
     nogui/sdl_vulkan_backing.h
+    nogui/sdl_window.cpp
+    nogui/sdl_window.h
     core/application.cpp
     core/application.h
     core/context.cpp

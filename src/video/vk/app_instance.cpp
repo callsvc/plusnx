@@ -29,8 +29,10 @@ namespace Plusnx::Video::Vk {
         assert(vk::enumerateInstanceExtensionProperties(nullptr, &count, properties.data()) == vk::Result::eSuccess);
 
         for (const auto& property : properties) {
-            if (ContainsValue(required, std::string_view(property.extensionName)))
-                extensions.emplace_back(property.extensionName);
+            for (const auto& content : required) {
+                if (content == std::string_view(property.extensionName))
+                    extensions.emplace_back(content.data());
+            }
         }
     }
 
@@ -44,11 +46,12 @@ namespace Plusnx::Video::Vk {
             {}, &applicationInfo, static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data()
         };
 
-        vkInstance = createInstance(instanceCreateInfo);
+        assert(required.size() == extensions.size());
+        instance = createInstance(instanceCreateInfo);
     }
 
     AppInstance::~AppInstance() {
-        if (vkInstance)
-            vkDestroyInstance(vkInstance, nullptr);
+        if (instance)
+            vkDestroyInstance(instance, nullptr);
     }
 }

@@ -1,15 +1,16 @@
 #pragma once
-
 #include <vector>
 
-#include <SDL2/SDL.h>
+#include <nogui/sdl_window.h>
+
+#include <video/graphics_types.h>
 namespace Plusnx::NoGui {
-    class SdlVulkanBacking {
+    class SdlVulkanBacking final : public SdlWindow, public Video::GraphicsSupportContext {
     public:
         SdlVulkanBacking();
-        ~SdlVulkanBacking();
+        ~SdlVulkanBacking() override;
 
-        std::vector<const char*> required;
-        SDL_Window* window{nullptr};
+        void ActivateContext(const vk::Instance& context) override;
+        void Update() override;
     };
 }

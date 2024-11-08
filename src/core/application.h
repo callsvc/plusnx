@@ -2,7 +2,7 @@
 #include <memory>
 #include <core/games_lists.h>
 #include <sys_fs/assets.h>
-#include <video/vk/api_types.h>
+#include <video/graphics_types.h>
 #include <generic_kernel/types/kprocess.h>
 namespace Plusnx::Os {
     class NxSys;
@@ -14,7 +14,8 @@ namespace Plusnx::Core {
     class Application {
     public:
         Application();
-        void Initialize(const Video::Vk::VkSupport& support);
+        ~Application();
+        void Initialize(std::shared_ptr<Video::GraphicsSupportContext>&& support);
         void LoadAGameByIndex(u64 index = 0) const;
 
         // Only selects a game from the collection (does not load it yet)
@@ -22,6 +23,9 @@ namespace Plusnx::Core {
         // Convert various file formats into a GameFS
         bool ExtractIntoGameFs();
         void SaveUserInformation() const;
+
+        void ClearUiEvents() const;
+        void UpdateFrame() const;
 
         std::shared_ptr<Context> context;
         std::shared_ptr<SysFs::Assets> assets;
@@ -33,6 +37,7 @@ namespace Plusnx::Core {
         std::string declared;
         SysFs::SysPath chosen;
 
+        std::shared_ptr<Video::GraphicsSupportContext> ui;
         std::unique_ptr<GamesLists> games;
     };
 }

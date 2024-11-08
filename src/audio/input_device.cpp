@@ -7,4 +7,7 @@ namespace Plusnx::Audio {
         SDL_ClearQueuedAudio(audio);
         Device::Stop();
     }
+
+    void InputDevice::HandleAudioEvent(const std::span<u8>& stream) {
+    }
 }

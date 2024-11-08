@@ -17,6 +17,7 @@ namespace Plusnx::Audio {
 
         virtual void Start();
         virtual void Stop();
+        virtual void HandleAudioEvent(const std::span<u8>& stream) = 0;
     protected:
         std::vector<const char*> available;
         const char* target{nullptr};

@@ -8,7 +8,8 @@ namespace Plusnx::Video {
     class GPU {
     public:
         GPU() = default;
-        void Initialize(const Vk::VkSupport& support);
+        void Initialize(const std::shared_ptr<GraphicsSupportContext>& support);
+
         std::shared_ptr<Vk::AppInstance> instance;
         std::shared_ptr<Vk::GraphicsDevice> device;
     };

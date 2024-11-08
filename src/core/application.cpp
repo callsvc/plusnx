@@ -24,7 +24,13 @@ namespace Plusnx::Core {
         context->keys = std::make_shared<Security::Keyring>(context);
     }
 
-    void Application::Initialize(const Video::Vk::VkSupport& support) {
+    Application::~Application() {
+        if (ui) {
+            auto gui{std::move(ui)};
+        }
+    }
+
+    void Application::Initialize(std::shared_ptr<Video::GraphicsSupportContext>&& support) {
         context->gpu->Initialize(support);
 
         context->process = [&] {
@@ -35,6 +41,8 @@ namespace Plusnx::Core {
             process->Initialize();
             return process;
         }();
+
+        ui = std::move(support);
         nos = std::make_shared<Os::NxSys>(context);
     }
 
@@ -83,5 +91,15 @@ namespace Plusnx::Core {
         const auto target{assets->temp.path / "device.enc"};
         const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
         submitter.CommitToFile(outputFile);
+    }
+
+    void Application::ClearUiEvents() const {
+        if (ui->apiType == Video::ApiType::Sdl) {
+            SDL_PumpEvents();
+        }
+    }
+
+    void Application::UpdateFrame() const {
+        ui->Update();
     }
 }

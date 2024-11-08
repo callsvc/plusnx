@@ -1,12 +1,15 @@
 #include <map>
 #include <ranges>
+#include <print>
 #include <video/vk/graphics_device.h>
 namespace Plusnx::Video::Vk {
-    GraphicsDevice::GraphicsDevice(const std::shared_ptr<AppInstance>& app) : vkInstance(app->vkInstance) {
-        const auto devices{vkInstance.enumeratePhysicalDevices()};
+    GraphicsDevice::GraphicsDevice(const std::shared_ptr<AppInstance>& app) : instance(app->instance) {
+        const auto devices{instance.enumeratePhysicalDevices()};
         std::multimap<i32, VkPhysicalDevice, std::less<>> selection;
 
         for (const auto& [index, dev] : std::ranges::views::enumerate(devices)) {
+            std::print("Vulkan device found: {}\n", dev.getProperties().deviceName.data());
+
             i32 counter{};
             if (dev.getProperties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
                 counter += 1000;

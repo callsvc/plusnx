@@ -12,6 +12,9 @@ namespace Plusnx::Audio {
         Device::Stop();
     }
 
+    void OutputDevice::HandleAudioEvent(const std::span<u8>& stream) {
+    }
+
     void OutputDevice::Start() {
         Device::Start();
         std::print("Let's play some noise to test the sound output\n");

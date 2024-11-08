@@ -2,6 +2,11 @@
 
 #include <audio/device.h>
 namespace Plusnx::Audio {
+    static void RenderSound(void* device, u8* stream, const i32 length) {
+        const auto sound{static_cast<Device*>(device)};
+        sound->HandleAudioEvent(std::span(stream, length));
+    }
+
     Device::Device(const i32 device) : recorder(device) {
         const auto devices{SDL_GetNumAudioDevices(device)};
 
@@ -28,6 +33,12 @@ namespace Plusnx::Audio {
             target = strdup(sound);
             specs = current;
         }
+
+#if 1
+        assert(specs.callback == nullptr);
+        specs.callback = RenderSound;
+        specs.userdata = this;
+#endif
 
         SDL_free(sound);
         audio = SDL_OpenAudioDevice(target, recorder, &specs, &current, 0);
