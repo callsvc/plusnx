@@ -72,6 +72,8 @@ namespace Plusnx::Loader {
                 continue;
 
             const SysFs::Nx::NCA nca(keys, pfs->OpenFile(path));
+            if (!nca.backing)
+                throw Except("The current NCA does not have valid backing");
             const auto stream{std::make_unique<SysFs::ContinuousBlock>(nca.backing)};
 
             while (auto remain{stream->RemainBytes()}) {

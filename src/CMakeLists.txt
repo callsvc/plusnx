@@ -106,6 +106,7 @@ target_sources(plusnx PRIVATE
     main.cpp
     driver.cpp
     container.h
+    except.cpp
     except.h
     types.cpp
     types.h
