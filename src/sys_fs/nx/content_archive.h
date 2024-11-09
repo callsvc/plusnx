@@ -22,8 +22,94 @@ namespace Plusnx::SysFs::Nx {
         System
     };
 
+    enum class FsType : u8 {
+        RomFs,
+        PartitionFs,
+    };
+    enum class HashType : u8 {
+        Auto,
+        None,
+        HierarchicalSha256Hash,
+        HierarchicalIntegrityHash,
+        AutoSha3, // [14.0.0+]
+        HierarchicalSha3256Hash, // [14.0.0+]
+        HierarchicalIntegritySha3Hash // [14.0.0+]
+    };
+
+    enum class EncryptionType : u8 {
+        Auto,
+        None,
+        AesXts,
+        AesCtr,
+        AesCtrEx,
+        AesCtrSkipLayerHash, // [14.0.0+]
+        AesCtrExSkipLayerHash // [14.0.0+]
+    };
 #pragma pack(push, 1)
-    struct alignas(0x200) NcaHeader {
+    struct FsEntry {
+        u32 startOffset;
+        u32 endOffset;
+        u64 pad0;
+    };
+
+    struct HierarchicalSha256Data {
+        std::array<u8, 0x20> masterHash; // SHA256 hash over the hash-table at section-start+0 with the below hash-table size
+        u32 blockSize;
+        u32 layerCount; // always 2
+        struct LayerRegion {
+            u64 offset;
+            u64 size;
+        };
+        std::array<LayerRegion, 2> regions;
+        std::array<LayerRegion, 3> pad0;
+        std::array<u8, 0x80> pad1;
+
+    };
+    struct IntegrityMetaInfo {
+        u32 magic;
+        u32 version;
+        u32 masterHashSize;
+        u32 maxLayers;
+        struct HierarchicalIntegrityVerificationLevelInformation {
+            u64 logicalOffset;
+            u64 hashDataSize;
+            u32 blockSize;
+            u32 pad0;
+        };
+        std::array<HierarchicalIntegrityVerificationLevelInformation, 6> levels;
+        std::array<u8, 0x20> signatureSalt;
+        std::array<u8, 0x20> masterHash;
+        std::array<u8, 0x18> pad0;
+
+        static_assert(sizeof(levels) == 0x90);
+    };
+
+    struct FsHeader {
+        u16 magic;
+        FsType type;
+        HashType hashType;
+        EncryptionType encryptionType;
+        u8 metaDataHashType; // [14.0.0+]
+        u16 pad0;
+        union {
+            std::array<u8, 0xF8> hashData;
+
+            HierarchicalSha256Data hash256;
+            IntegrityMetaInfo hashIntegrity;
+
+            static_assert(sizeof(hash256) == sizeof(hashData));
+            static_assert(sizeof(hashIntegrity) == sizeof(hashData));
+        };
+        std::array<u8, 0x40> patchInfo; // (only used with game updates RomFs)
+        u32 generation;
+        u32 secureValue;
+        std::array<u8, 0x30> sparseInfo;
+        std::array<u8, 0x28> compressionInfo;
+        std::array<u8, 0x30> metadataHashDataInfo; // [14.0.0+]
+        std::array<u8, 0x30> pad1;
+    };
+
+    struct NcaHeader {
         std::array<u8, 0x100> firstHeaderSignature;
         std::array<u8, 0x100> secondHeaderSignature; // using a key from NPDM (or zeroes if not a program)
         u32 magic;
@@ -37,9 +123,17 @@ namespace Plusnx::SysFs::Nx {
         u32 sdkAddonVersion;
         Security::KeyGeneration generation;
         u8 signatureGeneration;
-        std::array<u8, 0xe> pad0;
+        std::array<u8, 0xE> pad0;
         Security::RightsId rights;
+        std::array<FsEntry, 4> entries;
+        std::array<std::array<u8, 0x20>, 4> headersSum;
+        std::array<std::array<u8, 16>, 4> encryptedKeyArea;
+
+        std::array<u8, 0x400 - 0x340> pad1;
+        std::array<FsHeader, 4> headers;
     };
+
+    static_assert(sizeof(NcaHeader) == 0xC00);
 #pragma pack(pop)
 
     class NCA {
@@ -47,8 +141,16 @@ namespace Plusnx::SysFs::Nx {
         NCA(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca);
 
         static bool ValidateMagic(u32 magic);
-        const FileBackingPtr backing;
+        std::pair<FsType, FileBackingPtr> GetBackingFile();
+
+        std::optional<FileBackingPtr> romfs;
+        std::optional<FileBackingPtr> pfs;
     private:
+        void CreateFilesystemEntries(const FileBackingPtr& nca);
+        void CreateBackingFile(const FileBackingPtr& nca, const FsEntry& entry, const FsHeader& header);
+
+        Security::K128 GetDecryptionTitleKey(EncryptionType encType) const;
+
         std::optional<Security::CipherCast> cipher;
         const std::shared_ptr<Security::Keyring>& keys;
         NcaHeader content;

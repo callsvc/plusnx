@@ -26,6 +26,12 @@ namespace Plusnx {
     bool IsEmpty(const T& container) {
         return std::ranges::empty(container);
     }
+    template <typename T> requires std::is_trivial_v<T>
+    bool IsValueEmpty(const T& value) {
+        T empty{};
+        return std::memcmp(&value, &empty, sizeof(T)) == 0;
+    }
+
     template <typename T, typename B>
     bool IsEqual(const T& left, const B& right) {
         return std::ranges::equal(left, right);

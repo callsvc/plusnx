@@ -1,17 +1,19 @@
 #include <sys_fs/ctr_backing.h>
 
 namespace Plusnx::SysFs {
-    CtrBacking::CtrBacking(const FileBackingPtr& file, const Security::K128& key, const u64 offset) : FileBacking(file->path, file->mode), backing(file), adrOffset(offset) {
+    CtrBacking::CtrBacking(const FileBackingPtr& file, const Security::K128& key, const u64 offset, const u64 size) : FileBacking(file->path, file->mode), backing(file), adrOffset(offset), adrSize(size) {
         switch (mode) {
             case FileMode::Write:
-                encrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, true);
+                encrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, false);
             case FileMode::Read:
-                decrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, false);
+                decrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, true);
             default: {}
         }
     }
 
     u64 CtrBacking::GetSize() const {
+        if (mode == FileMode::Read && adrSize)
+            return adrSize;
         return backing->GetSize();
     }
 

@@ -61,20 +61,31 @@ namespace Plusnx::Loader {
         std::vector<u8> buffer(4 * 1024 * 1024);
 
         for (const auto& path : files) {
+            // ReSharper disable once CppEntityAssignedButNoRead
+            [[maybe_unused]] bool cnmt{};
             auto filename{path};
             if (filename.extension() != ".nca")
                 continue;
-            while (filename.has_extension())
+            while (filename.has_extension()) {
+                if (filename.extension() == ".cnmt")
+                    // ReSharper disable once CppDFAUnusedValue
+                    cnmt = true;
                 filename = filename.replace_extension();
+            }
+#if 0
+            if (cnmt)
+                continue;
+#endif
 
             auto expected{HexTextToByteArray<16>(filename.string())};
             if (IsEmpty(expected))
                 continue;
 
-            const SysFs::Nx::NCA nca(keys, pfs->OpenFile(path));
-            if (!nca.backing)
+            const auto nca{std::make_unique<SysFs::Nx::NCA>(keys, pfs->OpenFile(path))};
+
+            const auto stream{std::make_unique<SysFs::ContinuousBlock>(nca->GetBackingFile().second)};
+            if (!stream)
                 throw Except("The current NCA does not have valid backing");
-            const auto stream{std::make_unique<SysFs::ContinuousBlock>(nca.backing)};
 
             while (auto remain{stream->RemainBytes()}) {
                 if (remain > buffer.size())

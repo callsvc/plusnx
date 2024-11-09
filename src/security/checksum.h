@@ -10,7 +10,7 @@ namespace Plusnx::Security {
     };
     class Checksum {
     public:
-        Checksum();
+        Checksum(bool test = false);
         ~Checksum();
         Checksum(const Checksum& clone);
 

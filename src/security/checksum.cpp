@@ -2,10 +2,12 @@
 
 #include <security/checksum.h>
 namespace Plusnx::Security {
-    Checksum::Checksum() {
+    Checksum::Checksum(const bool test) {
         mbedtls_sha256_init(&state);
-        if (mbedtls_sha256_self_test(1))
-            return;
+        if (test) {
+            if (mbedtls_sha256_self_test(1))
+                return;
+        }
 
         status = CheckingStatus::Finished;
     }

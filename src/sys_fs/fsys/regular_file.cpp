@@ -59,6 +59,9 @@ namespace Plusnx::SysFs::FSys {
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};
             if (static_cast<u64>(result) != stride) {
+                std::print("{}\n", GetOsErrorString());
+                if (errno)
+                    throw Except("Could not read {:#x} bytes from offset {:#x} of descriptor {}", size, offset, descriptor);
             }
             copied += result;
             falling += result;

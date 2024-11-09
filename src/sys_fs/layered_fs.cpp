@@ -8,7 +8,7 @@ Plusnx::u64 Plusnx::SysFs::FileLayered::GetSize() const {
     return ends;
 }
 Plusnx::u64 Plusnx::SysFs::FileLayered::ReadImpl(void* output, const u64 size, const u64 offset) {
-    if (size > ends)
+    if (offset + size > ends)
         throw Except("Out of the current file bounds");
 
     const auto result{parent->Read(output, size, starts + offset)};

@@ -15,7 +15,7 @@ namespace Plusnx {
     public:
         template <typename... Args>
         Except(const std::format_string<Args...>& format, Args&&... args) :
-            std::runtime_error(std::format(format, std::forward<Args...>(args)...)) {
+            std::runtime_error(std::format(format, std::forward<Args>(args)...)) {
             for (const auto& function : GetStackTrace()) {
                 std::print("{}\n", function);
             }

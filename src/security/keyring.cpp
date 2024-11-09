@@ -1,27 +1,45 @@
 #include <ranges>
 #include <boost/algorithm/string.hpp>
-#include <security/keyring.h>
 
 #include <core/context.h>
+#include <security/keyring.h>
 namespace Plusnx::Security {
-    constexpr std::array aliasKeys{"header_key", "sd_card_save_key_source", "sd_card_nca_key_source", "header_key_source", "sd_card_save_key"};
-    IndexedKeyType GetKeyAlias(const std::string_view& key) {
-        static std::unordered_map<std::string_view, IndexedKeyType> indexed256Alias;
+    constexpr std::array keys256Names{"header_key", "sd_card_save_key_source", "sd_card_nca_key_source", "header_key_source", "sd_card_save_key"};
+    constexpr std::array kekKeysPrefix{"titlekek_", "key_area_key_application_", "key_area_key_ocean_", "key_area_key_system_"};
 
-        [[unlikely]] if (indexed256Alias.empty()) {
-            u32 counter{static_cast<u32>(IndexedKeyType::HeaderKey)};
-            for (const auto& alias : aliasKeys) {
-                indexed256Alias.emplace(alias, static_cast<IndexedKeyType>(counter++));
-            }
-        }
-        if (indexed256Alias.contains(key)) {
-            return indexed256Alias.at(key);
-        }
+    Key256Type GetKey256Alias(const std::string_view& key) {
+        if (key == "header_key")
+            return Key256Type::HeaderKey;
+        if (key == "sd_card_save_key_source")
+            return Key256Type::SdSaveKeySave;
+        if (key == "sd_card_nca_key_source")
+            return Key256Type::NcaKeySource;
+        if (key == "header_key_source")
+            return Key256Type::KeySource;
+        if (key == "sd_card_save_key")
+            return Key256Type::SdSaveKey;
+        return Key256Type::Invalid;
+    }
+    IndexedKeyType GetIndexKeyType(const std::string_view& key) {
+        if (key.contains("titlekek_"))
+            return IndexedKeyType::KekTitle;
+        if (key.contains("key_area_key_application_"))
+            return IndexedKeyType::KekAreaApplication;
+        if (key.contains("key_area_key_ocean_"))
+            return IndexedKeyType::KekAreaOcean;
+        if (key.contains("key_area_key_system_"))
+            return IndexedKeyType::KekAreaSystem;
+
         return IndexedKeyType::Invalid;
     }
 
     Keyring::Keyring(const std::shared_ptr<Core::Context>& context) {
         const auto provider{context->provider};
+
+        for (const auto& name : keys256Names)
+            keys256.emplace(GetKey256Alias(name), K256{});
+        for (const auto& name : kekKeysPrefix)
+            indexed.emplace(GetIndexKeyType(name), std::map<u32, K128>{});
 
         if (const auto prod{provider->OpenSystemFile(SysFs::RootId, "prod.keys")})
             ReadKeysPairs(prod, KeyType::Production);
@@ -34,14 +52,22 @@ namespace Plusnx::Security {
             throw Except("Title key not found");
     }
 
-    bool Keyring::GetIndexed(const IndexedKeyType type, u8* output, const u64 size) const {
+    bool Keyring::GetKey256(const Key256Type type, u8* output, const u64 size) const {
         std::memset(output, 0, size);
-        if (!indexed.contains(type)) {
-            throw Except("Key index {} not found", static_cast<u32>(type));
+        if (keys256.contains(type)) {
+            const auto& value{keys256.at(type)};
+            std::memcpy(output, value.data(), size);
         }
-        const auto& value{indexed.at(type)};
-        std::memcpy(output, value.data(), size);
 
+        return !IsEmpty(std::span(output, size));
+    }
+
+    bool Keyring::GetIndexedKey(const IndexedKeyType type, const u32 index, u8* output, const u64 size) const {
+        std::memset(output, 0, size);
+        if (indexed.contains(type) && indexed.at(type).contains(index)) {
+            const auto& value{indexed.at(type).at(index)};
+            std::memcpy(output, value.data(), size);
+        }
         return !IsEmpty(std::span(output, size));
     }
 
@@ -77,15 +103,30 @@ namespace Plusnx::Security {
     void Keyring::AddProductionPair(const std::pair<std::string_view, std::string_view>& view) {
         const auto key{view.first};
         const auto value{view.second};
-        if (value.size() > 64)
-            return;
-        const auto valueKey{HexTextToByteArray<32>(value)};
 
-        if (const auto type = GetKeyAlias(key); type != IndexedKeyType::Invalid) {
-            if (!indexed.contains(type))
-                indexed.emplace(type, valueKey);
+        if (const auto type = GetKey256Alias(key); type != Key256Type::Invalid) {
+            const auto valueKey{HexTextToByteArray<32>(value)};
+
+            if (keys256.contains(type))
+                keys256[type] = valueKey;
+        } else if (const auto type128 = GetIndexKeyType(key); type128 != IndexedKeyType::Invalid) {
+            const auto valueKey{HexTextToByteArray<16>(value)};
+            std::array<u8, 2> keyIndex;
+            if (auto index = key.substr(key.find_last_of("_") + 1); std::ranges::all_of(index, isxdigit))
+                keyIndex = HexTextToByteArray<2>(index);
+            else
+                return;
+
+            u32 counter{};
+            std::memcpy(&counter, keyIndex.data(), 2);
+
+            const auto it{indexed.find(type128)};
+            if (it != indexed.end()) {
+                it->second.emplace(counter, valueKey);
+            }
         } else {
-            prods.emplace(key, valueKey);
+            if (!prods.contains(key))
+                prods.emplace(key, value);
         }
     }
 }
