@@ -53,8 +53,10 @@ namespace Plusnx::SysFs::FSys {
         const auto content{static_cast<u8*>(output)};
         while (copied < size) {
             const u64 stride{size - copied > 4096 ? 4096 : size - copied};
-            if (!stride || copied + stride > GetSize() - offset) {
-                return stride;
+            std::array<SysPath, 1> SpecialInvalidSizeFiles{"/dev/urandom"};
+            if (!ContainsValue(SpecialInvalidSizeFiles, path)) {
+                if (!stride || copied + stride > GetSize() - offset)
+                    return stride;
             }
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};

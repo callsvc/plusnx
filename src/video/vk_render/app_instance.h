@@ -1,7 +1,7 @@
 #pragma once
 
 #include <video/graphics_types.h>
-namespace Plusnx::Video::Vk {
+namespace Plusnx::Video::VkRender {
     class AppInstance {
     public:
         explicit AppInstance(const std::vector<std::string_view>& required);

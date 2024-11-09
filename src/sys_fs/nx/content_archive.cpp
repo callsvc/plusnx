@@ -1,4 +1,5 @@
 #include <ranges>
+#include <boost/endian/conversion.hpp>
 
 #include <security/checksum.h>
 #include <sys_fs/ctr_backing.h>
@@ -24,6 +25,7 @@ namespace Plusnx::SysFs::Nx {
         }
         assert(content.keyGenerationOld == 2);
 
+        rights = !IsValueEmpty(content.rights);
         CreateFilesystemEntries(nca);
     }
 
@@ -50,9 +52,18 @@ namespace Plusnx::SysFs::Nx {
             checksum.Update(&header, sizeof(header));
             checksum.Finish(result);
 
-            if (!IsEqual(result, content.headersSum[index]))
+            if (!IsEmpty(content.headersSum[index]) && !IsEqual(result, content.headersSum[index])) {
                 throw Except("The entry in the NCA at index {} appears to be corrupted", index);
+            }
             CreateBackingFile(nca, entry, header);
+            if (const auto file{GetBackingFile().second}) {
+                if (auto testType = file->GetBytes(16); !testType.empty()) {
+                    if (header.type == FsType::PartitionFs)
+                        assert(std::memcmp(testType.data(), "PFS0", 4) == 0);
+                    else if (header.type == FsType::RomFs)
+                        assert(std::memcmp(testType.data(), "PFS0", 4));
+                }
+            }
         }
     }
 
@@ -78,7 +89,13 @@ namespace Plusnx::SysFs::Nx {
             return pfs;
         }();
 
-        emplaceBacking.emplace(std::make_shared<CtrBacking>(nca, GetDecryptionTitleKey(header.encryptionType), offset, size));
+        std::array<u8, 16> ctr{};
+        const auto gen{boost::endian::endian_reverse(header.generation)};
+        const auto secure{boost::endian::endian_reverse(header.secureValue)};
+        std::memcpy(&ctr[0], &gen, 4);
+        std::memcpy(&ctr[4], &secure, 4);
+
+        emplaceBacking.emplace(std::make_shared<CtrBacking>(nca, GetDecryptionTitleKey(header.encryptionType), offset, size, ctr));
     }
 
     Security::IndexedKeyType GetAreaType(const KeyAreaIndex area) {
@@ -88,28 +105,44 @@ namespace Plusnx::SysFs::Nx {
     }
 
     Security::K128 NCA::GetDecryptionTitleKey(const EncryptionType encType) const {
-        if (!IsValueEmpty(content.rights))
-            return content.rights;
+        const auto keyRevision{GetKeyRevision()};
 
-        const u32 keyRevision{std::max(static_cast<u32>(content.generation) - 1, 0U)};
+        if (rights) {
+            Security::K128 titleKek{};
+            keys->GetIndexedKey(Security::IndexedKeyType::KekTitle, keyRevision, titleKek.data(), titleKek.size());
+            Security::CipherCast titleCipher(titleKek.data(), titleKek.size(), Security::OperationMode::EcbAes, true);
+
+            Security::K128 title{};
+            titleCipher.Process(title.data(), title.data(), sizeof(title));
+            return title;
+        }
+
+        std::optional<Security::CipherCast> ecbDecrypt;
         const Security::K128 encryptedKey = [&] {
             Security::K128 key{};
             keys->GetIndexedKey(GetAreaType(content.areaIndex), keyRevision, key.data(), key.size());
 
             u32 indexArea{};
-            if (encType == EncryptionType::AesCtr)
+            if (encType == EncryptionType::AesCtrEx ||
+                encType == EncryptionType::AesCtr)
                 indexArea = 2;
+            ecbDecrypt.emplace(key.data(), key.size(), Security::OperationMode::EcbAes, true);
+
             return content.encryptedKeyArea[indexArea];
         }();
 
-        Security::K128 title{};
         Security::K128 decryptedKey{};
-        keys->GetIndexedKey(Security::IndexedKeyType::KekTitle, keyRevision, title.data(), title.size());
-
-        Security::CipherCast ecbDecrypt(title.data(), title.size(), Security::OperationMode::EcbAes, true);
-        ecbDecrypt.Process(decryptedKey.data(), encryptedKey.data(), encryptedKey.size());
+        ecbDecrypt->Process(decryptedKey.data(), encryptedKey.data(), encryptedKey.size());
 
         return decryptedKey;
+    }
+
+    u64 NCA::GetKeyRevision() const {
+        // https://github.com/strato-emu/strato/blob/master/app/src/main/cpp/skyline/vfs/nca.cpp#L97
+        const auto legacy{static_cast<u64>(content.keyGenerationOld)};
+        auto generation{static_cast<u64>(content.generation)};
+        generation = std::max(legacy, generation);
+        return std::max(generation - 1, 0UL);
     }
 
     std::pair<FsType, FileBackingPtr> NCA::GetBackingFile() {

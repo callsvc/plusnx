@@ -1,8 +1,8 @@
 #include <print>
 
-#include <video/vk/app_instance.h>
 #include <types.h>
-namespace Plusnx::Video::Vk {
+#include <video/vk_render/app_instance.h>
+namespace Plusnx::Video::VkRender {
     void AppInstance::EnumerateSupportLayers() {
         u32 layersCount;
 

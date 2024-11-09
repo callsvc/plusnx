@@ -8,7 +8,7 @@
 #include <os/nx_sys.h>
 #include <os/make_loader.h>
 
-#include <core/device_info_submitter.h>
+#include <core/telemetry_collector.h>
 #include <core/application.h>
 namespace Plusnx::Core {
     Application::Application() :
@@ -34,7 +34,7 @@ namespace Plusnx::Core {
         context->gpu->Initialize(support);
 
         context->process = [&] {
-            if (const auto last = context->process.lock())
+            if (const auto last = context->process)
                 last->Destroy();
 
             auto process{kernel->CreateNewProcess()};
@@ -43,16 +43,16 @@ namespace Plusnx::Core {
         }();
 
         ui = std::move(support);
-        nos = std::make_shared<Os::NxSys>(context);
+        context->nxOs = std::make_shared<Os::NxSys>(context);
     }
 
     void Application::LoadAGameByIndex(const u64 index) const {
         if (!index)
-            nos->LoadApplicationFile(*games->first);
+            context->nxOs->LoadApplicationFile(*games->first);
         else
             if (const auto collection = games->GetAllGames(); !collection.empty())
                 if (collection.size() < index)
-                    nos->LoadApplicationFile(collection[index]);
+                    context->nxOs->LoadApplicationFile(collection[index]);
     }
 
     void Application::PickByName(const std::string& game) {
@@ -85,12 +85,12 @@ namespace Plusnx::Core {
     }
 
     void Application::SaveUserInformation() const {
-        DeviceInfoSubmitter submitter;
-        submitter.Query();
+        TelemetryCollector collector;
+        collector.Query();
 
-        const auto target{assets->temp.path / "device.enc"};
+        const auto target{assets->temp.path / "telemetry.enc"};
         const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
-        submitter.CommitToFile(outputFile);
+        collector.CommitToFile(outputFile);
     }
 
     void Application::ClearUiEvents() const {

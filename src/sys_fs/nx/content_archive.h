@@ -145,11 +145,13 @@ namespace Plusnx::SysFs::Nx {
 
         std::optional<FileBackingPtr> romfs;
         std::optional<FileBackingPtr> pfs;
+        bool rights{};
     private:
         void CreateFilesystemEntries(const FileBackingPtr& nca);
         void CreateBackingFile(const FileBackingPtr& nca, const FsEntry& entry, const FsHeader& header);
 
         Security::K128 GetDecryptionTitleKey(EncryptionType encType) const;
+        u64 GetKeyRevision() const;
 
         std::optional<Security::CipherCast> cipher;
         const std::shared_ptr<Security::Keyring>& keys;

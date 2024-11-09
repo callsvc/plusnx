@@ -1,10 +1,12 @@
 #include <ranges>
-#include <core/context.h>
+#include <platform/hostx1.h>
 
+#include <core/context.h>
 namespace Plusnx::Core {
     Context::Context() :
         provider(std::make_shared<SysFs::Provider>()),
-        gpu(std::make_shared<Video::GPU>()),
+        gpu(std::make_shared<Video::TegraX1Gpu>()),
+        host1x(std::make_shared<Platform::Host1x>()),
         sound(std::make_shared<Audio::Sound>()) {
     }
 

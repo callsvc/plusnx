@@ -41,7 +41,7 @@ namespace Plusnx::Security {
 
             mbedtls_cipher_reset(&cortex);
             u64 result{};
-            mbedtls_cipher_update(&cortex, &source[read], stride, &output[read], &result);
+            assert(mbedtls_cipher_update(&cortex, &source[read], stride, &output[read], &result) == 0);
             read += result;
         }
         if (output != dest)

@@ -3,7 +3,7 @@
 
 #include <sys_fs/fs_types.h>
 namespace Plusnx::Core {
-    class DeviceInfoSubmitter {
+    class TelemetryCollector {
     public:
         void Query();
         void CommitToFile(const SysFs::FileBackingPtr& output) const;

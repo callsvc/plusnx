@@ -27,7 +27,7 @@ namespace Plusnx::SysFs {
         }
         const auto result{backing->Read(output, size, rcnt + offset)};
 
-        rcnt += size;
+        rcnt += result;
         return result;
     }
     u64 ContinuousBlock::WriteImpl(const void* input, const u64 size, const u64 offset) {

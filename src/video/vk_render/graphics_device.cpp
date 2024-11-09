@@ -1,8 +1,8 @@
 #include <map>
-#include <ranges>
 #include <print>
-#include <video/vk/graphics_device.h>
-namespace Plusnx::Video::Vk {
+#include <ranges>
+#include <video/vk_render/graphics_device.h>
+namespace Plusnx::Video::VkRender {
     GraphicsDevice::GraphicsDevice(const std::shared_ptr<AppInstance>& app) : instance(app->instance) {
         const auto devices{instance.enumeratePhysicalDevices()};
         std::multimap<i32, VkPhysicalDevice, std::less<>> selection;

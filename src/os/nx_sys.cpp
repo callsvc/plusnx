@@ -24,7 +24,7 @@ namespace Plusnx::Os {
             return;
         }
 
-        if (const auto& process{context->process.lock()}) {
+        if (const auto& process{context->process}) {
             const auto& npdm{process->npdm};
 #if 1
             assert(npdm.environment == AddrType::Guest64Bit);

@@ -1,0 +1,10 @@
+#pragma once
+
+#include <armored/armor_types.h>
+namespace Plusnx::Armored {
+    class EmitterDetails {
+    public:
+        virtual ~EmitterDetails() = default;
+        virtual u64 GetInstructionSize() = 0;
+    };
+}

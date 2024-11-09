@@ -7,7 +7,7 @@
 #include <types.h>
 #include <sys_fs/ctr_backing.h>
 #include <sys_fs/continuous_block.h>
-#include <core/device_info_submitter.h>
+#include <core/telemetry_collector.h>
 namespace Plusnx::Core {
     u64 GetCoresTotal() {
         const auto processors{static_cast<u64>(get_nprocs())};
@@ -15,13 +15,13 @@ namespace Plusnx::Core {
 
         return std::max(processors, byConfig);
     }
-    void DeviceInfoSubmitter::Query() {
+    void TelemetryCollector::Query() {
         strings << std::format("Available core count: {}\n", GetCoresTotal());
     }
 
     const auto seeder{"Plusnx Random AES"};
 
-    void DeviceInfoSubmitter::CommitToFile(const SysFs::FileBackingPtr& output) const {
+    void TelemetryCollector::CommitToFile(const SysFs::FileBackingPtr& output) const {
         mbedtls_entropy_context ent;
         mbedtls_ctr_drbg_context ctr;
 

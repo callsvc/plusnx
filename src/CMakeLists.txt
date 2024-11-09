@@ -2,8 +2,32 @@ cmake_minimum_required(VERSION 3.29)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(plusnx)
+target_include_directories(plusnx-core PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
+    $<INSTALL_INTERFACE:>
+)
+
 target_sources(plusnx PRIVATE
+    main.cpp
+)
+
+target_sources(plusnx-core PUBLIC
+    armored/armor_types.cpp
+    armored/armor_types.h
+    armored/code_blocks.cpp
+    armored/code_blocks.h
+    armored/cpu_context.cpp
+    armored/cpu_context.h
+    armored/jit_context.cpp
+    armored/jit_context.h
+    armored/arm64_emitter_context.cpp
+    armored/arm64_emitter_context.h
+    armored/emitter_interface.cpp
+    armored/emitter_interface.h
+    armored/emitter_details.cpp
+    armored/emitter_details.h
+    armored/arm64_details.cpp
+    armored/arm64_details.h
     audio/output_device.cpp
     audio/output_device.h
     audio/input_device.cpp
@@ -14,12 +38,16 @@ target_sources(plusnx PRIVATE
     audio/device.h
     audio/sound.cpp
     audio/sound.h
-    video/gpu.cpp
-    video/gpu.h
-    video/vk/app_instance.cpp
-    video/vk/app_instance.h
-    video/vk/graphics_device.cpp
-    video/vk/graphics_device.h
+    platform/hostx1.cpp
+    platform/hostx1.h
+    platform/syncpoint_ctl.cpp
+    platform/syncpoint_ctl.h
+    video/tegrax1_gpu.cpp
+    video/tegrax1_gpu.h
+    video/vk_render/app_instance.cpp
+    video/vk_render/app_instance.h
+    video/vk_render/graphics_device.cpp
+    video/vk_render/graphics_device.h
     video/graphics_types.h
     sys_fs/provider.cpp
     sys_fs/provider.h
@@ -57,8 +85,8 @@ target_sources(plusnx PRIVATE
     core/context.h
     core/games_lists.cpp
     core/games_lists.h
-    core/device_info_submitter.cpp
-    core/device_info_submitter.h
+    core/telemetry_collector.cpp
+    core/telemetry_collector.h
     cpu/core_container.cpp
     cpu/core_container.h
     cpu/unit_types.h
@@ -103,7 +131,6 @@ target_sources(plusnx PRIVATE
     security/key_types.h
     security/keyring.cpp
     security/keyring.h
-    main.cpp
     driver.cpp
     container.h
     except.cpp
@@ -112,4 +139,5 @@ target_sources(plusnx PRIVATE
     types.h
 )
 
-target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto)
+target_link_libraries(plusnx-core PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto)
+target_link_libraries(plusnx PRIVATE plusnx-core)
