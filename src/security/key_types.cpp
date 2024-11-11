@@ -1,6 +1,7 @@
 #include <boost/endian/conversion.hpp>
 
-#include <mbedtls/cipher.h>
+#include <mbedtls/error.h>
+
 #include <security/key_types.h>
 namespace Plusnx::Security {
     // https://gist.github.com/SciresM/fe8a631d13c069bd66e9c656ab5b3f7f
@@ -13,11 +14,12 @@ namespace Plusnx::Security {
     }
 
     std::string GetMbedError(const i32 error) {
-        switch (error) {
-            case MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA:
-                return "Bad input parameters";
-            default:
-                return {};
-        }
+        std::string result;
+        if (!error)
+            return result;
+        result.resize(100);
+        mbedtls_strerror(error, result.data(), result.size());
+
+        return result;
     }
 }

@@ -15,7 +15,7 @@ namespace Plusnx::Security {
         if (status == CheckingStatus::Finished)
             mbedtls_sha256_starts(&state, 0);
 
-        mbedtls_sha256_update(&state, static_cast<const u8*>(input), size);
+        assert(mbedtls_sha256_update(&state, static_cast<const u8*>(input), size) == 0);
         status = CheckingStatus::Updating;
     }
 

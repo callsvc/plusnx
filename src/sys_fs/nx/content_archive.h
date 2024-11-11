@@ -110,8 +110,8 @@ namespace Plusnx::SysFs::Nx {
     };
 
     struct NcaHeader {
-        std::array<u8, 0x100> firstHeaderSignature;
-        std::array<u8, 0x100> secondHeaderSignature; // using a key from NPDM (or zeroes if not a program)
+        std::array<u8, 0x100> fixedSignature;
+        std::array<u8, 0x100> npdmSignature; // using a key from NPDM (or zeroes if not a program)
         u32 magic;
         DistributionType dist;
         ContentType type;
@@ -122,7 +122,7 @@ namespace Plusnx::SysFs::Nx {
         u32 contentIndex;
         u32 sdkAddonVersion;
         Security::KeyGeneration generation;
-        u8 signatureGeneration;
+        u8 fixedGeneration;
         std::array<u8, 0xE> pad0;
         Security::RightsId rights;
         std::array<FsEntry, 4> entries;

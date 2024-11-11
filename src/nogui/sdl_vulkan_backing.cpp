@@ -17,7 +17,9 @@ namespace Plusnx::NoGui {
         type = Video::BackendType::Vulkan;
         apiType = Video::ApiType::Sdl;
 
+#if 0
         SDL_ShowWindow(window);
+#endif
     }
 
     SdlVulkanBacking::~SdlVulkanBacking() {

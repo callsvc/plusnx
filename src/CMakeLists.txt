@@ -131,6 +131,8 @@ target_sources(plusnx-core PUBLIC
     security/key_types.h
     security/keyring.cpp
     security/keyring.h
+    security/signatures.cpp
+    security/signatures.h
     driver.cpp
     container.h
     except.cpp

@@ -43,7 +43,7 @@ namespace Plusnx {
                 result.emplace_back(std::format("(): {}", *symbol));
                 continue;
             }
-            auto& function{symbols.find(*symbol)->second};
+            auto function{symbols.find(*symbol)->second};
             const auto begin{function.begin() + function.find_first_of('(') + 1};
             const auto end{function.begin() + function.find_last_of('+')};
             const auto value{std::exchange(*end, {})};
@@ -65,12 +65,12 @@ namespace Plusnx {
                 const auto total{std::strlen(&*end)};
                 function.replace(length, total, &*end);
 
+                if (function.size() > length + total)
+                    function.erase(length + total);
                 function.insert(0, "(");
-                if (function.size() > length + total + 1)
-                    function.erase(length + total + 1);
             }
 
-            result.emplace_back(std::format("{:02}: {}", count++, function));
+            result.emplace_back(std::format("{:02}: {}", count++, std::move(function)));
         }
 
         return result;

@@ -1,6 +1,7 @@
 #include <ranges>
 #include <boost/endian/conversion.hpp>
 
+#include <security/signatures.h>
 #include <security/checksum.h>
 #include <sys_fs/ctr_backing.h>
 #include <sys_fs/nx/content_archive.h>
@@ -23,7 +24,15 @@ namespace Plusnx::SysFs::Nx {
 
             assert(content.size == nca->GetSize());
         }
+
         assert(content.keyGenerationOld == 2);
+        if (!content.fixedGeneration) {
+            // https://gbatemp.net/threads/nca-signatures-verification-failed-tinfoil-nsp.533433/
+            Security::Signatures check(Security::SignatureOperationType::NcaHdrSignatureFixed);
+            const auto& signature{content.fixedSignature};
+            if (!check.Verify(reinterpret_cast<const u8*>(&content.magic), 0x200, signature.data(), signature.size()))
+                std::print("NCA signature verification failed\n");
+        }
 
         rights = !IsValueEmpty(content.rights);
         CreateFilesystemEntries(nca);
