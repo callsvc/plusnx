@@ -2,25 +2,24 @@
 
 #include <security/key_types.h>
 #include <sys_fs/provider.h>
-
 namespace Plusnx::Core {
     class Context;
 }
 namespace Plusnx::Security {
     enum class Key256Type {
-        Invalid,
         HeaderKey,
         SdSaveKeySave,
         NcaKeySource,
         KeySource,
         SdSaveKey,
+        Invalid
     };
     enum class IndexedKeyType {
-        Invalid,
         KekTitle,
         KekAreaApplication,
         KekAreaOcean,
-        KekAreaSystem
+        KekAreaSystem,
+        Invalid
     };
 
     enum class KeyType {

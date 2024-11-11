@@ -62,7 +62,7 @@ namespace Plusnx::Security {
         mbedtls_rsa_free(&context);
     }
 
-    bool Signatures::Verify(const u8 *input, const u64 size, const u8 *signature, const u64 length) {
+    bool Signatures::Verify(const u8* input, const u64 size, const u8* signature, const u64 length) {
         assert(mbedtls_rsa_get_len(&context) == length);
         std::vector<u8> hash(0x20);
         if (type != SignatureOperationType::NcaHdrSignatureFixed && !mask.has_value())

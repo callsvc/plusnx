@@ -90,7 +90,7 @@ namespace Plusnx::Loader {
             while (auto remain{stream->RemainBytes()}) {
                 if (remain > buffer.size())
                     remain = buffer.size();
-                const auto size{stream->Read(buffer.data(), remain, 0)};
+                const auto size{stream->Read(buffer.data(), remain)};
                 checksum.Update(buffer.data(), size);
             }
 

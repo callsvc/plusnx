@@ -23,9 +23,9 @@ namespace Plusnx::SysFs {
         if (size > puts.size())
             puts.resize(size);
 
-        backing->Read(puts.data(), size, offset + file.offset);
-        decrypt->Process(output, puts.data(), size);
-        return size;
+        const auto result{backing->Read(puts.data(), size, offset + file.offset)};
+        decrypt->Process(output, puts.data(), result);
+        return result;
     }
 
     u64 CtrBacking::WriteImpl(const void* input, const u64 size, const u64 offset) {

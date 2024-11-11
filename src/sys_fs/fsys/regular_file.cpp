@@ -46,18 +46,18 @@ namespace Plusnx::SysFs::FSys {
     u64 RegularFile::ReadImpl(void* output, const u64 size, const u64 offset) {
         u64 falling{offset};
         u64 copied{};
-#if defined(_NDEBUG)
+#if !defined(_NDEBUG)
         std::memset(output, 0, size);
 #endif
 
-        const auto content{static_cast<u8*>(output)};
+        const auto content{static_cast<u8 *>(output)};
+        const std::array<SysPath, 1> SpecialInvalidSizeFiles{"/dev/urandom"};
+        const auto realFile{!ContainsValue(SpecialInvalidSizeFiles, path)};
+
         while (copied < size) {
             const u64 stride{size - copied > 4096 ? 4096 : size - copied};
-            std::array<SysPath, 1> SpecialInvalidSizeFiles{"/dev/urandom"};
-            if (!ContainsValue(SpecialInvalidSizeFiles, path)) {
-                if (!stride || copied + stride > GetSize() - offset)
-                    return stride;
-            }
+            if (realFile && !stride || copied + stride > GetSize() - offset)
+                return stride;
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};
             if (static_cast<u64>(result) != stride) {

@@ -23,7 +23,7 @@ namespace Plusnx::Security {
         if (status != CheckingStatus::Updating)
             return;
         assert(result.size() == mbedtls_md_get_size(mbedtls_md_info_from_type(MBEDTLS_MD_SHA256)));
-        mbedtls_sha256_finish(&state, result.data());
+        assert(mbedtls_sha256_finish(&state, result.data()) == 0);
         status = CheckingStatus::Finished;
     }
 

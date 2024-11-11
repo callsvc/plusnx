@@ -157,5 +157,8 @@ namespace Plusnx::SysFs::Nx {
         const std::shared_ptr<Security::Keyring>& keys;
         NcaHeader content;
         u64 counter{};
+
+        bool verified{};
+        bool encrypted{};
     };
 }

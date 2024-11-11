@@ -13,8 +13,7 @@ namespace Plusnx::Video {
     class GraphicsSupportContext {
     public:
         virtual ~GraphicsSupportContext() = default;
-        virtual void ActivateContext(const vk::Instance& context) {
-        }
+        virtual void ActivateContext(const vk::Instance& context) = 0;
         virtual void Update() = 0;
 
         std::vector<const char*> required;

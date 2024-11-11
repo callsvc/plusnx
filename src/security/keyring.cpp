@@ -8,28 +8,13 @@ namespace Plusnx::Security {
     constexpr std::array kekKeysPrefix{"titlekek_", "key_area_key_application_", "key_area_key_ocean_", "key_area_key_system_"};
 
     Key256Type GetKey256Alias(const std::string_view& key) {
-        if (key == "header_key")
-            return Key256Type::HeaderKey;
-        if (key == "sd_card_save_key_source")
-            return Key256Type::SdSaveKeySave;
-        if (key == "sd_card_nca_key_source")
-            return Key256Type::NcaKeySource;
-        if (key == "header_key_source")
-            return Key256Type::KeySource;
-        if (key == "sd_card_save_key")
-            return Key256Type::SdSaveKey;
+        if (const auto result{std::ranges::find(keys256Names, key)}; result != std::end(keys256Names))
+            return static_cast<Key256Type>(std::distance(keys256Names.begin(), result));
         return Key256Type::Invalid;
     }
     IndexedKeyType GetIndexKeyType(const std::string_view& key) {
-        if (key.contains("titlekek_"))
-            return IndexedKeyType::KekTitle;
-        if (key.contains("key_area_key_application_"))
-            return IndexedKeyType::KekAreaApplication;
-        if (key.contains("key_area_key_ocean_"))
-            return IndexedKeyType::KekAreaOcean;
-        if (key.contains("key_area_key_system_"))
-            return IndexedKeyType::KekAreaSystem;
-
+        if (const auto result{std::ranges::find(kekKeysPrefix, key)}; result != std::end(kekKeysPrefix))
+            return static_cast<IndexedKeyType>(std::distance(kekKeysPrefix.begin(), result));
         return IndexedKeyType::Invalid;
     }
 
@@ -41,15 +26,15 @@ namespace Plusnx::Security {
         for (const auto& name : kekKeysPrefix)
             indexed.emplace(GetIndexKeyType(name), std::map<u32, K128>{});
 
-        if (const auto prod{provider->OpenSystemFile(SysFs::RootId, "prod.keys")})
-            ReadKeysPairs(prod, KeyType::Production);
-        if (const auto title{provider->OpenSystemFile(SysFs::RootId, "title.keys")})
-            ReadKeysPairs(title, KeyType::Title);
-
-        if (prods.empty())
-            throw Except("Production key not found");
-        if (titles.empty())
-            throw Except("Title key not found");
+        auto ReadKeys = [&](const std::string& keyPath, const KeyType type, const std::string& tag) {
+            if (const auto keyFile{provider->OpenSystemFile(SysFs::RootId, keyPath)})
+                ReadKeysPairs(keyFile, type);
+            if ((type == KeyType::Production && prods.empty()) || (type == KeyType::Title && titles.empty())) {
+                throw Except("{} key not found", tag);
+            }
+        };
+        ReadKeys("prod.keys", KeyType::Production, "Production");
+        ReadKeys("title.keys", KeyType::Title, "Title");
     }
 
     bool Keyring::GetKey256(const Key256Type type, u8* output, const u64 size) const {

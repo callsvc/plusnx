@@ -12,7 +12,7 @@ namespace Plusnx::SysFs::Nx {
     NCA::NCA(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca) : keys(_keys) {
         if (nca->Read(content) != sizeof(content))
             return;
-        if (!ValidateMagic(content.magic)) {
+        if (encrypted = !ValidateMagic(content.magic); encrypted) {
             Security::K256 headerKey{};
             keys->GetKey256(Security::Key256Type::HeaderKey, headerKey.data(), headerKey.size());
 
@@ -28,9 +28,9 @@ namespace Plusnx::SysFs::Nx {
         assert(content.keyGenerationOld == 2);
         if (!content.fixedGeneration) {
             // https://gbatemp.net/threads/nca-signatures-verification-failed-tinfoil-nsp.533433/
-            Security::Signatures check(Security::SignatureOperationType::NcaHdrSignatureFixed);
+            Security::Signatures verifier(Security::SignatureOperationType::NcaHdrSignatureFixed);
             const auto& signature{content.fixedSignature};
-            if (!check.Verify(reinterpret_cast<const u8*>(&content.magic), 0x200, signature.data(), signature.size()))
+            if (verified = verifier.Verify(reinterpret_cast<const u8*>(&content.magic), 0x200, signature.data(), signature.size()); !verified)
                 std::print("NCA signature verification failed\n");
         }
 

@@ -16,11 +16,13 @@ namespace Plusnx {
                 return true;
 
         std::array<char, 24> line{};
-        const auto pipe{popen("loginctl show-session 2 -p Type", "r")};
-        if (!pipe)
-            return {};
-        fgets(line.data(), sizeof(line), pipe);
-        pclose(pipe);
+        {
+            const auto pipe{popen("loginctl show-session 2 -p Type", "r")};
+            if (!pipe)
+                return {};
+            fgets(line.data(), sizeof(line), pipe);
+            pclose(pipe);
+        }
         return std::string_view(line).contains("wayland");
     }
 }

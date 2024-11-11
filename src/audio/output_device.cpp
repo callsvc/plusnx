@@ -9,7 +9,9 @@ namespace Plusnx::Audio {
         SDL_AudioSpec required{.freq = SampleRate, .format = Format, .channels = Channels};
         const auto name{SDL_GetAudioDeviceName(0, identifier)};
         Initialize(name, required);
+#if 0
         Device::Stop();
+#endif
     }
 
     void OutputDevice::HandleAudioEvent(const std::span<u8>& stream) {
