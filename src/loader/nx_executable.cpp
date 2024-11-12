@@ -1,11 +1,12 @@
 #include <ranges>
 #include <sys_fs/layered_fs.h>
+#include <sys_fs/nx/readonly_filesystem.h>
+#include <sys_fs/nx/partition_filesystem.h>
 
 #include <loader/nx_executable.h>
 namespace Plusnx::Loader {
     NxExecutable::NxExecutable(const SysFs::FileBackingPtr& nro) :
-        AppLoader(AppType::Nro, ConstMagic<u32>("NRO0")) {
-
+        ExecutableAppLoader(AppType::Nro, ConstMagic<u32>("NRO0")) {
         u64 offset{},
             assets{};
         if (offset = nro->Read(content); offset != sizeof(content))
@@ -26,13 +27,13 @@ namespace Plusnx::Loader {
             assets += sizeof(AssetHeader);
 
             if (romfs)
-                DisplayRomFsContent(romfs.value());
+                DisplayRomFsContent(romfs);
         }
         assert(assets + content.size == nro->GetSize());
 
-        text = ReadSectionContent(nro, SectionType::Text, offset);
-        ro = ReadSectionContent(nro, SectionType::Ro, offset + text.size());
-        data = ReadSectionContent(nro, SectionType::Data, offset + text.size() + ro.size());
+        textSection = ReadSectionContent(nro, SectionType::Text, offset);
+        roSection = ReadSectionContent(nro, SectionType::Ro, offset + textSection.size());
+        dataSection = ReadSectionContent(nro, SectionType::Data, offset + textSection.size() + roSection.size());
     }
 
     void NxExecutable::ReadAssets(const SysFs::FileBackingPtr& nro) {
@@ -42,20 +43,19 @@ namespace Plusnx::Loader {
             if (!section.size)
                 continue;
 
-            auto assetFile = [&] {
+            auto asset = [&] {
                 const auto offset{content.size + section.offset};
                 if (index == 0)
                     assert(section.offset == sizeof(AssetHeader));
                 return std::make_shared<SysFs::FileLayered>(nro, "", offset, section.size);
             }();
-            const auto content = [&] {
-                if (!index)
-                    return &icon;
-                if (index == 1)
-                    return &control;
-                return &romfs;
-            }();
-            content->emplace(assetFile);
+
+            if (index == 2)
+                control = std::move(asset);
+            else if (index == 1)
+                icon = std::make_shared<SysFs::Nx::PartitionFilesystem>(asset);
+            else if (!index)
+                romfs = std::make_shared<SysFs::Nx::ReadOnlyFilesystem>(asset);
         }
     }
 
@@ -79,5 +79,16 @@ namespace Plusnx::Loader {
 
     void NxExecutable::Load(std::shared_ptr<Core::Context>& context) {
         [[maybe_unused]] auto& process{context->process};
+        __builtin_trap();
+    }
+    std::span<u8> NxExecutable::GetExeSection(const SectionType type) const {
+        if (type == SectionType::Text)
+            return textSection;
+        if (type == SectionType::Ro)
+            return roSection;
+        if (type == SectionType::Data)
+            return dataSection;
+
+        throw Except("The BSS section is invalid for this type of executable");
     }
 }

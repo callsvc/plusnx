@@ -13,20 +13,22 @@ namespace Plusnx::Security {
         return Key256Type::Invalid;
     }
     IndexedKeyType GetIndexKeyType(const std::string_view& key) {
-        if (const auto result{std::ranges::find(kekKeysPrefix, key)}; result != std::end(kekKeysPrefix))
-            return static_cast<IndexedKeyType>(std::distance(kekKeysPrefix.begin(), result));
+        for (const auto [index, name] : std::ranges::views::enumerate(kekKeysPrefix)) {
+            if (key.contains(name))
+                return static_cast<IndexedKeyType>(index);
+        }
         return IndexedKeyType::Invalid;
     }
 
-    Keyring::Keyring(const std::shared_ptr<Core::Context>& context) {
+    Keyring::Keyring(const std::shared_ptr<Core::Context> &context) {
         const auto provider{context->provider};
 
-        for (const auto& name : keys256Names)
+        for (const auto &name: keys256Names)
             keys256.emplace(GetKey256Alias(name), K256{});
-        for (const auto& name : kekKeysPrefix)
+        for (const auto &name: kekKeysPrefix)
             indexed.emplace(GetIndexKeyType(name), std::map<u32, K128>{});
 
-        auto ReadKeys = [&](const std::string& keyPath, const KeyType type, const std::string& tag) {
+        auto ReadKeys = [&](const std::string &keyPath, const KeyType type, const std::string &tag) {
             if (const auto keyFile{provider->OpenSystemFile(SysFs::RootId, keyPath)})
                 ReadKeysPairs(keyFile, type);
             if ((type == KeyType::Production && prods.empty()) || (type == KeyType::Title && titles.empty())) {
@@ -35,6 +37,14 @@ namespace Plusnx::Security {
         };
         ReadKeys("prod.keys", KeyType::Production, "Production");
         ReadKeys("title.keys", KeyType::Title, "Title");
+    }
+    bool Keyring::AddTicket(std::unique_ptr<Ticket>&& ticket) {
+        if (tickets.contains(ticket->GetRights().first))
+            return {};
+
+        AddTitlePair(ticket->GetRights().second, ticket->GetTitleKey());
+        tickets.emplace(ticket->GetRights().first, std::move(ticket));
+        return true;
     }
 
     bool Keyring::GetKey256(const Key256Type type, u8* output, const u64 size) const {
@@ -47,16 +57,22 @@ namespace Plusnx::Security {
         return !IsEmpty(std::span(output, size));
     }
 
-    bool Keyring::GetIndexedKey(const IndexedKeyType type, const u32 index, u8* output, const u64 size) const {
-        std::memset(output, 0, size);
+    bool Keyring::GetIndexedKey(const IndexedKeyType type, const u32 index, u8 *output, const u64 size) const {
         if (indexed.contains(type) && indexed.at(type).contains(index)) {
-            const auto& value{indexed.at(type).at(index)};
+            const auto &value{indexed.at(type).at(index)};
+            std::memcpy(output, value.data(), size);
+        }
+        return !IsEmpty(std::span(output, size));
+    }
+    bool Keyring::GetTitleKey(const K128& key, u8* output, const u64 size) {
+        if (const auto it{titles.find(key)}; it != titles.end()) {
+            const auto& value{it->second};
             std::memcpy(output, value.data(), size);
         }
         return !IsEmpty(std::span(output, size));
     }
 
-    void Keyring::ReadKeysPairs(const SysFs::FileBackingPtr& file, [[maybe_unused]] const KeyType type) {
+    void Keyring::ReadKeysPairs(const SysFs::FileBackingPtr& file, const KeyType type) {
         assert(type == KeyType::Title ? titles.empty() : prods.empty());
         std::vector<std::string_view> pairs;
 
@@ -83,8 +99,15 @@ namespace Plusnx::Security {
         const auto key{HexTextToByteArray<16>(view.first)};
         const auto value{HexTextToByteArray<16>(view.second)};
 
+        AddTitlePair(key, value);
+    }
+    void Keyring::AddTitlePair(const K128& key, const K128& value) {
+        if (titles.contains(key))
+            return;
+
         titles.emplace(key, value);
     }
+
     void Keyring::AddProductionPair(const std::pair<std::string_view, std::string_view>& view) {
         const auto key{view.first};
         const auto value{view.second};

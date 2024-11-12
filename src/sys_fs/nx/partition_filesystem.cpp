@@ -60,4 +60,9 @@ namespace Plusnx::SysFs::Nx {
 
         return result;
     }
+
+    // https://switchbrew.org/wiki/ExeFS
+    bool IsAExeFsPartition(const std::unique_ptr<PartitionFilesystem>& pfs) {
+        return pfs->OpenFile("main") && pfs->OpenFile("main.npdm");
+    }
 }

@@ -1,8 +1,8 @@
 #include <print>
 
 #include <sys_fs/nx/readonly_filesystem.h>
-#include <loader/app_loader.h>
 #include <loader/nx_executable.h>
+#include <loader/app_loader.h>
 namespace Plusnx::Loader {
     ContainedFormat GetEntryFormat(const SysFs::SysPath& filename) {
         const auto& extension{filename.extension()};
@@ -22,40 +22,33 @@ namespace Plusnx::Loader {
                 return offsetof(NroHeader, magic);
             return {};
         }();
-        u64 requested{MinimumAppSize};
-        if (type == AppType::Nsp)
-            requested *= 1'000;
+        const auto requested = [&] -> u64 {
+            if (type == AppType::Nro)
+                return static_cast<u64>(MinimumAppSize::Nro);
+            return static_cast<u64>(MinimumAppSize::Nsp);
+        }();
 
-        bool result{};
         if (file->GetSize() < requested) {
             status = LoaderStatus::BrokenFile;
-            return result;
+            return {};
         }
+        bool result{};
         if (result = file->Read<u32>(offset) == validMagic; !result)
             status = LoaderStatus::InvalidMagicValue;
-
         return result;
     }
+    void AppLoader::DisplayRomFsContent(const std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem>& content) {
+        for (const auto& filename : content->ListAllFiles()) {
+            std::print("File name from this RomFS: {}\n", filename.string());
+        }
+    }
 
-    void AppLoader::DisplaySection(const SectionType type) const {
+    void ExecutableAppLoader::DisplaySection(const SectionType type) const {
         std::stringstream ss;
         if (type == SectionType::Text)
             throw Except("Text sections are not supported");
 
-        const auto strings = [&] {
-            if (type == SectionType::Ro)
-                return StringViewBuilder(ro);
-            return StringViewBuilder(data);
-        }();
-        ss << strings;
-
+        ss << StringViewBuilder(GetExeSection(type));
         std::print("{}\n", ss.str());
-    }
-
-    void AppLoader::DisplayRomFsContent(const SysFs::FileBackingPtr& content) {
-        const auto backing{std::make_unique<SysFs::Nx::ReadOnlyFilesystem>(content)};
-        for (const auto& filename : backing->ListAllFiles()) {
-            std::print("File name from this RomFS: {}\n", filename.string());
-        }
     }
 }

@@ -3,7 +3,7 @@
 #include <os/process_creator.h>
 
 namespace Plusnx::Os {
-    void ProcessCreator::DumpRomContent() {
+    void ProcessCreator::DumpRomContent() const {
         const auto tempDir{std::filesystem::temp_directory_path()};
         if (romfs)
             romfs->ExtractAllFiles(tempDir);
@@ -13,10 +13,10 @@ namespace Plusnx::Os {
         const auto application{nxOs.application};
 
         if (auto content{application->romfs})
-            romfs.emplace(content.value());
+            romfs = content;
 
         if (auto content{application->control}) {
-            nacp.emplace(content.value());
+            nacp.emplace(content);
             const auto& context{nxOs.context};
             title = nacp->GetApplicationName(context->language);
             publisher = nacp->GetApplicationPublisher(context->language);

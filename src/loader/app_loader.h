@@ -1,11 +1,17 @@
 #pragma once
 
-#include <types.h>
-#include <sys_fs/fs_types.h>
 #include <core/context.h>
+#include <sys_fs/fs_types.h>
 
+namespace Plusnx::SysFs::Nx {
+    class ReadOnlyFilesystem;
+    class PartitionFilesystem;
+}
 namespace Plusnx::Loader {
-    constexpr auto MinimumAppSize{1024 * 200};
+    enum class MinimumAppSize {
+        Nro = 1024 * 200,
+        Nsp = 1024 * Nro
+    };
 
     enum class ContainedFormat {
         Invalid,
@@ -44,23 +50,27 @@ namespace Plusnx::Loader {
         virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const {
             return {};
         }
-        virtual void Load(std::shared_ptr<Core::Context>& context) {}
+        virtual void Load(std::shared_ptr<Core::Context>& context) = 0;
 
         AppType type;
         u32 validMagic;
         LoaderStatus status{LoaderStatus::None};
 
-        std::optional<SysFs::FileBackingPtr> icon;
-        std::optional<SysFs::FileBackingPtr> control;
-        std::optional<SysFs::FileBackingPtr> romfs;
-
-        std::span<u8> text;
-        std::span<u8> data;
-        std::span<u8> ro;
+        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> romfs;
+        std::shared_ptr<SysFs::Nx::PartitionFilesystem> exefs;
+        std::shared_ptr<SysFs::Nx::PartitionFilesystem> icon;
+        std::shared_ptr<SysFs::FileBacking> control;
 
     protected:
         bool CheckHeader(const SysFs::FileBackingPtr& file);
+        static void DisplayRomFsContent(const std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem>& content);
+    };
+
+    class ExecutableAppLoader : public AppLoader {
+    public:
+        ExecutableAppLoader(const AppType app, const u32 magic = 0) : AppLoader(app, magic) {}
+
+        virtual std::span<u8> GetExeSection(SectionType type) const = 0;
         void DisplaySection(SectionType type) const;
-        static void DisplayRomFsContent(const SysFs::FileBackingPtr& content);
     };
 }

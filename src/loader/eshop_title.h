@@ -12,15 +12,16 @@ namespace Plusnx::Loader {
         EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& nsp);
 
         bool ExtractFilesInto(const SysFs::SysPath& path) const override;
-        void Load(std::shared_ptr<Core::Context>& process) override;
+        void Load(std::shared_ptr<Core::Context>& context) override;
 
         std::unique_ptr<SysFs::Nx::PartitionFilesystem> pfs;
     private:
         void ImportTicket(const SysFs::SysPath& filename) const;
-        void IndexNcaEntries(const std::optional<SysFs::Nx::NCA>& metadata) const;
+        void IndexNcaEntries(const std::optional<SysFs::Nx::NCA>& metadata);
 
         std::optional<SysFs::SysPath> ValidateAllFiles(const std::vector<SysFs::SysPath>& files) const;
-        std::list<SysFs::Nx::NCA> contents;
+        std::list<std::unique_ptr<SysFs::Nx::NCA>> contents;
+
         const std::shared_ptr<Security::Keyring> keys;
     };
 }

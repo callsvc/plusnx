@@ -104,29 +104,39 @@ namespace Plusnx::SysFs::Nx {
         std::memcpy(&ctr[0], &gen, 4);
         std::memcpy(&ctr[4], &secure, 4);
 
-        emplaceBacking.emplace(std::make_shared<CtrBacking>(nca, GetDecryptionTitleKey(header.encryptionType), offset, size, ctr));
+        if (header.encryptionType == EncryptionType::AesCtr || header.encryptionType == EncryptionType::AesCtrEx)
+            emplaceBacking.emplace(std::make_shared<CtrBacking>(nca, rights ? GetTitleKey() : GetAreaKey(header.encryptionType), offset, size, ctr));
     }
 
     Security::IndexedKeyType GetAreaType(const KeyAreaIndex area) {
         if (area == KeyAreaIndex::Application)
             return Security::IndexedKeyType::KekAreaApplication;
+        if (area == KeyAreaIndex::Ocean)
+            return Security::IndexedKeyType::KekAreaOcean;
+        if (area == KeyAreaIndex::System)
+            return Security::IndexedKeyType::KekAreaSystem;
         return Security::IndexedKeyType::Invalid;
     }
 
-    Security::K128 NCA::GetDecryptionTitleKey(const EncryptionType encType) const {
-        const auto keyRevision{GetKeyRevision()};
-
-        if (rights) {
-            Security::K128 titleKek{};
-            keys->GetIndexedKey(Security::IndexedKeyType::KekTitle, keyRevision, titleKek.data(), titleKek.size());
-            Security::CipherCast titleCipher(titleKek.data(), titleKek.size(), Security::OperationMode::EcbAes, true);
-
-            Security::K128 title{};
-            titleCipher.Process(title.data(), title.data(), sizeof(title));
+    Security::K128 NCA::GetTitleKey() const {
+        Security::K128 title{};
+        if (!rights)
             return title;
-        }
 
-        std::optional<Security::CipherCast> ecbDecrypt;
+        Security::K128 titleKek{};
+        keys->GetIndexedKey(Security::IndexedKeyType::KekTitle, GetKeyRevision(), titleKek.data(), titleKek.size());
+        keys->GetTitleKey(content.rights, title.data(), title.size());
+
+        Security::CipherCast decrypt(titleKek.data(), titleKek.size(), Security::OperationMode::EcbAes, true);
+        Security::K128 decrypted{};
+        decrypt.Process(decrypted.data(), title.data(), title.size());
+        return decrypted;
+    }
+
+    Security::K128 NCA::GetAreaKey(const EncryptionType encType) const {
+        const auto keyRevision{GetKeyRevision()};
+        std::optional<Security::CipherCast> decrypt;
+
         const Security::K128 encryptedKey = [&] {
             Security::K128 key{};
             keys->GetIndexedKey(GetAreaType(content.areaIndex), keyRevision, key.data(), key.size());
@@ -135,13 +145,13 @@ namespace Plusnx::SysFs::Nx {
             if (encType == EncryptionType::AesCtrEx ||
                 encType == EncryptionType::AesCtr)
                 indexArea = 2;
-            ecbDecrypt.emplace(key.data(), key.size(), Security::OperationMode::EcbAes, true);
+            decrypt.emplace(key.data(), key.size(), Security::OperationMode::EcbAes, true);
 
             return content.encryptedKeyArea[indexArea];
         }();
 
         Security::K128 decryptedKey{};
-        ecbDecrypt->Process(decryptedKey.data(), encryptedKey.data(), encryptedKey.size());
+        decrypt->Process(decryptedKey.data(), encryptedKey.data(), encryptedKey.size());
 
         return decryptedKey;
     }

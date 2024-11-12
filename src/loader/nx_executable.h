@@ -47,13 +47,19 @@ namespace Plusnx::Loader {
 #pragma pack(pop)
 
     // https://switchbrew.org/wiki/NRO
-    class NxExecutable final : public AppLoader {
+    class NxExecutable final : public ExecutableAppLoader {
     public:
         NxExecutable(const SysFs::FileBackingPtr& nro);
         void ReadAssets(const SysFs::FileBackingPtr& nro);
 
         std::span<u8> ReadSectionContent(const SysFs::FileBackingPtr& nro, SectionType type, u32 fileOffset);
         void Load(std::shared_ptr<Core::Context>& context) override;
+
+        std::span<u8> textSection;
+        std::span<u8> roSection;
+        std::span<u8> dataSection;
+
+        std::span<u8> GetExeSection(SectionType type) const override;
     private:
         NroHeader content;
         AssetHeader assetHeader;

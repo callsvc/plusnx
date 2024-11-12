@@ -3,7 +3,6 @@
 
 #include <security/checksum.h>
 #include <sys_fs/fsys/rigid_directory.h>
-
 #include <loader/eshop_title.h>
 namespace Plusnx::Loader {
     EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& nsp) :
@@ -15,9 +14,13 @@ namespace Plusnx::Loader {
             return;
 
         const auto files{pfs->ListAllFiles()};
+        for (const auto& file : files) {
+            if (GetEntryFormat(file) == ContainedFormat::Ticket)
+                ImportTicket(file);
+        }
 
         std::optional<SysFs::Nx::NCA> cnmt;
-#if 1
+#if 0
         if (const auto damaged = ValidateAllFiles(files)) {
             throw Except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
         }
@@ -26,14 +29,9 @@ namespace Plusnx::Loader {
         for (const auto& file : files) {
             const auto type{GetEntryFormat(file)};
             if (type == ContainedFormat::Nca)
-                contents.emplace_back(keys, pfs->OpenFile(file));
+                contents.emplace_back(std::make_unique<SysFs::Nx::NCA>(keys, pfs->OpenFile(file)));
             else if (type == ContainedFormat::Cnmt)
                 cnmt.emplace(keys, pfs->OpenFile(file));
-
-            if (type != ContainedFormat::Ticket)
-                continue;
-
-            ImportTicket(file);
         }
 
         IndexNcaEntries(cnmt);
@@ -44,14 +42,32 @@ namespace Plusnx::Loader {
         return true;
     }
 
-    void EShopTitle::Load(std::shared_ptr<Core::Context>& process) {
-        assert(pfs->ListAllFiles().size());
+    void EShopTitle::Load(std::shared_ptr<Core::Context>& context) {
+        if (!exefs)
+            return;
+
+        if (const auto npdm{exefs->OpenFile("main.npdm")}; !npdm) {
+            throw Except("The NSP does not have a valid ExeFS, preventing it from loading");
+        }
+        const auto& process{context->process};
+        process->npdm = SysFs::Npdm(exefs->OpenFile("main.npdm"));
+
     }
     void EShopTitle::ImportTicket(const SysFs::SysPath& filename) const {
-        [[maybe_unused]] const auto ticket{pfs->OpenFile(filename)};
+        const auto tikFile{pfs->OpenFile(filename)};
+        keys->AddTicket(std::move(std::make_unique<Security::Ticket>(tikFile)));
     }
-    void EShopTitle::IndexNcaEntries([[maybe_unused]] const std::optional<SysFs::Nx::NCA>& metadata) const {
+    void EShopTitle::IndexNcaEntries([[maybe_unused]] const std::optional<SysFs::Nx::NCA>& metadata) {
         assert(contents.size());
+
+        for (const auto& nextNca : contents) {
+            const auto [type, backingNcaFile] = nextNca->GetBackingFile();
+            if (type == SysFs::Nx::FsType::PartitionFs) {
+                if (auto partition{std::make_unique<SysFs::Nx::PartitionFilesystem>(backingNcaFile)})
+                    if (IsAExeFsPartition(partition))
+                        exefs = std::move(partition);
+            }
+        }
     }
 
     std::optional<SysFs::SysPath> EShopTitle::ValidateAllFiles(const std::vector<SysFs::SysPath>& files) const {
@@ -59,7 +75,6 @@ namespace Plusnx::Loader {
 
         std::array<u8, 32> result;
         std::vector<u8> buffer(4 * 1024 * 1024);
-
         for (const auto& path : files) {
             // ReSharper disable once CppEntityAssignedButNoRead
             [[maybe_unused]] bool cnmt{};

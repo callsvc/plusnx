@@ -127,7 +127,7 @@ namespace Plusnx::SysFs::Nx {
         Security::RightsId rights;
         std::array<FsEntry, 4> entries;
         std::array<std::array<u8, 0x20>, 4> headersSum;
-        std::array<std::array<u8, 16>, 4> encryptedKeyArea;
+        std::array<std::array<u8, 0x10>, 4> encryptedKeyArea;
 
         std::array<u8, 0x400 - 0x340> pad1;
         std::array<FsHeader, 4> headers;
@@ -150,7 +150,8 @@ namespace Plusnx::SysFs::Nx {
         void CreateFilesystemEntries(const FileBackingPtr& nca);
         void CreateBackingFile(const FileBackingPtr& nca, const FsEntry& entry, const FsHeader& header);
 
-        Security::K128 GetDecryptionTitleKey(EncryptionType encType) const;
+        Security::K128 GetTitleKey() const;
+        Security::K128 GetAreaKey(EncryptionType encType) const;
         u64 GetKeyRevision() const;
 
         std::optional<Security::CipherCast> cipher;
