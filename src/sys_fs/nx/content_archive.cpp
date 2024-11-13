@@ -1,9 +1,11 @@
 #include <ranges>
 #include <boost/endian/conversion.hpp>
 
-#include <security/signatures.h>
 #include <security/checksum.h>
+#include <security/signatures.h>
 #include <sys_fs/ctr_backing.h>
+#include <sys_fs/layered_fs.h>
+
 #include <sys_fs/nx/content_archive.h>
 namespace Plusnx::SysFs::Nx {
     constexpr auto XtsMode{Security::OperationMode::XtsAes};
@@ -65,13 +67,13 @@ namespace Plusnx::SysFs::Nx {
                 throw Except("The entry in the NCA at index {} appears to be corrupted", index);
             }
             CreateBackingFile(nca, entry, header);
-            if (const auto file{GetBackingFile().second}) {
-                if (auto testType = file->GetBytes(16); !testType.empty()) {
-                    if (header.type == FsType::PartitionFs)
-                        assert(std::memcmp(testType.data(), "PFS0", 4) == 0);
-                    else if (header.type == FsType::RomFs)
-                        assert(std::memcmp(testType.data(), "PFS0", 4));
-                }
+
+            const auto [type, file] = GetBackingFiles().front();
+            if (auto testType = file->GetBytes(16); !testType.empty()) {
+                if (type == FsType::PartitionFs)
+                    assert(std::memcmp(testType.data(), "PFS0", 4) == 0);
+                else if (type == FsType::RomFs)
+                    assert(std::memcmp(testType.data(), "PFS0", 4));
             }
         }
     }
@@ -84,6 +86,8 @@ namespace Plusnx::SysFs::Nx {
             assert(header.hash256.layerCount == 2);
             offset += header.hash256.regions.back().offset;
             size = header.hash256.regions.back().size;
+
+            assert(size < entry.endOffset * 0x200);
         }
         if (header.hashType == HashType::HierarchicalIntegrityHash) {
             assert(header.hashIntegrity.magic == ConstMagic<u32>("IVFC"));
@@ -91,21 +95,24 @@ namespace Plusnx::SysFs::Nx {
             size = header.hashIntegrity.levels.back().hashDataSize;
         }
 
-        auto& emplaceBacking = [&] -> std::optional<FileBackingPtr>& {
-            if (header.type == FsType::RomFs)
-                return romfs;
-            assert(header.type == FsType::PartitionFs);
-            return pfs;
-        }();
+        auto EmplaceBacking = [&] (const FileBackingPtr& file) {
+            if (header.type == FsType::RomFs) {
+                romfsList.emplace_back(std::move(file));
+            } else if (header.type == FsType::PartitionFs) {
+                pfsList.emplace_back(std::move(file));
+            }
+        };
 
         std::array<u8, 16> ctr{};
-        const auto gen{boost::endian::endian_reverse(header.generation)};
+        const auto generation{boost::endian::endian_reverse(header.generation)};
         const auto secure{boost::endian::endian_reverse(header.secureValue)};
-        std::memcpy(&ctr[0], &gen, 4);
-        std::memcpy(&ctr[4], &secure, 4);
+        std::memcpy(&ctr[0], &secure, 4);
+        std::memcpy(&ctr[4], &generation, 4);
 
         if (header.encryptionType == EncryptionType::AesCtr || header.encryptionType == EncryptionType::AesCtrEx)
-            emplaceBacking.emplace(std::make_shared<CtrBacking>(nca, rights ? GetTitleKey() : GetAreaKey(header.encryptionType), offset, size, ctr));
+            EmplaceBacking(std::make_shared<CtrBacking>(nca, rights ? GetTitleKey() : GetAreaKey(header.encryptionType), offset, size, ctr));
+        else if (header.encryptionType == EncryptionType::None)
+            EmplaceBacking(std::make_shared<FileLayered>(nca, nca->path, offset, size));
     }
 
     Security::IndexedKeyType GetAreaType(const KeyAreaIndex area) {
@@ -164,11 +171,27 @@ namespace Plusnx::SysFs::Nx {
         return std::max(generation - 1, 0UL);
     }
 
-    std::pair<FsType, FileBackingPtr> NCA::GetBackingFile() {
-        if (romfs)
-            return std::make_pair(FsType::RomFs, *romfs);
-        if (pfs)
-            return std::make_pair(FsType::PartitionFs, *pfs);
-        return {};
+    std::vector<FileBackingPtr> NCA::GetBackingFiles(const bool partition) const {
+        std::vector<FileBackingPtr> result;
+
+        if (partition) {
+            result.reserve(pfsList.size());
+            std::ranges::copy(pfsList, std::back_inserter(result));
+        } else {
+            result.reserve(romfsList.size());
+            std::ranges::copy(romfsList, std::back_inserter(result));
+        }
+        return result;
+    }
+    std::vector<std::pair<FsType, FileBackingPtr>> NCA::GetBackingFiles() const {
+        std::vector<std::pair<FsType, FileBackingPtr>> result;
+        result.reserve(pfsList.size() + romfsList.size());
+        for (const auto& partition : GetBackingFiles(true)) {
+            result.emplace_back(FsType::PartitionFs, partition);
+        }
+        for (const auto& romfs : GetBackingFiles(false)) {
+            result.emplace_back(FsType::RomFs, romfs);
+        }
+        return result;
     }
 }

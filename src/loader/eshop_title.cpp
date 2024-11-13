@@ -3,6 +3,7 @@
 
 #include <security/checksum.h>
 #include <sys_fs/fsys/rigid_directory.h>
+#include <sys_fs/nx/readonly_filesystem.h>
 #include <loader/eshop_title.h>
 namespace Plusnx::Loader {
     EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& nsp) :
@@ -20,7 +21,7 @@ namespace Plusnx::Loader {
         }
 
         std::optional<SysFs::Nx::NCA> cnmt;
-#if 0
+#if 1
         if (const auto damaged = ValidateAllFiles(files)) {
             throw Except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
         }
@@ -61,13 +62,20 @@ namespace Plusnx::Loader {
         assert(contents.size());
 
         for (const auto& nextNca : contents) {
-            const auto [type, backingNcaFile] = nextNca->GetBackingFile();
-            if (type == SysFs::Nx::FsType::PartitionFs) {
-                if (auto partition{std::make_unique<SysFs::Nx::PartitionFilesystem>(backingNcaFile)})
-                    if (IsAExeFsPartition(partition))
-                        exefs = std::move(partition);
+            for (const auto& [type, backingNcaFile] : nextNca->GetBackingFiles()) {
+                if (type == SysFs::Nx::FsType::RomFs) {
+                    if (!romfs)
+                        romfs = std::make_shared<SysFs::Nx::ReadOnlyFilesystem>(backingNcaFile);
+                    continue;
+                }
+                auto partition{std::make_unique<SysFs::Nx::PartitionFilesystem>(backingNcaFile)};
+                if (IsAExeFsPartition(partition))
+                    exefs = std::move(partition);
             }
         }
+        if (romfs)
+            if (const auto file = romfs->OpenFile("/control.nacp"))
+                control = std::move(file);
     }
 
     std::optional<SysFs::SysPath> EShopTitle::ValidateAllFiles(const std::vector<SysFs::SysPath>& files) const {
@@ -76,31 +84,32 @@ namespace Plusnx::Loader {
         std::array<u8, 32> result;
         std::vector<u8> buffer(4 * 1024 * 1024);
         for (const auto& path : files) {
-            // ReSharper disable once CppEntityAssignedButNoRead
-            [[maybe_unused]] bool cnmt{};
+            bool cnmt{};
             auto filename{path};
-            if (filename.extension() != ".nca")
+            if (GetEntryFormat(filename) != ContainedFormat::Nca)
                 continue;
             while (filename.has_extension()) {
-                if (filename.extension() == ".cnmt")
-                    // ReSharper disable once CppDFAUnusedValue
+                if (GetEntryFormat(filename) == ContainedFormat::Cnmt)
                     cnmt = true;
                 filename = filename.replace_extension();
             }
-#if 0
             if (cnmt)
                 continue;
-#endif
 
             auto expected{HexTextToByteArray<16>(filename.string())};
             if (IsEmpty(expected))
                 continue;
 
-            const auto nca{std::make_unique<SysFs::Nx::NCA>(keys, pfs->OpenFile(path))};
-
-            const auto stream{std::make_unique<SysFs::ContinuousBlock>(nca->GetBackingFile().second)};
+            bool match{};
+            const auto stream{std::make_unique<SysFs::ContinuousBlock>(pfs->OpenFile(path))};
             if (!stream)
                 throw Except("The current NCA does not have valid backing");
+
+#if 1
+            // Skipping files larger than 4MB for now
+            if (stream->GetSize() > buffer.size())
+                continue;
+#endif
 
             while (auto remain{stream->RemainBytes()}) {
                 if (remain > buffer.size())
@@ -108,9 +117,9 @@ namespace Plusnx::Loader {
                 const auto size{stream->Read(buffer.data(), remain)};
                 checksum.Update(buffer.data(), size);
             }
-
             checksum.Finish(std::span(result));
-            if (!IsEqual(std::span(result).subspan(0, 16), std::span(expected)))
+            match = IsEqual(std::span(result).subspan(0, 16), std::span(expected));
+            if (!match)
                 return path;
         }
 

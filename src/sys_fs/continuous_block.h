@@ -11,8 +11,7 @@ namespace Plusnx::SysFs {
 
     class ContinuousBlock final : public FileBacking {
     public:
-        ContinuousBlock(const FileBackingPtr& file, const u64 starts = 0) :
-            FileBacking(file->path.string() + std::format(".{}:{}", starts, file->GetSize())), rcnt(starts), wcnt(starts), backing(file) {}
+        ContinuousBlock(const FileBackingPtr& file, const u64 starts = 0) : FileBacking(file->path), rcnt(starts), wcnt(starts), backing(file) {}
 
         u64 GetSize() const override;
         u64 SkipBytes(u64 count = 0, CounterType type = CounterType::Read);

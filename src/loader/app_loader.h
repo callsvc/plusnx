@@ -17,7 +17,8 @@ namespace Plusnx::Loader {
         Invalid,
         Nca,
         Ticket,
-        Cnmt
+        Cnmt,
+        Xml
     };
     ContainedFormat GetEntryFormat(const SysFs::SysPath& filename);
 

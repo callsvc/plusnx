@@ -4,7 +4,7 @@
 namespace Plusnx::SysFs::FSys {
     class RigidDirectory final : public DirectoryBacking {
     public:
-        RigidDirectory() = default;
+        RigidDirectory() : DirectoryBacking("Empty") {}
         RigidDirectory(const SysPath& path, bool create = false);
 
         FileBackingPtr OpenFile(const SysPath& filename, FileMode mode = FileMode::Read) override;

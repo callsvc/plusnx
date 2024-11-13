@@ -66,8 +66,6 @@ namespace Plusnx::SysFs {
 
     class RoDirectoryBacking {
     public:
-        RoDirectoryBacking() = default;
-
         explicit RoDirectoryBacking(const SysPath& dir) : path(dir) {}
         virtual ~RoDirectoryBacking() = default;
 
@@ -81,7 +79,6 @@ namespace Plusnx::SysFs {
     };
     class DirectoryBacking : public RoDirectoryBacking {
     public:
-        DirectoryBacking() = default;
         DirectoryBacking(const SysPath& path) : RoDirectoryBacking(path) {}
 
         virtual FileBackingPtr CreateFile(const SysPath& file) = 0;
@@ -99,7 +96,7 @@ namespace Plusnx::SysFs {
 
     class FileSystem : public RoDirectoryBacking {
     public:
-        FileSystem() = default;
+        FileSystem(const SysPath& path) : RoDirectoryBacking(path) {}
 
         virtual void ExtractAllFiles(const SysPath& output);
     protected:

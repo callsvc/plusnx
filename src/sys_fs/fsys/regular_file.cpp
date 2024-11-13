@@ -56,7 +56,7 @@ namespace Plusnx::SysFs::FSys {
 
         while (copied < size) {
             const u64 stride{size - copied > 4096 ? 4096 : size - copied};
-            if (realFile && !stride || copied + stride > GetSize() - offset)
+            if (realFile && (!stride || copied + stride > GetSize() - offset))
                 return stride;
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};

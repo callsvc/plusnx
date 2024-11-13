@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <sys_fs/fs_types.h>
 
 #include <security/cipher_cast.h>
@@ -53,7 +54,7 @@ namespace Plusnx::SysFs::Nx {
     };
 
     struct HierarchicalSha256Data {
-        std::array<u8, 0x20> masterHash; // SHA256 hash over the hash-table at section-start+0 with the below hash-table size
+        std::array<u8, 0x20> tableHash; // SHA256 hash over the hash-table at section-start+0 with the below hash-table size
         u32 blockSize;
         u32 layerCount; // always 2
         struct LayerRegion {
@@ -68,7 +69,7 @@ namespace Plusnx::SysFs::Nx {
     struct IntegrityMetaInfo {
         u32 magic;
         u32 version;
-        u32 masterHashSize;
+        u32 hashSize;
         u32 maxLayers;
         struct HierarchicalIntegrityVerificationLevelInformation {
             u64 logicalOffset;
@@ -78,7 +79,7 @@ namespace Plusnx::SysFs::Nx {
         };
         std::array<HierarchicalIntegrityVerificationLevelInformation, 6> levels;
         std::array<u8, 0x20> signatureSalt;
-        std::array<u8, 0x20> masterHash;
+        std::array<u8, 0x20> hash;
         std::array<u8, 0x18> pad0;
 
         static_assert(sizeof(levels) == 0x90);
@@ -141,10 +142,11 @@ namespace Plusnx::SysFs::Nx {
         NCA(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca);
 
         static bool ValidateMagic(u32 magic);
-        std::pair<FsType, FileBackingPtr> GetBackingFile();
+        std::vector<FileBackingPtr> GetBackingFiles(bool partition) const;
+        std::vector<std::pair<FsType, FileBackingPtr>> GetBackingFiles() const;
 
-        std::optional<FileBackingPtr> romfs;
-        std::optional<FileBackingPtr> pfs;
+        std::list<FileBackingPtr> romfsList;
+        std::list<FileBackingPtr> pfsList;
         bool rights{};
     private:
         void CreateFilesystemEntries(const FileBackingPtr& nca);

@@ -28,15 +28,17 @@ namespace Plusnx::SysFs::Nx {
         u32 nextDirOffset;
         u32 nameLength;
     };
+    static_assert(sizeof(DirectoryEntryMeta) == 0x18);
 
     struct FileEntryMeta {
-        u32 directoryOffset;
+        u32 parentOffset;
         u32 nextFileSiblingOffset;
         u64 dataOffset;
         u64 size;
         u32 nextFileOffset;
         u32 nameLength;
     };
+    static_assert(sizeof(FileEntryMeta) == 0x20);
 #pragma pack(pop)
 
     // https://www.3dbrew.org/wiki/RomFS

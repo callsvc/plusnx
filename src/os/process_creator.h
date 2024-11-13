@@ -8,7 +8,7 @@ namespace Plusnx::Os {
     public:
         ProcessCreator(NxSys& nos) : nxOs(nos) {}
         void Initialize();
-        void DumpRomContent() const;
+        void DumpControlContent() const;
 
         std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> romfs;
         std::optional<Sdk::ControlProperty> nacp;

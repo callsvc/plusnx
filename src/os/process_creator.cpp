@@ -3,16 +3,16 @@
 #include <os/process_creator.h>
 
 namespace Plusnx::Os {
-    void ProcessCreator::DumpRomContent() const {
+    void ProcessCreator::DumpControlContent() const {
         const auto tempDir{std::filesystem::temp_directory_path()};
-        if (romfs)
-            romfs->ExtractAllFiles(tempDir);
+        if (romfs && nacp)
+            romfs->ExtractAllFiles(tempDir / std::format("{:X}", nacp->titleId));
     }
 
     void ProcessCreator::Initialize() {
         const auto application{nxOs.application};
 
-        if (auto content{application->romfs})
+        if (const auto content{application->romfs})
             romfs = content;
 
         if (auto content{application->control}) {
@@ -26,7 +26,7 @@ namespace Plusnx::Os {
             programId = nacp->titleId;
 
 #if 1
-        DumpRomContent();
+        DumpControlContent();
 #endif
 
         std::print("Name of the application about to be loaded: {} v{}\n", title, version);

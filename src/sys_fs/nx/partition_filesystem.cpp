@@ -3,21 +3,23 @@
 #include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/partition_filesystem.h>
 namespace Plusnx::SysFs::Nx {
-    PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) : backing(pfs) {
-        if (pfs->Read(superBlock) != sizeof(superBlock)) {
+    PartitionFilesystem::PartitionFilesystem(const FileBackingPtr& pfs) : RoDirectoryBacking("/" / pfs->path), backing(pfs) {
+        if (pfs->Read(block) != sizeof(block)) {
             return;
         }
-        if (superBlock.magic == ConstMagic<u32>("HFS0"))
+        if (block.magic == ConstMagic<u32>("HFS0"))
             hashable = true;
+        if (!hashable && block.magic != ConstMagic<u32>("PFS0"))
+            return;
 
         entrySize = hashable ? sizeof(HashableContentEntry) : sizeof(ContentEntry);
-        const auto totalSize{entrySize * superBlock.entries};
-        const StringTable strings(totalSize + sizeof(superBlock), superBlock.strTableSize, pfs);
+        const auto totalSize{entrySize * block.entries};
+        const StringTable strings(totalSize + sizeof(block), block.strTableSize, pfs);
 
-        content = pfs->GetBytes<u8>(totalSize, sizeof(superBlock));
+        content = pfs->GetBytes<u8>(totalSize, sizeof(block));
         dataOffset = strings.offset + strings.size;
         FileEntry entry{};
-        for (u32 index{}; index < superBlock.entries; index++) {
+        for (u32 index{}; index < block.entries; index++) {
             assert(content.size() - entrySize * index >= sizeof(entry));
             std::memcpy(&entry, &content[entrySize * index], sizeof(entry));
 

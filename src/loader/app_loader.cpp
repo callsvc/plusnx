@@ -12,6 +12,8 @@ namespace Plusnx::Loader {
             return ContainedFormat::Ticket;
         if (extension == ".cnmt")
             return ContainedFormat::Cnmt;
+        if (extension == ".xml")
+            return ContainedFormat::Xml;
 
         return ContainedFormat::Invalid;
     }

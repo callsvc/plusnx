@@ -4,7 +4,7 @@
 #include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/readonly_filesystem.h>
 namespace Plusnx::SysFs::Nx {
-    ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) {
+    ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) : FileSystem(romfs->path) {
         if (romfs->Read(content) != sizeof(RomFsHeader))
             return;
         assert(sizeof(RomFsHeader) == content.size);
@@ -12,6 +12,7 @@ namespace Plusnx::SysFs::Nx {
         SysPath root{"/"};
         VisitSubdirectories(romfs, root, content.dirMetaOffset);
 
+#if 0
         const auto filesTable(romfs->GetBytes<u32>(content.dirHashSize / sizeof(u32), content.dirHashOffset));
         const auto countOfFiles = [&] {
             u32 count{};
@@ -22,6 +23,7 @@ namespace Plusnx::SysFs::Nx {
         }();
 
         assert(ListAllFiles().size() == countOfFiles);
+#endif
     }
 
     void AppendEntryName(const FileBackingPtr& romfs, SysPath& path, const u64 length, const u64 offset) {
@@ -38,11 +40,14 @@ namespace Plusnx::SysFs::Nx {
             if (entry.childDirOffset != RomFsEmptyEntry) {
                 VisitSubdirectories(romfs, path, offset + entry.childDirOffset);
             }
+            if (!filesystem)
+                AddDirectory({});
 
             if (entry.firstFileOffset != RomFsEmptyEntry)
                 VisitFiles(romfs, path, content.fileMetaOffset + entry.firstFileOffset);
         };
         DirectoryEntryMeta entry{};
+        const auto dirOffset{offset};
         do {
             romfs->Read(entry, offset);
 
@@ -50,21 +55,23 @@ namespace Plusnx::SysFs::Nx {
             if (path.has_parent_path())
                 path = path.parent_path();
 
-            offset += entry.nextDirSiblingOffset - sizeof(entry);
+            offset = dirOffset + entry.nextDirSiblingOffset;
         } while (entry.nextDirSiblingOffset != RomFsEmptyEntry);
     }
 
     void ReadOnlyFilesystem::VisitFiles(const FileBackingPtr& romfs, SysPath& path, u64 offset) {
         FileEntryMeta file{};
+        const auto fileOffset{offset};
         do {
             romfs->Read(file, offset);
-            AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
+            if (file.nameLength == RomFsEmptyEntry)
+                return;
 
+            AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
             AddFile(path, std::make_shared<FileLayered>(romfs, path, content.fileDataOffset + file.dataOffset, file.size));
             path = path.parent_path();
 
-            offset += file.nextFileSiblingOffset - sizeof(file);
-
+            offset = fileOffset + file.nextFileSiblingOffset;
         } while (file.nextFileSiblingOffset != RomFsEmptyEntry);
     }
 
@@ -118,6 +125,9 @@ namespace Plusnx::SysFs::Nx {
                 return placeholder;
             }());
         }
+        if (path.empty())
+            return;
+
         EmplaceContent(path, "Nonexistent subdirectory, unable to create the new directory", [&](Directory& target, [[maybe_unused]] const SysPath& directory) {
             target.subdirs.emplace(path.filename(), Directory{});
             return true;

@@ -40,10 +40,10 @@ namespace Plusnx::SysFs::Nx {
         bool hashable{};
         u64 entrySize;
         u64 dataOffset;
-        SuperBlock superBlock;
+        SuperBlock block;
 
         std::vector<u8> content;
-        const FileBackingPtr& backing;
+        const FileBackingPtr backing;
     };
 
     class StringTable {
