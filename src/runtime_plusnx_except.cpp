@@ -1,8 +1,8 @@
 #include <cxxabi.h>
 #include <execinfo.h>
 
-#include <except.h>
 #include <ranges>
+#include <runtime_plusnx_except.h>
 #include <types.h>
 namespace Plusnx {
     inline void GetCallStack(std::vector<void*>& tracer, std::map<void*, std::string>& symbols) {
@@ -29,7 +29,17 @@ namespace Plusnx {
     }
 
     constexpr auto SymbolNameSize{0x34};
-    std::vector<std::string> Except::GetStackTrace() {
+    void runtime_plusnx_except::PrintPrettyMessage() const {
+        for (const auto& function : GetStackTrace()) {
+            std::print("{}\n", function);
+        }
+        std::print("Call stack dump completed successfully\n");
+#if PLUSNX_GUI_SDL2
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "An exception was thrown", runtime_error::what(), nullptr);
+#endif
+    }
+
+    std::vector<std::string> runtime_plusnx_except::GetStackTrace() {
         std::vector<std::string> result;
 
         std::vector<void*> tracer(32);

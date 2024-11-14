@@ -1,10 +1,11 @@
 #include <fstream>
 #include <utility>
 
+#include <boost/align/align_up.hpp>
+#include <boost/range/size.hpp>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <boost/align/align_up.hpp>
 
 #include <sys_fs/fsys/regular_file.h>
 namespace Plusnx::SysFs::FSys {
@@ -24,7 +25,7 @@ namespace Plusnx::SysFs::FSys {
             if (mode == FileMode::Write)
                 return O_RDWR;
 
-            throw Except("Invalid file mode");
+            throw runtime_plusnx_except("Invalid file mode");
         }();
         descriptor = open(path.c_str(), parameter);
         if (descriptor < 2)
@@ -60,11 +61,12 @@ namespace Plusnx::SysFs::FSys {
                 return stride;
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};
-            if (static_cast<u64>(result) != stride) {
-                std::print("{}\n", GetOsErrorString());
-                if (errno)
-                    throw Except("Could not read {:#x} bytes from offset {:#x} of descriptor {}", size, offset, descriptor);
+            if (static_cast<u64>(result) != stride && errno) {
+                throw runtime_plusnx_except("Error reading {:#x} bytes from descriptor {}, due to {}\n", size, descriptor, GetOsErrorString());
             }
+            if (static_cast<u64>(result) < stride)
+                break;
+
             copied += result;
             falling += result;
         }
@@ -79,7 +81,7 @@ namespace Plusnx::SysFs::FSys {
         if (GetSize() < final) {
             if (fallocate64(descriptor, 0, offset, final) != 0)
                 if (errno)
-                    throw Except("{}", GetOsErrorString());
+                    throw runtime_plusnx_except(GetOsErrorString());
         }
         return pwrite64(descriptor, input, size, offset);
     }

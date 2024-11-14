@@ -18,7 +18,7 @@ namespace Plusnx::Loader {
 
 #if 1
         if (const auto damaged = VerifyTitleIntegrity())
-            throw Except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
+            throw runtime_plusnx_except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
 #endif
 
         if (nsp)
@@ -34,7 +34,7 @@ namespace Plusnx::Loader {
         if (!exefs)
             return;
         if (const auto npdm{exefs->OpenFile("main.npdm")}; !npdm) {
-            throw Except("The NSP does not have a valid ExeFS, preventing it from loading");
+            throw runtime_plusnx_except("The NSP does not have a valid ExeFS, preventing it from loading");
         }
         const auto &process{context->process};
         process->npdm = SysFs::Npdm(exefs->OpenFile("main.npdm"));

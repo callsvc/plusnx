@@ -9,12 +9,12 @@ Plusnx::u64 Plusnx::SysFs::FileLayered::GetSize() const {
 }
 Plusnx::u64 Plusnx::SysFs::FileLayered::ReadImpl(void* output, const u64 size, const u64 offset) {
     if (offset + size > ends)
-        throw Except("Out of the current file bounds");
+        throw runtime_plusnx_except("Out of the current file bounds");
 
     const auto result{parent->Read(output, size, starts + offset)};
     return result;
 }
 
 Plusnx::u64 Plusnx::SysFs::FileLayered::WriteImpl([[maybe_unused]] const void* input, [[maybe_unused]] u64 size, [[maybe_unused]] u64 offset) {
-    throw Except("It is not possible to write data to virtual files");
+    throw runtime_plusnx_except("It is not possible to write data to virtual files");
 }

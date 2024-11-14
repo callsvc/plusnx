@@ -1,6 +1,8 @@
 #pragma once
 #include <armored/code_blocks.h>
 #include <armored/cpu_context.h>
+
+#include <cpu/features.h>
 namespace Plusnx::Armored {
     enum class GuestCpuType {
         Arm32,
@@ -18,6 +20,7 @@ namespace Plusnx::Armored {
     private:
         std::shared_ptr<EmitterInterface> jitter;
         std::shared_ptr<EmitterDetails> details;
+        Cpu::Features caps;
 
         JitConfigs configuration;
         std::map<u64, CodeBlocks> blocks;

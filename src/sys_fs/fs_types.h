@@ -21,6 +21,10 @@ namespace Plusnx::SysFs {
         FileBacking(const SysPath& file, const FileMode type = FileMode::Read) : path(file), mode(type) {}
         virtual ~FileBacking() = default;
 
+        virtual operator bool() const {
+            return true;
+        }
+
         template <typename T> requires (std::is_trivial_v<T>)
         T Read(const u32 offset = 0) {
             T object;

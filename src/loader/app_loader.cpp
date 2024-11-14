@@ -34,7 +34,7 @@ namespace Plusnx::Loader {
     void ExecutableAppLoader::DisplaySection(const SectionType type) const {
         std::stringstream ss;
         if (type == SectionType::Text)
-            throw Except("Text sections are not supported");
+            throw runtime_plusnx_except("Text sections are not supported");
 
         ss << StringViewBuilder(GetExeSection(type));
         std::print("{}\n", ss.str());

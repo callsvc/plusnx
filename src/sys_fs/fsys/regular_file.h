@@ -9,6 +9,10 @@ namespace Plusnx::SysFs::FSys {
         RegularFile(const SysPath& path, FileMode mode = FileMode::Read);
         ~RegularFile() override;
 
+        operator bool() const override {
+            return descriptor > 0;
+        }
+
         u64 GetSize() const override;
     private:
         u64 ReadImpl(void* output, u64 size, u64 offset) override;

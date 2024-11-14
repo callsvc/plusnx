@@ -35,7 +35,7 @@ namespace Plusnx::GenericKernel {
 
         size = boost::alignment::align_up(size, SwitchPageSize);
         if (mmap(reinterpret_cast<void*>(target), size, flags, MAP_SHARED | MAP_FIXED, mfd, addr) == MAP_FAILED)
-            throw Except("{}", GetOsErrorString());
+            throw runtime_plusnx_except(GetOsErrorString());
 
         descriptor.emplace(target, VAddrPool(MemoryType::Alias, size / SwitchPageSize));
     }

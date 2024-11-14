@@ -6,7 +6,7 @@
 #include <boost/algorithm/hex.hpp>
 
 #include <container.h>
-#include <except.h>
+#include <runtime_plusnx_except.h>
 namespace Plusnx {
     using u64 = std::uint64_t;
 

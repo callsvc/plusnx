@@ -95,6 +95,8 @@ target_sources(plusnx-core PUBLIC
     core/telemetry_collector.h
     cpu/core_container.cpp
     cpu/core_container.h
+    cpu/features.cpp
+    cpu/features.h
     cpu/unit_types.h
     generic_kernel/types/kprocess.cpp
     generic_kernel/types/kprocess.h
@@ -147,8 +149,8 @@ target_sources(plusnx-core PUBLIC
     security/ticket.h
     driver.cpp
     container.h
-    except.cpp
-    except.h
+    runtime_plusnx_except.cpp
+    runtime_plusnx_except.h
     types.cpp
     types.h
 )
