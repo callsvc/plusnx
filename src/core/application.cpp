@@ -13,15 +13,19 @@
 namespace Plusnx::Core {
     Application::Application() :
         context(std::make_shared<Context>()) {
+        const auto rootDir{std::filesystem::current_path()};
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
         assets = std::make_shared<SysFs::Assets>(context);
+        context->configs->Initialize(rootDir / "plusnx.toml");
+        context->configs->ExportConfigs(rootDir / "plusnx-bkp.toml");
+
+        context->keys = std::make_shared<Security::Keyring>(context);
+
         kernel = std::make_shared<GenericKernel::Kernel>();
 
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();
-
-        context->keys = std::make_shared<Security::Keyring>(context);
     }
 
     Application::~Application() {

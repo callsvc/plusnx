@@ -93,6 +93,8 @@ target_sources(plusnx-core PUBLIC
     core/games_lists.h
     core/telemetry_collector.cpp
     core/telemetry_collector.h
+    core/configs.cpp
+    core/configs.h
     cpu/core_container.cpp
     cpu/core_container.h
     cpu/features.cpp
@@ -155,5 +157,5 @@ target_sources(plusnx-core PUBLIC
     types.h
 )
 
-target_link_libraries(plusnx-core PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto)
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto toml11::toml11)
 target_link_libraries(plusnx PRIVATE plusnx-core)

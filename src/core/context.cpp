@@ -4,6 +4,7 @@
 #include <core/context.h>
 namespace Plusnx::Core {
     Context::Context() :
+        configs(std::make_shared<Configs>()),
         provider(std::make_shared<SysFs::Provider>()),
         gpu(std::make_shared<Video::TegraX1Gpu>()),
         host1x(std::make_shared<Platform::Host1x>()),

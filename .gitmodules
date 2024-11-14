@@ -7,3 +7,6 @@
 [submodule "externals/mbedtls"]
 	path = externals/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "externals/toml11"]
+	path = externals/toml11
+	url = https://github.com/ToruNiina/toml11.git

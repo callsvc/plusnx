@@ -18,8 +18,8 @@ namespace Plusnx::Os::Sdk {
             titleId = update - 0x1000;
     }
 
-    std::string ControlProperty::GetApplicationName(Services::Settings::LanguageType type) const {
-        const auto application{Services::Settings::GetLanguageCode(static_cast<u32>(type), true)};
+    std::string ControlProperty::GetApplicationName(const Services::Settings::LanguageType type) const {
+        const auto application{Services::Settings::GetLanguageCode(std::to_underlying(type), true)};
         if (!ContainsValue(languages, application)) {
             return std::string(content.title[0].titleTag.data());
         }
@@ -28,8 +28,8 @@ namespace Plusnx::Os::Sdk {
         return std::string(title.data());
     }
 
-    std::string ControlProperty::GetApplicationPublisher(Services::Settings::LanguageType type) const {
-        const auto application{Services::Settings::GetLanguageCode(static_cast<u32>(type), true)};
+    std::string ControlProperty::GetApplicationPublisher(const Services::Settings::LanguageType type) const {
+        const auto application{Services::Settings::GetLanguageCode(std::to_underlying(type), true)};
         if (!ContainsValue(languages, application)) {
             return std::string(content.title[0].publisher.data());
         }

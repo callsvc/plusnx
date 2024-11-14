@@ -3,6 +3,7 @@
 #include <memory>
 #include <filesystem>
 
+#include <core/configs.h>
 #include <sys_fs/provider.h>
 #include <video/tegrax1_gpu.h>
 #include <audio/sound.h>
@@ -30,8 +31,10 @@ namespace Plusnx::Core {
     public:
         Context();
         [[nodiscard]] SysFs::SysPath GetSystemPath(SystemPaths tagged) const;
+
         bool IsFromSystemPath(const SysFs::SysPath& path) const;
 
+        std::shared_ptr<Configs> configs;
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Security::Keyring> keys;
         std::shared_ptr<Video::TegraX1Gpu> gpu;

@@ -26,7 +26,8 @@ namespace Plusnx::Os {
             programId = nacp->titleId;
 
 #if 1
-        DumpControlContent();
+        if (nxOs.context->configs->excfs)
+            DumpControlContent();
 #endif
 
         std::print("Name of the application about to be loaded: {} v{}\n", title, version);
