@@ -4,20 +4,6 @@
 #include <loader/nx_executable.h>
 #include <loader/app_loader.h>
 namespace Plusnx::Loader {
-    ContainedFormat GetEntryFormat(const SysFs::SysPath& filename) {
-        const auto& extension{filename.extension()};
-        if (extension == ".nca")
-            return ContainedFormat::Nca;
-        if (extension == ".tik")
-            return ContainedFormat::Ticket;
-        if (extension == ".cnmt")
-            return ContainedFormat::Cnmt;
-        if (extension == ".xml")
-            return ContainedFormat::Xml;
-
-        return ContainedFormat::Invalid;
-    }
-
     bool AppLoader::CheckHeader(const SysFs::FileBackingPtr& file) {
         const auto offset = [&] -> u64 {
             if (type == AppType::Nro)

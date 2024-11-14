@@ -21,15 +21,15 @@ namespace Plusnx::Security {
         switch (signatureType) {
             case SignatureType::Rsa4096Sha1:
             case SignatureType::Rsa4096Sha256:
-                offset += 0x23c;
+                offset += 0x23C;
                 break;
             case SignatureType::Rsa2048Sha1:
             case SignatureType::Rsa2048Sha256:
-                offset += 0x13c;
+                offset += 0x13C;
                 break;
             case SignatureType::EcdsaSha1:
             case SignatureType::EcdsaSha256:
-                offset += 0x7c;
+                offset += 0x7C;
                 break;
             default: {
             }

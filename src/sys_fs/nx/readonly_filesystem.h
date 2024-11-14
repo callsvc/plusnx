@@ -3,7 +3,7 @@
 
 #include <sys_fs/fs_types.h>
 namespace Plusnx::SysFs::Nx {
-    constexpr auto RomFsEmptyEntry{0xffffffff};
+    constexpr auto RomFsEmptyEntry{0xFFFFFFFF};
 
 #pragma pack(push, 1)
     struct RomFsHeader {
@@ -19,36 +19,39 @@ namespace Plusnx::SysFs::Nx {
 
         u64 fileDataOffset;
     };
+    static_assert(sizeof(RomFsHeader) == 0x50);
 
     struct DirectoryEntryMeta {
         u32 parentOffset;
-        u32 nextDirSiblingOffset;
-        u32 childDirOffset;
-        u32 firstFileOffset;
-        u32 nextDirOffset;
-        u32 nameLength;
+        u32 siblingOffset;
+        u32 childOffset;
+        u32 fileOffset;
+        u32 hash;
+        u32 nameSize;
     };
     static_assert(sizeof(DirectoryEntryMeta) == 0x18);
 
     struct FileEntryMeta {
         u32 parentOffset;
-        u32 nextFileSiblingOffset;
-        u64 dataOffset;
+        u32 siblingOffset;
+        u64 offset;
         u64 size;
-        u32 nextFileOffset;
-        u32 nameLength;
+        u32 hash;
+        u32 nameSize;
     };
     static_assert(sizeof(FileEntryMeta) == 0x20);
 #pragma pack(pop)
 
     // https://www.3dbrew.org/wiki/RomFS
-    class ReadOnlyFilesystem final : public FileSystem {
+    // https://github.com/switchbrew/libnx/blob/master/nx/source/runtime/devices/romfs_dev.c#L155
+    class ReadOnlyFilesystem : public FileSystem {
     public:
+        ReadOnlyFilesystem();
         ReadOnlyFilesystem(const FileBackingPtr& romfs);
 
         FileBackingPtr OpenFile(const SysPath& path, FileMode = FileMode::Read) override;
         std::vector<SysPath> ListAllFiles() const override;
-    private:
+    protected:
         void AddDirectory(const SysPath& path);
         void AddFile(const SysPath& path, const FileBackingPtr& file);
         void EmplaceContent(const SysPath& path, const std::string& error, BaseDirCallback&& callback);
@@ -58,6 +61,6 @@ namespace Plusnx::SysFs::Nx {
 
         RomFsHeader content;
 
-        std::optional<std::pair<SysPath, Directory>> filesystem;
+        std::optional<Directory> filesystem;
     };
 }

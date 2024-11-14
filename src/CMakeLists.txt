@@ -9,6 +9,10 @@ target_include_directories(plusnx-core PUBLIC
 
 target_sources(plusnx PRIVATE
     main.cpp
+    nogui/sdl_vulkan_backing.cpp
+    nogui/sdl_vulkan_backing.h
+    nogui/sdl_window.cpp
+    nogui/sdl_window.h
 )
 
 target_sources(plusnx-core PUBLIC
@@ -63,6 +67,16 @@ target_sources(plusnx-core PUBLIC
     sys_fs/nx/partition_filesystem.h
     sys_fs/nx/readonly_filesystem.cpp
     sys_fs/nx/readonly_filesystem.h
+    sys_fs/nx/submission_package.cpp
+    sys_fs/nx/submission_package.h
+    sys_fs/nx/nca_core.cpp
+    sys_fs/nx/nca_core.h
+    sys_fs/nx/nso_core.cpp
+    sys_fs/nx/nso_core.h
+    sys_fs/nx/content_metadata.cpp
+    sys_fs/nx/content_metadata.h
+    sys_fs/nx/fake_romfs.cpp
+    sys_fs/nx/fake_romfs.h
     sys_fs/layered_fs.cpp
     sys_fs/layered_fs.h
     sys_fs/continuous_block.cpp
@@ -71,14 +85,6 @@ target_sources(plusnx-core PUBLIC
     sys_fs/npdm.h
     sys_fs/ctr_backing.cpp
     sys_fs/ctr_backing.h
-    sys_fs/nx/content_archive.cpp
-    sys_fs/nx/content_archive.h
-    sys_fs/nx/content_metadata.cpp
-    sys_fs/nx/content_metadata.h
-    nogui/sdl_vulkan_backing.cpp
-    nogui/sdl_vulkan_backing.h
-    nogui/sdl_window.cpp
-    nogui/sdl_window.h
     core/application.cpp
     core/application.h
     core/context.cpp
@@ -113,6 +119,10 @@ target_sources(plusnx-core PUBLIC
     loader/nx_executable.h
     loader/game_fs.cpp
     loader/game_fs.h
+    loader/main_executable.cpp
+    loader/main_executable.h
+    loader/content_archive.cpp
+    loader/content_archive.h
     os/nx_sys.cpp
     os/nx_sys.h
     os/process_creator.cpp

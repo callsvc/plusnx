@@ -3,7 +3,7 @@
 #include <loader/app_loader.h>
 namespace Plusnx::Loader {
     enum class RomSize : u8 {
-        MinorCard0 = 0xFa,
+        MinorCard0 = 0xFA,
         MinorCard1 = 0xF8,
         MediumCard0 = 0xF0,
         MediumCard1 = 0xE0,
@@ -43,7 +43,8 @@ namespace Plusnx::Loader {
     class Cartridge final : public AppLoader {
     public:
         Cartridge(const SysFs::FileBackingPtr& xci);
-        void Load(std::shared_ptr<Core::Context>& context) override;
+        void Load(std::shared_ptr<Core::Context> &context) override;
+        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override;
 
         std::unique_ptr<SysFs::Nx::PartitionFilesystem> pfs;
     private:

@@ -13,20 +13,13 @@ namespace Plusnx::Loader {
         Nsp = 1024 * Nro
     };
 
-    enum class ContainedFormat {
-        Invalid,
-        Nca,
-        Ticket,
-        Cnmt,
-        Xml
-    };
-    ContainedFormat GetEntryFormat(const SysFs::SysPath& filename);
-
     enum class AppType {
         Invalid,
         Nsp,
         Xci,
+        Nca,
         Nro,
+        Nso,
         GameFs
     };
 
@@ -52,15 +45,11 @@ namespace Plusnx::Loader {
             return {};
         }
         virtual void Load(std::shared_ptr<Core::Context>& context) = 0;
+        virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const = 0;
 
         AppType type;
         u32 validMagic;
         LoaderStatus status{LoaderStatus::None};
-
-        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> romfs;
-        std::shared_ptr<SysFs::Nx::PartitionFilesystem> exefs;
-        std::shared_ptr<SysFs::Nx::PartitionFilesystem> icon;
-        std::shared_ptr<SysFs::FileBacking> control;
 
     protected:
         bool CheckHeader(const SysFs::FileBackingPtr& file);

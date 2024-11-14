@@ -27,7 +27,7 @@ namespace Plusnx {
                 result[ptr] |= boost::algorithm::detail::hex_char_to_int(container[index + 1]);
                 index += 2;
             }
-        } catch ([[maybe_unused]] boost::exception& except) {
+        } catch ([[maybe_unused]] const boost::exception& except) {
             return {};
         }
 

@@ -1,6 +1,6 @@
-#include <print>
 #include <os/nx_sys.h>
 #include <os/process_creator.h>
+#include <print>
 
 namespace Plusnx::Os {
     void ProcessCreator::DumpControlContent() const {
@@ -12,11 +12,11 @@ namespace Plusnx::Os {
     void ProcessCreator::Initialize() {
         const auto application{nxOs.application};
 
-        if (const auto content{application->romfs})
+        if (const auto content{application->GetRomFs(true)})
             romfs = content;
 
-        if (auto content{application->control}) {
-            nacp.emplace(content);
+        if (romfs) {
+            nacp.emplace(romfs->OpenFile("/control.nacp"));
             const auto& context{nxOs.context};
             title = nacp->GetApplicationName(context->language);
             publisher = nacp->GetApplicationPublisher(context->language);

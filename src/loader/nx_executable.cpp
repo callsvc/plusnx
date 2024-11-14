@@ -1,6 +1,7 @@
 #include <ranges>
 #include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/readonly_filesystem.h>
+#include <sys_fs/nx/fake_romfs.h>
 #include <sys_fs/nx/partition_filesystem.h>
 
 #include <loader/nx_executable.h>
@@ -45,17 +46,17 @@ namespace Plusnx::Loader {
 
             auto asset = [&] {
                 const auto offset{content.size + section.offset};
-                if (index == 0)
+                if (!index)
                     assert(section.offset == sizeof(AssetHeader));
-                return std::make_shared<SysFs::FileLayered>(nro, "", offset, section.size);
+                return std::make_shared<SysFs::FileLayered>(nro, !index ? "icon" : index == 1 ? "/control.nacp" : "romfs", offset, section.size);
             }();
 
             if (index == 2)
-                control = std::move(asset);
+                romfs = std::make_shared<SysFs::Nx::ReadOnlyFilesystem>(std::move(asset));
             else if (index == 1)
-                icon = std::make_shared<SysFs::Nx::PartitionFilesystem>(asset);
+                nacp = std::move(asset);
             else if (!index)
-                romfs = std::make_shared<SysFs::Nx::ReadOnlyFilesystem>(asset);
+                icon = std::make_shared<SysFs::Nx::PartitionFilesystem>(std::move(asset));
         }
     }
 
@@ -79,8 +80,16 @@ namespace Plusnx::Loader {
 
     void NxExecutable::Load(std::shared_ptr<Core::Context>& context) {
         [[maybe_unused]] auto& process{context->process};
-        __builtin_trap();
     }
+    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> NxExecutable::GetRomFs(const bool isControl) const {
+        if (!isControl)
+            return romfs;
+        const auto control{std::make_shared<SysFs::Nx::FakeRomFs>()};
+        control->AddFile(nacp);
+
+        return control;
+    }
+
     std::span<u8> NxExecutable::GetExeSection(const SectionType type) const {
         if (type == SectionType::Text)
             return textSection;

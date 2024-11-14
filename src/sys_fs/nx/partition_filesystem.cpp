@@ -32,6 +32,10 @@ namespace Plusnx::SysFs::Nx {
             total += ensure.size;
         }
         assert(pfs->GetSize() > total);
+
+        const auto files{ListAllFiles()};
+        if (!files.empty())
+            first = files.front();
     }
 
     std::vector<SysPath> PartitionFilesystem::ListAllFiles() const {

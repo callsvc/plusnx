@@ -4,7 +4,7 @@
 
 namespace Plusnx::SysFs {
     constexpr auto CtrBlockSize{0x10};
-    CtrBacking::CtrBacking(const FileBackingPtr& file, const Security::K128& key, const u64 offset, const u64 size, const std::array<u8, 16>& ctr) : FileBacking(file->path, file->mode), backing(file), file(offset, size), nonce(ctr) {
+    CtrBacking::CtrBacking(const FileBackingPtr& file, const Security::K128& key, const u64 offset, const u64 size, const std::array<u8, 0x10>& ctr) : FileBacking(file->path, file->mode), backing(file), file(offset, size), nonce(ctr) {
         switch (mode) {
             case FileMode::Write:
                 encrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, false);

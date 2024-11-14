@@ -1,19 +1,22 @@
-#include <ranges>
 #include <boost/align/align_up.hpp>
+#include <ranges>
 
 #include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/readonly_filesystem.h>
+
 namespace Plusnx::SysFs::Nx {
+    ReadOnlyFilesystem::ReadOnlyFilesystem() : FileSystem("Zeroed"), content() {}
     ReadOnlyFilesystem::ReadOnlyFilesystem(const FileBackingPtr& romfs) : FileSystem(romfs->path) {
         if (romfs->Read(content) != sizeof(RomFsHeader))
             return;
         assert(sizeof(RomFsHeader) == content.size);
 
         SysPath root{"/"};
-        VisitSubdirectories(romfs, root, content.dirMetaOffset);
+        if (!filesystem)
+            AddDirectory({});
+        VisitSubdirectories(romfs, root, 0);
 
-#if 0
-        const auto filesTable(romfs->GetBytes<u32>(content.dirHashSize / sizeof(u32), content.dirHashOffset));
+        const auto filesTable(romfs->GetBytes<u32>(content.fileHashSize / sizeof(u32), content.fileHashOffset));
         const auto countOfFiles = [&] {
             u32 count{};
             for (const auto& file : filesTable)
@@ -22,57 +25,66 @@ namespace Plusnx::SysFs::Nx {
             return count;
         }();
 
-        assert(ListAllFiles().size() == countOfFiles);
-#endif
+        const auto files{ReadOnlyFilesystem::ListAllFiles()};
+        if (countOfFiles < files.size()) {
+            std::print("File count exceeds the available hashes in this RomFS\n");
+        }
+        u64 totalSize{};
+        for (const auto& file : files) {
+            totalSize += ReadOnlyFilesystem::OpenFile(file)->GetSize();
+        }
+        std::print("File count {}, total file bundle size {}\n", files.size(), GetReadableSize(totalSize));
     }
 
     void AppendEntryName(const FileBackingPtr& romfs, SysPath& path, const u64 length, const u64 offset) {
-        const auto dirName{romfs->GetBytes<char>(length, boost::alignment::align_up(offset, 4))};
-        path.append(std::string_view(dirName.data(), dirName.size()));
+        const auto dirName{romfs->GetBytes<char>(boost::alignment::align_up(length, 4), offset)};
+        path.append(std::string_view(dirName.data(), length));
     }
 
     void ReadOnlyFilesystem::VisitSubdirectories(const FileBackingPtr& romfs, SysPath& path, u64 offset) {
-        auto PopulateSubdirectory = [&] (const DirectoryEntryMeta& entry) {
-            if (entry.nameLength) {
-                AppendEntryName(romfs, path, entry.nameLength, offset + sizeof(entry));
+        u32 dirOffset{};
+        auto PopulateSubdirectory = [&] (const DirectoryEntryMeta& directory) {
+            if (directory.nameSize) {
+                AppendEntryName(romfs, path, directory.nameSize, dirOffset + sizeof(directory));
                 AddDirectory(path);
             }
-            if (entry.childDirOffset != RomFsEmptyEntry) {
-                VisitSubdirectories(romfs, path, offset + entry.childDirOffset);
+            if (directory.fileOffset != RomFsEmptyEntry)
+                VisitFiles(romfs, path, directory.fileOffset);
+
+            if (directory.childOffset != RomFsEmptyEntry) {
+                VisitSubdirectories(romfs, path, directory.childOffset);
             }
-            if (!filesystem)
-                AddDirectory({});
-
-            if (entry.firstFileOffset != RomFsEmptyEntry)
-                VisitFiles(romfs, path, content.fileMetaOffset + entry.firstFileOffset);
         };
-        DirectoryEntryMeta entry{};
-        const auto dirOffset{offset};
+        DirectoryEntryMeta directory{};
         do {
-            romfs->Read(entry, offset);
+            dirOffset = content.dirMetaOffset + offset;
+            romfs->Read(directory, dirOffset);
 
-            PopulateSubdirectory(entry);
+            PopulateSubdirectory(directory);
             if (path.has_parent_path())
                 path = path.parent_path();
 
-            offset = dirOffset + entry.nextDirSiblingOffset;
-        } while (entry.nextDirSiblingOffset != RomFsEmptyEntry);
+            offset = directory.siblingOffset;
+        } while (directory.siblingOffset != RomFsEmptyEntry);
     }
 
     void ReadOnlyFilesystem::VisitFiles(const FileBackingPtr& romfs, SysPath& path, u64 offset) {
         FileEntryMeta file{};
-        const auto fileOffset{offset};
+        u32 fileOffset{};
         do {
-            romfs->Read(file, offset);
-            if (file.nameLength == RomFsEmptyEntry)
+            fileOffset = content.fileMetaOffset + offset;
+            romfs->Read(file, fileOffset);
+            if (file.nameSize == RomFsEmptyEntry)
                 return;
 
-            AppendEntryName(romfs, path, file.nameLength, offset + sizeof(file));
-            AddFile(path, std::make_shared<FileLayered>(romfs, path, content.fileDataOffset + file.dataOffset, file.size));
-            path = path.parent_path();
+            if (file.nameSize) {
+                AppendEntryName(romfs, path, file.nameSize, fileOffset + sizeof(file));
+                AddFile(path, std::make_shared<FileLayered>(romfs, path, content.fileDataOffset + file.offset, file.size));
+                path = path.parent_path();
+            }
 
-            offset = fileOffset + file.nextFileSiblingOffset;
-        } while (file.nextFileSiblingOffset != RomFsEmptyEntry);
+            offset = file.siblingOffset;
+        } while (file.siblingOffset != RomFsEmptyEntry);
     }
 
     FileBackingPtr ReadOnlyFilesystem::OpenFile(const SysPath& path, const FileMode mode) {
@@ -87,7 +99,7 @@ namespace Plusnx::SysFs::Nx {
             return result != nullptr;
         };
 
-        WalkDirectories(filesystem->second, path.parent_path(), OpenFileWithin);
+        WalkDirectories(*filesystem, path.parent_path(), OpenFileWithin);
         return result;
     }
     std::vector<SysPath> ReadOnlyFilesystem::ListAllFiles() const {
@@ -100,14 +112,14 @@ namespace Plusnx::SysFs::Nx {
                 ListAllTopLevelDirs(result, subdir);
             }
         };
-        ListAllTopLevelDirs(files, filesystem->second);
+        ListAllTopLevelDirs(files, *filesystem);
 
         return files;
     }
 
     void ReadOnlyFilesystem::EmplaceContent(const SysPath& path, const std::string& error, BaseDirCallback&& callback) {
         bool result{};
-        WalkDirectories(filesystem->second, path, [&](Directory& target, const SysPath& directory) {
+        WalkDirectories(*filesystem, path, [&](Directory& target, const SysPath& directory) {
             if (directory == path.parent_path())
                 result = callback(target, directory);
             return result;
@@ -119,10 +131,10 @@ namespace Plusnx::SysFs::Nx {
 
     void ReadOnlyFilesystem::AddDirectory(const SysPath& path) {
         if (!filesystem) {
-            filesystem.emplace(".", [&] {
-                Directory placeholder{};
-                placeholder.subdirs.emplace("/", Directory{});
-                return placeholder;
+            filesystem.emplace([] {
+                Directory root{};
+                root.subdirs.emplace("/", Directory{});
+                return root;
             }());
         }
         if (path.empty())

@@ -7,6 +7,9 @@
 
 namespace Plusnx::SysFs {
     using SysPath = std::filesystem::path;
+
+    std::string GetReadableSize(u64 amount);
+
     enum class FileMode {
         Read,
         Write,

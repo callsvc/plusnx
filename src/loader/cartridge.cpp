@@ -12,10 +12,12 @@ namespace Plusnx::Loader {
         assert(header.magic == ConstMagic<u32>("HEAD"));
         assert(header.backupStartAddr == 0xFFFFFFFF);
 
-        auto partition{std::make_unique<SysFs::FileLayered>(xci, "", header.pfsBeginAddr, header.pfsSize)};
+        auto partition{std::make_unique<SysFs::FileLayered>(xci, xci->path, header.pfsBeginAddr, header.pfsSize)};
         pfs = std::make_unique<SysFs::Nx::PartitionFilesystem>(std::move(partition));
 
     }
-    void Cartridge::Load(std::shared_ptr<Core::Context>& context) {
+    void Cartridge::Load(std::shared_ptr<Core::Context> &context) {}
+    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> Cartridge::GetRomFs(bool isControl) const {
+        return nullptr;
     }
 }

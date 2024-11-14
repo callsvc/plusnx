@@ -3,6 +3,7 @@
 #include <sys_fs/fs_types.h>
 
 #include <security/cipher_cast.h>
+#include <security/checksum.h>
 #include <security/keyring.h>
 namespace Plusnx::SysFs::Nx {
     enum class DistributionType : u8 {
@@ -137,20 +138,25 @@ namespace Plusnx::SysFs::Nx {
     static_assert(sizeof(NcaHeader) == 0xC00);
 #pragma pack(pop)
 
-    class NCA {
+    class NcaCore {
     public:
-        NCA(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca);
+        NcaCore(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca);
 
         static bool ValidateMagic(u32 magic);
         std::vector<FileBackingPtr> GetBackingFiles(bool partition) const;
         std::vector<std::pair<FsType, FileBackingPtr>> GetBackingFiles() const;
+        bool VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer) const;
 
         std::list<FileBackingPtr> romfsList;
         std::list<FileBackingPtr> pfsList;
+
+        ContentType type;
+        SysPath path;
         bool rights{};
+
     private:
-        void CreateFilesystemEntries(const FileBackingPtr& nca);
-        void CreateBackingFile(const FileBackingPtr& nca, const FsEntry& entry, const FsHeader& header);
+        void CreateFilesystemEntries();
+        void CreateBackingFile(const FsEntry& entry, const FsHeader& header);
 
         Security::K128 GetTitleKey() const;
         Security::K128 GetAreaKey(EncryptionType encType) const;
@@ -158,6 +164,8 @@ namespace Plusnx::SysFs::Nx {
 
         std::optional<Security::CipherCast> cipher;
         const std::shared_ptr<Security::Keyring>& keys;
+        const FileBackingPtr backing;
+
         NcaHeader content;
         u64 counter{};
 

@@ -37,10 +37,10 @@ namespace Plusnx::GenericKernel {
     }
 
     void UserSpace::Write32(const u64 vaddr, const u32 value) const {
-        Write8(vaddr, value & 0xff);
-        Write8(vaddr + 1, value >> 8 & 0xff);
-        Write8(vaddr + 2, value >> 16 & 0xff);
-        Write8(vaddr + 3, value >> 24 & 0xff);
+        Write8(vaddr, value & 0xFF);
+        Write8(vaddr + 1, value >> 8 & 0xFF);
+        Write8(vaddr + 2, value >> 16 & 0xFF);
+        Write8(vaddr + 3, value >> 24 & 0xFF);
     }
 
 

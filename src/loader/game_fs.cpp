@@ -6,7 +6,8 @@ namespace Plusnx::Loader {
 
         [[maybe_unused]] auto files{directory.ListAllFiles()};
     }
-    void GameFs::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
-
+    void GameFs::Load([[maybe_unused]] std::shared_ptr<Core::Context> &context) {}
+    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GameFs::GetRomFs(bool isControl) const {
+        return nullptr;
     }
 }

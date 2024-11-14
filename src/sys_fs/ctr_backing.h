@@ -6,7 +6,7 @@
 namespace Plusnx::SysFs {
     class CtrBacking final : public FileBacking {
     public:
-        CtrBacking(const FileBackingPtr& file, const Security::K128& key, u64 offset, u64 size = 0, const std::array<u8, 16>& ctr = {});
+        CtrBacking(const FileBackingPtr& file, const Security::K128& key, u64 offset, u64 size = 0, const std::array<u8, 0x10>& ctr = {});
 
         u64 GetSize() const override;
     private:
@@ -19,7 +19,7 @@ namespace Plusnx::SysFs {
             u64 offset;
             u64 size;
         } file;
-        std::array<u8, 16> nonce{};
+        std::array<u8, 0x10> nonce{};
 
         std::vector<u8> puts;
         std::vector<u8> out;

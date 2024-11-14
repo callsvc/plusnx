@@ -35,6 +35,8 @@ namespace Plusnx::SysFs::Nx {
             u32 pad0;
         };
 
+        std::optional<SysPath> first;
+
     private:
         std::unordered_map<SysPath, FileEntry> entries;
         bool hashable{};

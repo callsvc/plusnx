@@ -5,13 +5,15 @@
 #include <security/signatures.h>
 #include <sys_fs/ctr_backing.h>
 #include <sys_fs/layered_fs.h>
+#include <sys_fs/continuous_block.h>
 
-#include <sys_fs/nx/content_archive.h>
+#include <sys_fs/nx/content_metadata.h>
+#include <sys_fs/nx/nca_core.h>
 namespace Plusnx::SysFs::Nx {
     constexpr auto XtsMode{Security::OperationMode::XtsAes};
     constexpr auto SectorSize{0x200};
 
-    NCA::NCA(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca) : keys(_keys) {
+    NcaCore::NcaCore(const std::shared_ptr<Security::Keyring>& _keys, const FileBackingPtr& nca) : keys(_keys), backing(nca) {
         if (nca->Read(content) != sizeof(content))
             return;
         if (encrypted = !ValidateMagic(content.magic); encrypted) {
@@ -37,10 +39,14 @@ namespace Plusnx::SysFs::Nx {
         }
 
         rights = !IsValueEmpty(content.rights);
-        CreateFilesystemEntries(nca);
+
+        type = content.type;
+        path = backing->path;
+
+        CreateFilesystemEntries();
     }
 
-    bool NCA::ValidateMagic(const u32 magic) {
+    bool NcaCore::ValidateMagic(const u32 magic) {
         static std::vector<u32> magics;
         if (magics.empty()) {
             magics.reserve(4);
@@ -51,7 +57,7 @@ namespace Plusnx::SysFs::Nx {
         return ContainsValue(magics, magic);
     }
 
-    void NCA::CreateFilesystemEntries(const FileBackingPtr& nca) {
+    void NcaCore::CreateFilesystemEntries() {
         Security::Checksum checksum;
         std::array<u8, 0x20> result;
         for (const auto& [index, entry] : std::ranges::views::enumerate(content.entries)) {
@@ -66,7 +72,7 @@ namespace Plusnx::SysFs::Nx {
             if (!IsEmpty(content.headersSum[index]) && !IsEqual(result, content.headersSum[index])) {
                 throw Except("The entry in the NCA at index {} appears to be corrupted", index);
             }
-            CreateBackingFile(nca, entry, header);
+            CreateBackingFile(entry, header);
 
             const auto [type, file] = GetBackingFiles().front();
             if (auto testType = file->GetBytes(16); !testType.empty()) {
@@ -78,7 +84,7 @@ namespace Plusnx::SysFs::Nx {
         }
     }
 
-    void NCA::CreateBackingFile(const FileBackingPtr& nca, const FsEntry& entry, const FsHeader& header) {
+    void NcaCore::CreateBackingFile(const FsEntry& entry, const FsHeader& header) {
         u64 offset{entry.startOffset * 0x200};
         u64 size{};
 
@@ -110,9 +116,9 @@ namespace Plusnx::SysFs::Nx {
         std::memcpy(&ctr[4], &generation, 4);
 
         if (header.encryptionType == EncryptionType::AesCtr || header.encryptionType == EncryptionType::AesCtrEx)
-            EmplaceBacking(std::make_shared<CtrBacking>(nca, rights ? GetTitleKey() : GetAreaKey(header.encryptionType), offset, size, ctr));
+            EmplaceBacking(std::make_shared<CtrBacking>(backing, rights ? GetTitleKey() : GetAreaKey(header.encryptionType), offset, size, ctr));
         else if (header.encryptionType == EncryptionType::None)
-            EmplaceBacking(std::make_shared<FileLayered>(nca, nca->path, offset, size));
+            EmplaceBacking(std::make_shared<FileLayered>(backing, backing->path, offset, size));
     }
 
     Security::IndexedKeyType GetAreaType(const KeyAreaIndex area) {
@@ -125,7 +131,7 @@ namespace Plusnx::SysFs::Nx {
         return Security::IndexedKeyType::Invalid;
     }
 
-    Security::K128 NCA::GetTitleKey() const {
+    Security::K128 NcaCore::GetTitleKey() const {
         Security::K128 title{};
         if (!rights)
             return title;
@@ -140,7 +146,7 @@ namespace Plusnx::SysFs::Nx {
         return decrypted;
     }
 
-    Security::K128 NCA::GetAreaKey(const EncryptionType encType) const {
+    Security::K128 NcaCore::GetAreaKey(const EncryptionType encType) const {
         const auto keyRevision{GetKeyRevision()};
         std::optional<Security::CipherCast> decrypt;
 
@@ -163,7 +169,7 @@ namespace Plusnx::SysFs::Nx {
         return decryptedKey;
     }
 
-    u64 NCA::GetKeyRevision() const {
+    u64 NcaCore::GetKeyRevision() const {
         // https://github.com/strato-emu/strato/blob/master/app/src/main/cpp/skyline/vfs/nca.cpp#L97
         const auto legacy{static_cast<u64>(content.keyGenerationOld)};
         auto generation{static_cast<u64>(content.generation)};
@@ -171,7 +177,7 @@ namespace Plusnx::SysFs::Nx {
         return std::max(generation - 1, 0UL);
     }
 
-    std::vector<FileBackingPtr> NCA::GetBackingFiles(const bool partition) const {
+    std::vector<FileBackingPtr> NcaCore::GetBackingFiles(const bool partition) const {
         std::vector<FileBackingPtr> result;
 
         if (partition) {
@@ -183,7 +189,7 @@ namespace Plusnx::SysFs::Nx {
         }
         return result;
     }
-    std::vector<std::pair<FsType, FileBackingPtr>> NCA::GetBackingFiles() const {
+    std::vector<std::pair<FsType, FileBackingPtr>> NcaCore::GetBackingFiles() const {
         std::vector<std::pair<FsType, FileBackingPtr>> result;
         result.reserve(pfsList.size() + romfsList.size());
         for (const auto& partition : GetBackingFiles(true)) {
@@ -193,5 +199,37 @@ namespace Plusnx::SysFs::Nx {
             result.emplace_back(FsType::RomFs, romfs);
         }
         return result;
+    }
+
+
+    bool NcaCore::VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer) const {
+        auto filename{backing->path};
+        if (GetEntryFormat(filename) == ContainedFormat::Cnmt)
+            return {};
+
+        while (filename.has_extension())
+            filename = filename.replace_extension();
+
+        expected = HexTextToByteArray<16>(filename.string());
+        if (IsEmpty(expected))
+            return {};
+
+        const auto stream{std::make_unique<ContinuousBlock>(backing)};
+        if (!stream)
+            throw Except("The current NCA does not have valid backing");
+#if 1
+        // Skipping files larger than 4MB for now
+        if (stream->GetSize() > buffer.size())
+            return {};
+#endif
+
+        while (auto remain{stream->RemainBytes()}) {
+            if (remain > buffer.size())
+                remain = buffer.size();
+            const auto size{stream->Read(buffer.data(), remain)};
+            checksum.Update(buffer.data(), size);
+        }
+
+        return true;
     }
 }

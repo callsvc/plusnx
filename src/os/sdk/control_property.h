@@ -11,7 +11,7 @@ namespace Plusnx::Os::Sdk {
     };
     struct alignas(0x4000) ControlHeader {
         std::array<ApplicationTitle, 0x10> title;
-        std::array<u8, 0x2c> pad0;
+        std::array<u8, 0x2C> pad0;
         u32 supportedLanguages;
         std::array<u8, 0x8> pad1;
         u64 presenceGroup;
