@@ -88,16 +88,17 @@ namespace Plusnx::Security {
             boost::trim(key);
             boost::trim(value);
 
+            auto keyPair(std::make_pair(key, value));
             if (type == KeyType::Title)
-                AddTitlePair(std::make_pair(key, value));
+                AddTitlePair(std::move(keyPair));
             else
-                AddProductionPair(std::make_pair(key, value));
+                AddProductionPair(std::move(keyPair));
         }
     }
 
-    void Keyring::AddTitlePair(const std::pair<std::string_view, std::string_view>& view) {
-        const auto key{HexTextToByteArray<16>(view.first)};
-        const auto value{HexTextToByteArray<16>(view.second)};
+    void Keyring::AddTitlePair(std::pair<std::string, std::string>&& keyPair) {
+        const auto key{HexTextToByteArray<16>(keyPair.first)};
+        const auto value{HexTextToByteArray<16>(keyPair.second)};
 
         AddTitlePair(key, value);
     }
@@ -108,9 +109,9 @@ namespace Plusnx::Security {
         titles.emplace(key, value);
     }
 
-    void Keyring::AddProductionPair(const std::pair<std::string_view, std::string_view>& view) {
-        const auto key{view.first};
-        const auto value{view.second};
+    void Keyring::AddProductionPair(std::pair<std::string, std::string>&& keyPair) {
+        const auto& key{keyPair.first};
+        const auto& value{keyPair.second};
 
         if (const auto type = GetKey256Alias(key); type != Key256Type::Invalid) {
             const auto valueKey{HexTextToByteArray<32>(value)};

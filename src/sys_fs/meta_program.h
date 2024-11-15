@@ -82,7 +82,7 @@ namespace Plusnx::SysFs {
         void DisplayBinaryInformation() const;
 
         GenericKernel::AddressSpaceType addressType{};
-        std::optional<std::string_view> title;
+        std::optional<std::string> title;
         std::optional<u64> titleId;
     private:
         void SetKac(const std::vector<u32>& descriptors);

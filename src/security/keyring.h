@@ -49,12 +49,12 @@ namespace Plusnx::Security {
 
     private:
         void ReadKeysPairs(const SysFs::FileBackingPtr& file, KeyType type);
-        void AddTitlePair(const std::pair<std::string_view, std::string_view>& view);
+        void AddTitlePair(std::pair<std::string, std::string>&& keyPair);
         void AddTitlePair(const K128& key, const K128& value);
-        void AddProductionPair(const std::pair<std::string_view, std::string_view>& view);
+        void AddProductionPair(std::pair<std::string, std::string>&& keyPair);
 
         std::unordered_map<K128, K128, K128Hash> titles{};
-        std::unordered_map<std::string_view, std::string> prods{};
+        std::unordered_map<std::string, std::string> prods{};
         std::map<u64, std::unique_ptr<Ticket>> tickets;
 
         std::unordered_map<Key256Type, K256> keys256{};

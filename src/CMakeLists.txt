@@ -101,6 +101,9 @@ target_sources(plusnx-core PUBLIC
     cpu/core_container.h
     cpu/features.cpp
     cpu/features.h
+    cpu/coroutine.cpp
+    cpu/coroutine_impl.s
+    cpu/coroutine.h
     cpu/unit_types.h
     generic_kernel/types/kprocess.cpp
     generic_kernel/types/kprocess.h
@@ -159,5 +162,5 @@ target_sources(plusnx-core PUBLIC
     types.h
 )
 
-target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm Boost::program_options mbedcrypto toml11::toml11 sqlite3::sqlite3)
-target_link_libraries(plusnx PRIVATE plusnx-core)
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3)
+target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)
