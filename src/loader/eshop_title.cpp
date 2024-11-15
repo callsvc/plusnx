@@ -33,12 +33,8 @@ namespace Plusnx::Loader {
     void EShopTitle::Load(std::shared_ptr<Core::Context> &context) {
         if (!exefs)
             return;
-        if (const auto npdm{exefs->OpenFile("main.npdm")}; !npdm) {
-            throw runtime_plusnx_except("The NSP does not have a valid ExeFS, preventing it from loading");
-        }
-        const auto &process{context->process};
-        process->npdm = SysFs::Npdm(exefs->OpenFile("main.npdm"));
 
+        [[maybe_unused]] const auto& process{context->process};
         [[maybe_unused]] SysFs::Nx::NsoCore main(exefs->OpenFile("main"));
     }
 
@@ -82,6 +78,17 @@ namespace Plusnx::Loader {
             if (!IsEqual(std::span(result).subspan(0, 16), std::span(expected)))
                 return nca->path;
         }
+        return {};
+    }
+
+    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> EShopTitle::GetRomFs(const bool isControl) const {
+        if (isControl)
+            return control;
+        return {};
+    }
+    SysFs::FileBackingPtr EShopTitle::GetNpdm() const {
+        if (IsAExeFsPartition(exefs))
+            return exefs->OpenFile("main.npdm");
         return {};
     }
 }

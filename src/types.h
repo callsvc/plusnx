@@ -16,6 +16,35 @@ namespace Plusnx {
     using u16 = std::uint16_t;
     using u8 = std::uint8_t;
 
+    template<typename T> requires(std::is_integral_v<T>)
+    class Range {
+    public:
+        Range() = default;
+        Range(T _min, T _max) : min(_min), max(_max) {
+            assert(min < max);
+        }
+
+        std::vector<T> CreateValues(u64 count) {
+            std::vector<T> result;
+            if (!(max - min))
+                return result;
+            if (count > max - min)
+                result.reserve(count);
+            else
+                result.resize(max - min);
+            for (u64 pos{min}; pos < max; ++pos)
+                result.emplace(pos);
+            return result;
+        }
+
+        operator std::string() const {
+            return std::format("{} to {}", min, max);
+        }
+    private:
+        T min{};
+        T max{};
+    };
+
     template <u64 Size>
     std::array<u8, Size> HexTextToByteArray(const std::string_view& container) {
         std::array<u8, Size> result{};

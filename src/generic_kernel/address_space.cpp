@@ -7,13 +7,13 @@
 namespace Plusnx::GenericKernel {
     u32 GetHostBitsCount(AddressSpaceType type) {
 #if NATIVE_CODE_EXECUTION
-        if (type == AddressSpaceType::Guest64Bit)
+        if (type == AddressSpaceType::AddressSpace64Bit)
             return 38;
 #else
-        if (type == AddressSpaceType::Guest64Bit)
+        if (type == AddressSpaceType::AddressSpace64Bit)
             return 39;
 #endif
-        if (type == AddressSpaceType::Old64Bit)
+        if (type == AddressSpaceType::AddressSpace64BitOld)
             return 36;
 
         return 32;

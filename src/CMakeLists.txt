@@ -81,8 +81,8 @@ target_sources(plusnx-core PUBLIC
     sys_fs/layered_fs.h
     sys_fs/continuous_block.cpp
     sys_fs/continuous_block.h
-    sys_fs/npdm.cpp
-    sys_fs/npdm.h
+    sys_fs/meta_program.cpp
+    sys_fs/meta_program.h
     sys_fs/ctr_backing.cpp
     sys_fs/ctr_backing.h
     core/application.cpp

@@ -4,6 +4,24 @@
 #include <loader/nx_executable.h>
 #include <loader/app_loader.h>
 namespace Plusnx::Loader {
+    std::string GetTypeName(const AppType type) {
+        switch (type) {
+            case AppType::Nca:
+                return "NCA";
+            case AppType::Nro:
+                return "NRO";
+            case AppType::Nsp:
+                return "NSP";
+            case AppType::Xci:
+                return "XCI";
+            case AppType::Nso:
+                return "NSO";
+            case AppType::GameFs:
+                return "GameFS";
+            default: return {};
+        }
+    }
+
     bool AppLoader::CheckHeader(const SysFs::FileBackingPtr& file) {
         const auto offset = [&] -> u64 {
             if (type == AppType::Nro)

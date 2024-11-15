@@ -66,6 +66,11 @@ namespace Plusnx::Loader {
         std::span<u8> dataSection;
 
         std::span<u8> GetExeSection(SectionType type) const override;
+        SysFs::FileBackingPtr GetNpdm() const override {
+            // NRO is the executable format for non-ExeFS binaries
+            return {};
+        }
+
     private:
         NroHeader content;
         AssetHeader assetHeader;

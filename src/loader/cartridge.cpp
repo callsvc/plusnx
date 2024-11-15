@@ -17,7 +17,4 @@ namespace Plusnx::Loader {
 
     }
     void Cartridge::Load(std::shared_ptr<Core::Context> &context) {}
-    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> Cartridge::GetRomFs(bool isControl) const {
-        return nullptr;
-    }
 }

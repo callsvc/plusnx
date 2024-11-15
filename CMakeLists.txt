@@ -4,7 +4,7 @@ project(plusnx)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wall")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -rdynamic")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -rdynamic -fsanitize=address")
 set(CMAKE_CXX_FLAGS_RELEASE "-flto=auto -O3 -ffast-math -Werror -s")
 
 find_package(Vulkan REQUIRED)

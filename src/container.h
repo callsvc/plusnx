@@ -10,10 +10,14 @@ namespace Plusnx {
         return result != container.end();
     }
 
-    template <typename T>
+    template <typename T> requires std::is_integral_v<T>
     constexpr auto ConstMagic(const std::string_view& string) {
-        T value;
-        std::memcpy(&value, string.data(), sizeof(value));
+        T value{};
+        T count{};
+        for (const auto& byte : string) {
+            value |= static_cast<std::uint8_t>(byte) << count++ * 8;
+        }
+
         return value;
     }
 

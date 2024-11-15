@@ -6,7 +6,7 @@ namespace Plusnx::GenericKernel {
 
         u64 total{};
         u64 size{};
-        if (type == AddressSpaceType::Guest64Bit) {
+        if (type == AddressSpaceType::AddressSpace64Bit) {
             total = VirtualMemorySpace39::TotalSize;
             size = SwitchMainSize;
         }

@@ -8,7 +8,6 @@ namespace Plusnx::Loader {
         ContentArchive(const std::shared_ptr<Security::Keyring>& keys, const SysFs::FileBackingPtr& nca);
 
         void Load(std::shared_ptr<Core::Context>& context) override;
-        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override;
     private:
         std::unique_ptr<SysFs::Nx::NcaCore> nca;
     };

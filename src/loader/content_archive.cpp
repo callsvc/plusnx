@@ -13,7 +13,4 @@ namespace Plusnx::Loader {
         for ([[maybe_unused]] const auto& [type, file]: files) {
         }
     }
-    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> ContentArchive::GetRomFs(bool isControl) const {
-        return nullptr;
-    }
 }

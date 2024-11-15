@@ -17,6 +17,7 @@ namespace Plusnx::Os {
         NxSys(const std::shared_ptr<Core::Context>& ctx) : context(ctx) {}
 
         void LoadApplicationFile(const SysFs::SysPath& path);
+        void CheckNpdmPresence() const;
         SysFs::FileBackingPtr backing;
 
         std::shared_ptr<Loader::AppLoader> application;

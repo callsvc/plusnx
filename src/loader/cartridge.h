@@ -44,7 +44,6 @@ namespace Plusnx::Loader {
     public:
         Cartridge(const SysFs::FileBackingPtr& xci);
         void Load(std::shared_ptr<Core::Context> &context) override;
-        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override;
 
         std::unique_ptr<SysFs::Nx::PartitionFilesystem> pfs;
     private:

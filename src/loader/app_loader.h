@@ -22,6 +22,7 @@ namespace Plusnx::Loader {
         Nso,
         GameFs
     };
+    std::string GetTypeName(AppType type);
 
     enum class SectionType {
         Text,
@@ -41,11 +42,11 @@ namespace Plusnx::Loader {
         virtual ~AppLoader() = default;
 
         AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
-        virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const {
-            return {};
-        }
         virtual void Load(std::shared_ptr<Core::Context>& context) = 0;
-        virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const = 0;
+
+        virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const { return {}; }
+        virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const { return {}; }
+        virtual SysFs::FileBackingPtr GetNpdm() const { return {}; }
 
         AppType type;
         u32 validMagic;
@@ -60,7 +61,7 @@ namespace Plusnx::Loader {
     public:
         ExecutableAppLoader(const AppType app, const u32 magic = 0) : AppLoader(app, magic) {}
 
-        virtual std::span<u8> GetExeSection(SectionType type) const = 0;
+        virtual std::span<u8> GetExeSection(SectionType type) const { return {}; }
         void DisplaySection(SectionType type) const;
     };
 }

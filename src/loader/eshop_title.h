@@ -12,9 +12,8 @@ namespace Plusnx::Loader {
 
         bool ExtractFilesInto(const SysFs::SysPath& path) const override;
         void Load(std::shared_ptr<Core::Context>& context) override;
-        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override {
-            return control;
-        }
+        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override;
+        SysFs::FileBackingPtr GetNpdm() const override;
 
         std::unique_ptr<SysFs::Nx::SubmissionPackage> nsp;
 

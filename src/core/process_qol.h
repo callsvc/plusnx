@@ -19,7 +19,7 @@ namespace Plusnx::Core {
         ~ProcessQol();
 
         void ChangeGame(const GameInformation& game);
-        std::vector<std::string> GetPlayedSessions();
+        std::vector<std::string> GetPlayedSessions(u64 maxCount);
     private:
         sqlite3* db{nullptr};
         sqlite3_stmt* stmt{nullptr};

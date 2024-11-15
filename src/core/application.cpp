@@ -61,7 +61,7 @@ namespace Plusnx::Core {
 
         if (context->details)
             appQol->ChangeGame(*context->details);
-        [[maybe_unused]] const auto notes{appQol->GetPlayedSessions()};
+        [[maybe_unused]] const auto notes{appQol->GetPlayedSessions(10)};
     }
 
     void Application::PickByName(const std::string& game) {

@@ -5,7 +5,7 @@
 #include <generic_kernel/types/kthread.h>
 
 #include <generic_kernel/user_space.h>
-#include <sys_fs/npdm.h>
+#include <sys_fs/meta_program.h>
 
 namespace Plusnx::GenericKernel::Types {
     class KProcess : public KBaseType {
@@ -21,6 +21,6 @@ namespace Plusnx::GenericKernel::Types {
 
         std::list<KThread> threads;
         std::unique_ptr<UserSpace>& us;
-        SysFs::Npdm npdm{};
+        SysFs::MetaProgram npdm{};
     };
 }
