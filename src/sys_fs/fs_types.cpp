@@ -31,6 +31,7 @@ namespace Plusnx::SysFs {
 
         return std::format("{:3.04f} {}", size, formats[fmt]);
     }
+
     void FileSystem::ExtractAllFiles(const SysPath& output) {
         const auto cachedFiles{ListAllFiles()};
         std::print("Extracting the contents of FS {}\n", path.string());

@@ -34,4 +34,12 @@ namespace Plusnx::Os {
         std::print("Name of the respective publisher: {}\n", publisher);
         application->Load(nxOs.context);
     }
+    Core::GameInformation ProcessCreator::GetQolGame() const {
+        Core::GameInformation info;
+        info.title = title;
+        info.subtitle = "Playing on Plusnx (Emulator)";
+        info.state = "Home screen";
+
+        return info;
+    }
 }

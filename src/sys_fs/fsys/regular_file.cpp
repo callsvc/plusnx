@@ -78,7 +78,7 @@ namespace Plusnx::SysFs::FSys {
         fstat64(descriptor, &block);
 
         const auto final{boost::alignment::align_up(offset + size, block.st_blksize)};
-        if (GetSize() < final) {
+        if (GetSize() < final && mode != FileMode::Read && expandable) {
             if (fallocate64(descriptor, 0, offset, final) != 0)
                 if (errno)
                     throw runtime_plusnx_except(GetOsErrorString());

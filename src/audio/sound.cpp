@@ -14,8 +14,8 @@ namespace Plusnx::Audio {
 
         std::print("Current audio driver: {}\n", SDL_GetCurrentAudioDriver());
 
-        input = std::make_unique<InputDevice>();
         output = std::make_unique<OutputDevice>();
+        input = std::make_unique<InputDevice>();
     }
 
     Sound::~Sound() {

@@ -6,6 +6,7 @@ namespace Plusnx::SysFs {
         const auto root{context->GetSystemPath(Core::BaseDirectoryFs)};
 
         temp = root / "temp";
+        user = root / "user";
         logs = root / "logs";
         games = root / "games";
         keys = root / "keys";
@@ -13,6 +14,7 @@ namespace Plusnx::SysFs {
         cache = root / "cache";
 
         CheckDir(temp);
+        CheckDir(user);
         CheckDir(logs);
         CheckDir(games);
         CheckDir(keys);

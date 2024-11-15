@@ -7,6 +7,7 @@ if(NOT TARGET Vulkan::Headers)
 	add_subdirectory(Vulkan-Headers)
 endif()
 
+add_subdirectory(sqlite3)
 add_subdirectory(boost)
 
 set(TOML11_PRECOMPILE ON CACHE BOOL "precompile toml11 library" FORCE)

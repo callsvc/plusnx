@@ -59,6 +59,14 @@ i32 main(const i32 argc, const char** argv) {
         app->UpdateFrame();
 
         SDL_GetPerformanceCounter();
+#if 1
+        static u64 count{};
+        // Process at least 1000 interactions before exiting
+        if (count++ == 1'000)
+            quit = true;
+        std::this_thread::sleep_for(3ms);
+#else
         SDL_WaitEvent(&event);
+#endif
     }
 }

@@ -35,5 +35,7 @@ namespace Plusnx::Os {
 
         creator.emplace(*this);
         creator->Initialize();
+
+        context->details.emplace(creator->GetQolGame());
     }
 }

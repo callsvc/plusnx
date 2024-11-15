@@ -64,6 +64,7 @@ namespace Plusnx::SysFs {
 
         SysPath path;
         FileMode mode;
+        bool expandable{true};
         virtual u64 GetSize() const = 0;
     protected:
         virtual u64 ReadImpl(void* output, u64 size, u64 offset = 0) = 0;

@@ -16,6 +16,7 @@ namespace Plusnx::SysFs {
         void ResetDir(FSys::RigidDirectory& directory) const;
 
         FSys::RigidDirectory temp;
+        FSys::RigidDirectory user;
         FSys::RigidDirectory logs;
         FSys::RigidDirectory games;
         FSys::RigidDirectory keys;

@@ -13,6 +13,7 @@
 // Kernel-related types
 #include <generic_kernel/types/kprocess.h>
 
+#include <core/process_qol.h>
 namespace Plusnx::Os {
     class NxSys;
 }
@@ -44,6 +45,7 @@ namespace Plusnx::Core {
 
         // User-selected language
         Services::Settings::LanguageType language{};
+        std::optional<GameInformation> details;
 
         std::shared_ptr<Os::NxSys> nxOs;
 

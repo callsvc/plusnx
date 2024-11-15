@@ -4,6 +4,8 @@
 #include <sys_fs/assets.h>
 #include <video/graphics_types.h>
 #include <generic_kernel/types/kprocess.h>
+
+#include <core/process_qol.h>
 namespace Plusnx::Os {
     class NxSys;
 };
@@ -31,8 +33,9 @@ namespace Plusnx::Core {
         std::shared_ptr<SysFs::Assets> assets;
 
         std::shared_ptr<GenericKernel::Kernel> kernel;
+        std::unique_ptr<ProcessQol> appQol;
     private:
-        std::string declared;
+        SysFs::SysPath declared;
         SysFs::SysPath chosen;
 
         std::shared_ptr<Video::GraphicsSupportContext> ui;

@@ -13,12 +13,11 @@
 namespace Plusnx::Core {
     Application::Application() :
         context(std::make_shared<Context>()) {
-        const auto rootDir{std::filesystem::current_path()};
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
         assets = std::make_shared<SysFs::Assets>(context);
-        context->configs->Initialize(rootDir / "plusnx.toml");
-        context->configs->ExportConfigs(rootDir / "plusnx-bkp.toml");
+        context->configs->Initialize(assets->user.path / "plusnx.toml");
+        context->configs->ExportConfigs(assets->temp.path / "plusnx-bkp.toml");
 
         context->keys = std::make_shared<Security::Keyring>(context);
 
@@ -26,6 +25,8 @@ namespace Plusnx::Core {
 
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();
+
+        appQol = std::make_unique<ProcessQol>(assets->user.path / "quality.db");
     }
 
     Application::~Application() {
@@ -57,6 +58,10 @@ namespace Plusnx::Core {
             if (const auto collection = games->GetAllGames(); !collection.empty())
                 if (collection.size() < index)
                     context->nxOs->LoadApplicationFile(collection[index]);
+
+        if (context->details)
+            appQol->ChangeGame(*context->details);
+        [[maybe_unused]] const auto notes{appQol->GetPlayedSessions()};
     }
 
     void Application::PickByName(const std::string& game) {
@@ -85,7 +90,7 @@ namespace Plusnx::Core {
         if (!loader)
             return {};
 
-        return loader->ExtractFilesInto(SysFs::SysPath(declared).filename());
+        return loader->ExtractFilesInto(declared.filename());
     }
 
     void Application::SaveUserInformation() const {
