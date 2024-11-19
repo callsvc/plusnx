@@ -7,7 +7,7 @@
 #include <loader/nx_executable.h>
 namespace Plusnx::Loader {
     NxExecutable::NxExecutable(const SysFs::FileBackingPtr& nro) :
-        ExecutableAppLoader(AppType::Nro, ConstMagic<u32>("NRO0")) {
+        AppLoader(AppType::Nro, ConstMagic<u32>("NRO0")) {
         u64 offset{},
             assets{};
         if (offset = nro->Read(content); offset != sizeof(content))

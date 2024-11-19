@@ -47,7 +47,7 @@ namespace Plusnx::Loader {
 #pragma pack(pop)
 
     // https://switchbrew.org/wiki/NRO
-    class NxExecutable final : public ExecutableAppLoader {
+    class NxExecutable final : public AppLoader {
     public:
         NxExecutable(const SysFs::FileBackingPtr& nro);
         void ReadAssets(const SysFs::FileBackingPtr& nro);

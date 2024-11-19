@@ -13,3 +13,6 @@
 [submodule "externals/sqlite3"]
 	path = externals/sqlite3
 	url = https://github.com/callsvc/sqlite3.git
+[submodule "externals/lz4"]
+	path = externals/lz4
+	url = https://github.com/lz4/lz4.git

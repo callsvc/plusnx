@@ -28,7 +28,8 @@ namespace Plusnx::Loader {
         Text,
         Ro,
         Data,
-        Bss
+        Bss,
+        Invalid
     };
 
     enum class LoaderStatus {
@@ -55,11 +56,6 @@ namespace Plusnx::Loader {
     protected:
         bool CheckHeader(const SysFs::FileBackingPtr& file);
         static void DisplayRomFsContent(const std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem>& content);
-    };
-
-    class ExecutableAppLoader : public AppLoader {
-    public:
-        ExecutableAppLoader(const AppType app, const u32 magic = 0) : AppLoader(app, magic) {}
 
         virtual std::span<u8> GetExeSection(SectionType type) const { return {}; }
         void DisplaySection(SectionType type) const;

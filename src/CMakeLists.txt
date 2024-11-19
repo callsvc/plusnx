@@ -162,5 +162,5 @@ target_sources(plusnx-core PUBLIC
     types.h
 )
 
-target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3)
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static)
 target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

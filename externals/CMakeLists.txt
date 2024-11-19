@@ -10,6 +10,10 @@ endif()
 add_subdirectory(sqlite3)
 add_subdirectory(boost)
 
+set(LZ4_BUILD_CLI OFF CACHE BOOL "Build lz4 program" OFF)
+set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" ON)
+add_subdirectory(lz4/build/cmake)
+
 set(TOML11_PRECOMPILE ON CACHE BOOL "precompile toml11 library" FORCE)
 add_subdirectory(toml11)
 

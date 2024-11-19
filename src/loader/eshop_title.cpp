@@ -30,12 +30,26 @@ namespace Plusnx::Loader {
         return true;
     }
 
-    void EShopTitle::Load(std::shared_ptr<Core::Context> &context) {
+    void EShopTitle::Load(std::shared_ptr<Core::Context>& context) {
         if (!exefs)
             return;
 
         [[maybe_unused]] const auto& process{context->process};
-        [[maybe_unused]] SysFs::Nx::NsoCore main(exefs->OpenFile("main"));
+        auto modules{exefs->ListAllFiles()};
+
+        constexpr u64 baseAddr{};
+        if (ContainsValue(modules, "rtld")) {
+            const SysFs::Nx::NsoCore main(exefs->OpenFile("rtld"));
+            main.Load(baseAddr, true);
+        }
+
+        modules.erase(std::ranges::find(modules, "rtld"));
+        modules.erase(std::ranges::find(modules, "main.npdm"));
+
+        for (const auto& binary : modules) {
+            SysFs::Nx::NsoCore module(exefs->OpenFile(binary));
+            module.Load(baseAddr);
+        }
     }
 
     void EShopTitle::GetAllContent() {
