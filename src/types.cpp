@@ -1,6 +1,8 @@
 #include <cstring>
 #include <cerrno>
 
+#include <sys/signal.h>
+
 #include <types.h>
 namespace Plusnx {
     std::string GetOsErrorString() {
@@ -18,5 +20,15 @@ namespace Plusnx {
 #endif
 
         return error;
+    }
+
+    void ActivateTrap() {
+#if __has_builtin(__builtin_debugtrap)
+        __builtin_debugtrap();
+#elif defined(__linux__)
+        raise(SIGTRAP);
+#else
+        __builtin_trap();
+#endif
     }
 }

@@ -6,8 +6,9 @@
 #include <sys_fs/fsys/regular_file.h>
 #include <sys_fs/nx/readonly_filesystem.h>
 
-#include <sys_fs/ext/nso_modules.h>
+#include <details/perf_measure.h>
 #include <loader/eshop_title.h>
+#include <sys_fs/ext/nso_modules.h>
 namespace Plusnx::Loader {
     EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& _nsp) :
         AppLoader(AppType::Nsp, ConstMagic<u32>("PFS0")),
@@ -72,9 +73,8 @@ namespace Plusnx::Loader {
                     exefs = std::move(partition);
             }
         }
-        const auto controlNca{nsp->GetIndexedNcas(SysFs::Nx::ContentType::Control, metaType)};
-        if (!controlNca.empty())
-            for (const auto& [type, file] : controlNca.front()->GetBackingFiles())
+        if (const auto ncaCtrl = nsp->GetIndexedNcas(SysFs::Nx::ContentType::Control, metaType); !ncaCtrl.empty())
+            for (const auto& [type, file] : ncaCtrl.front()->GetBackingFiles())
                 if (type == SysFs::Nx::FsType::RomFs)
                     control = std::make_unique<SysFs::Nx::ReadOnlyFilesystem>(file);
     }
@@ -87,16 +87,27 @@ namespace Plusnx::Loader {
 
         const auto files{nsp->GetAllNcas()};
 
+        u64 totalBytes{};
+        Details::PerfMeasure measure{Details::Metrics::Milli};
+
+        std::print("Performing a checksum on eligible NCAs...\n");
         for (const auto& nca : files) {
             std::array<u8, 16> expected;
-            if (!nca->VerifyNca(expected, checksum, buffer))
+            u64 processed{};
+            if (!nca->VerifyNca(expected, checksum, buffer, processed))
                 continue;
+            totalBytes += processed;
 
             checksum.Finish(std::span(result));
 
             if (!IsEqual(std::span(result).subspan(0, 16), std::span(expected)))
                 return nca->path;
         }
+
+        double elapsed;
+        measure.Stop(elapsed);
+        std::print("Verified data size: {} - Execution time: {}ms\n", SysFs::GetReadableSize(totalBytes), elapsed);
+
         return {};
     }
 

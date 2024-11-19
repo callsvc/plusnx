@@ -156,6 +156,8 @@ target_sources(plusnx-core PUBLIC
     security/signatures.h
     security/ticket.cpp
     security/ticket.h
+    details/perf_measure.cpp
+    details/perf_measure.h
     driver.cpp
     container.h
     runtime_plusnx_except.cpp

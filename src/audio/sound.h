@@ -14,7 +14,7 @@ namespace Plusnx::Audio {
         std::unique_ptr<OutputDevice> output;
         std::unique_ptr<InputDevice> input;
     private:
-        bool driver;
+        bool driver{};
         void MigrateDriver();
     };
 }

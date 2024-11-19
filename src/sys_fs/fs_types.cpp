@@ -16,20 +16,16 @@ namespace Plusnx::SysFs {
     }
 
     std::string GetReadableSize(const u64 amount) {
-        constexpr std::array formats{
-            "B",
-            "KiB",
-            "MiB",
-            "GiB"
-        };
-        u32 fmt{};
+        constexpr std::array formats{"B", "KiB", "MiB", "GiB"};
+        u64 format{};
+
         auto size{static_cast<double>(amount)};
         for (; size > 0x400; size /= 0x400)
-            fmt++;
-        if (fmt > std::size(formats))
+            format++;
+        if (format > std::size(formats))
             return {};
 
-        return std::format("{:3.04f} {}", size, formats[fmt]);
+        return std::format("{:.4} {}", size, formats[format]);
     }
 
     void FileSystem::ExtractAllFiles(const SysPath& output) {

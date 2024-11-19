@@ -22,6 +22,9 @@ po::options_description desc("Plusnx options");
 i32 main(const i32 argc, const char** argv) {
     auto sdlVkWindow{std::make_shared<NoGui::SdlVulkanBacking>()};
     CheckDriversVersion();
+    if (!argc && argv)
+        if (*argv)
+            return strlen(*argv);
 
     const auto app{std::make_unique<Core::Application>()};
     app->Initialize(std::move(sdlVkWindow));
@@ -69,4 +72,5 @@ i32 main(const i32 argc, const char** argv) {
         SDL_WaitEvent(&event);
 #endif
     }
+    return {};
 }

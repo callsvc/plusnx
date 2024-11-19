@@ -202,7 +202,7 @@ namespace Plusnx::SysFs::Nx {
     }
 
 
-    bool NcaCore::VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer) const {
+    bool NcaCore::VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer, u64& readSize) const {
         auto filename{backing->path};
         if (GetEntryFormat(filename) == ContainedFormat::Cnmt)
             return {};
@@ -218,8 +218,8 @@ namespace Plusnx::SysFs::Nx {
         if (!stream)
             throw runtime_plusnx_except("The current NCA does not have valid backing");
 #if 1
-        // Skipping files larger than 4MB for now
-        if (stream->GetSize() > buffer.size())
+        // Skipping files larger than 512MiB for now
+        if (stream->GetSize() > 512 * 1024 * 1024)
             return {};
 #endif
 
@@ -227,6 +227,8 @@ namespace Plusnx::SysFs::Nx {
             if (remain > buffer.size())
                 remain = buffer.size();
             const auto size{stream->Read(buffer.data(), remain)};
+
+            readSize += size;
             checksum.Update(buffer.data(), size);
         }
 

@@ -28,7 +28,7 @@ namespace Plusnx {
         demangle.resize(std::strlen(demangle.data()));
     }
 
-    constexpr auto SymbolNameSize{0x34};
+    constexpr auto SymbolNameSize{0x44};
     void runtime_plusnx_except::PrintPrettyMessage() const {
         for (const auto& function : GetStackTrace()) {
             std::print("{}\n", function);
