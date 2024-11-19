@@ -75,8 +75,10 @@ target_sources(plusnx-core PUBLIC
     sys_fs/nx/nso_core.h
     sys_fs/nx/content_metadata.cpp
     sys_fs/nx/content_metadata.h
-    sys_fs/nx/fake_romfs.cpp
-    sys_fs/nx/fake_romfs.h
+    sys_fs/ext/fake_romfs.cpp
+    sys_fs/ext/fake_romfs.h
+    sys_fs/ext/nso_modules.cpp
+    sys_fs/ext/nso_modules.h
     sys_fs/layered_fs.cpp
     sys_fs/layered_fs.h
     sys_fs/continuous_block.cpp

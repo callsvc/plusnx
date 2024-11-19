@@ -1,8 +1,8 @@
 #include <ranges>
 #include <sys_fs/layered_fs.h>
 #include <sys_fs/nx/readonly_filesystem.h>
-#include <sys_fs/nx/fake_romfs.h>
 #include <sys_fs/nx/partition_filesystem.h>
+#include <sys_fs/ext/fake_romfs.h>
 
 #include <loader/nx_executable.h>
 namespace Plusnx::Loader {
@@ -84,7 +84,7 @@ namespace Plusnx::Loader {
     std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> NxExecutable::GetRomFs(const bool isControl) const {
         if (!isControl)
             return romfs;
-        const auto control{std::make_shared<SysFs::Nx::FakeRomFs>()};
+        const auto control{std::make_shared<SysFs::Ext::FakeRomFs>()};
         control->AddFile(nacp);
 
         return control;

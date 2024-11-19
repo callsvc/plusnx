@@ -6,7 +6,7 @@
 #include <sys_fs/fsys/regular_file.h>
 #include <sys_fs/nx/readonly_filesystem.h>
 
-#include <sys_fs/nx/nso_core.h>
+#include <sys_fs/ext/nso_modules.h>
 #include <loader/eshop_title.h>
 namespace Plusnx::Loader {
     EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& _nsp) :
@@ -38,18 +38,23 @@ namespace Plusnx::Loader {
         auto modules{exefs->ListAllFiles()};
 
         constexpr u64 baseAddr{};
-        if (ContainsValue(modules, "rtld")) {
-            const SysFs::Nx::NsoCore main(exefs->OpenFile("rtld"));
-            main.Load(baseAddr, true);
-        }
-
-        modules.erase(std::ranges::find(modules, "rtld"));
         modules.erase(std::ranges::find(modules, "main.npdm"));
 
-        for (const auto& binary : modules) {
-            SysFs::Nx::NsoCore module(exefs->OpenFile(binary));
-            module.Load(baseAddr);
+        SysFs::Ext::NsoModules nsoHolder;
+        std::vector<SysFs::FileBackingPtr> files;
+
+        // We need to maintain the order of these objects in memory layout
+        std::vector<SysFs::SysPath> modulesArray{"rtld", "sdk"};
+        for (u32 sub{}; sub <= 6; sub++)
+            modulesArray.emplace_back(std::format("subsdk{}", sub));
+
+        for (const auto& target : modulesArray) {
+            if (ContainsValue(modules, target)) {
+                files.emplace_back(exefs->OpenFile(target));
+            }
         }
+
+        nsoHolder.LoadProgramImage(baseAddr, files);
     }
 
     void EShopTitle::GetAllContent() {
