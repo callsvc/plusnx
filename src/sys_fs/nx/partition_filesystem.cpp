@@ -48,7 +48,7 @@ namespace Plusnx::SysFs::Nx {
     }
     FileBackingPtr PartitionFilesystem::OpenFile(const SysPath& path, const FileMode mode) {
         assert(mode == FileMode::Read);
-        if (!entries.contains(path))
+        if (!Exists(path))
             return {};
         return std::make_shared<FileLayered>(backing, path, dataOffset + entries[path].offset, entries[path].size);
     }
@@ -68,7 +68,7 @@ namespace Plusnx::SysFs::Nx {
     }
 
     // https://switchbrew.org/wiki/ExeFS
-    bool IsAExeFsPartition(const std::unique_ptr<PartitionFilesystem>& pfs) {
-        return pfs->OpenFile("main") && pfs->OpenFile("main.npdm");
+    bool IsAExeFsPartition(const std::shared_ptr<PartitionFilesystem>& pfs) {
+        return pfs->Exists("main") && pfs->Exists("main.npdm");
     }
 }

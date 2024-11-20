@@ -43,7 +43,8 @@ i32 main(const i32 argc, const char** argv) {
     }
 
     if (!game.empty() && vm.contains("extract")) {
-        app->PickByName(game);
+        if (!app->PickByName(game))
+            return 1;
         app->ExtractIntoGameFs();
     } else {
         app->LoadAGameByIndex();

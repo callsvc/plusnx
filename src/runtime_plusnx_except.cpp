@@ -18,17 +18,17 @@ namespace Plusnx {
         free(strings);
     }
 
-    inline void DemangleFunctionName(const char* name, std::string& demangle, u64& length) {
-        __cxxabiv1::__cxa_demangle(name, nullptr, &length, nullptr);
+    inline void DemangleFunctionName(const std::string_view& name, std::string& demangle, u64& length) {
+        __cxxabiv1::__cxa_demangle(name.data(), nullptr, &length, nullptr);
         if (demangle.capacity() < length)
             demangle.reserve(length);
 
         demangle.resize(length);
-        __cxxabiv1::__cxa_demangle(name, demangle.data(), &length, nullptr);
+        __cxxabiv1::__cxa_demangle(name.data(), demangle.data(), &length, nullptr);
         demangle.resize(std::strlen(demangle.data()));
     }
 
-    constexpr auto SymbolNameSize{0x44};
+    constexpr auto SymbolNameSize{0x50};
     void runtime_plusnx_except::PrintPrettyMessage() const {
         for (const auto& function : GetStackTrace()) {
             std::print("{}\n", function);
@@ -54,13 +54,15 @@ namespace Plusnx {
                 continue;
             }
             auto function{symbols.find(*symbol)->second};
-            const auto begin{function.begin() + function.find_first_of('(') + 1};
-            const auto end{function.begin() + function.find_last_of('+')};
-            const auto value{std::exchange(*end, {})};
-
             u64 length{};
-            DemangleFunctionName(begin.base(), demangle, length);
-            *end = value;
+            {
+                const auto content{function.begin() + function.find_first_of('(') + 1};
+                const auto addrPrefix{function.find_last_of('+')};
+                function[addrPrefix] = '\0';
+
+                DemangleFunctionName(&*content, demangle, length);
+                function[addrPrefix] = '+';
+            }
 
             if (length) {
                 if (length > SymbolNameSize)
@@ -72,11 +74,11 @@ namespace Plusnx {
                 if (demangle.size() > length)
                     function.replace(length - 3, 3, "...");
 
-                const auto total{std::strlen(&*end)};
-                function.replace(length, total, &*end);
+                const auto final{function.substr(function.find_last_of('+'))};
+                function.replace(length, final.size(), final);
 
-                if (function.size() > length + total)
-                    function.erase(length + total);
+                if (function.size() > length + final.size())
+                    function.erase(length + final.size());
                 function.insert(0, "(");
             }
 

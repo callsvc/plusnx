@@ -54,4 +54,12 @@ namespace Plusnx::SysFs::Nx {
 
         return ncas;
     }
+    u64 SubmissionPackage::GetProgramTitleId() const {
+        if (cnmt && cnmt->ListAllFiles().size()) {
+            if (const ContentMetadata meta(cnmt->OpenFile(*cnmt->first)); meta.programId)
+                return meta.programId;
+        }
+
+        return {};
+    }
 }

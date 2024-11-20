@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sys_fs/fs_types.h>
-#include <sys_fs/continuous_block.h>
+#include <sys_fs/streamed_file.h>
 
 #include <generic_kernel/address_space.h>
 #include <security/key_types.h>
@@ -87,7 +87,7 @@ namespace Plusnx::SysFs {
     private:
         void SetKac(const std::vector<u32>& descriptors);
 
-        std::unique_ptr<ContinuousBlock> metaFile;
+        std::unique_ptr<StreamedFile> metaFile;
 
         NpdmHeader content{};
 

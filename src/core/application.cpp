@@ -64,18 +64,25 @@ namespace Plusnx::Core {
         [[maybe_unused]] const auto notes{appQol->GetPlayedSessions(10)};
     }
 
-    void Application::PickByName(const std::string& game) {
+    bool Application::PickByName(const std::string& game) {
         const auto& pack{games->GetAllGames()};
-        declared = game;
+        std::optional<boost::regex> regex;
+        try {
+            regex.emplace(game, boost::regex::grep);
+            declared = game;
+        } catch (const boost::regex_error& except) {
+            std::print("{} is not a valid regex expression, error: {}\n", game, except.what());
+            return {};
+        }
 
-        const boost::regex regex(game);
         std::vector<SysFs::SysPath> filter;
         for (const auto& disc : pack) {
-            if (regex_match(disc.string(), regex))
+            if (regex_search(disc.string(), *regex))
                 filter.emplace_back(disc);
         }
         if (!filter.empty())
             chosen = filter.front();
+        return !chosen.empty();
     }
 
     bool Application::ExtractIntoGameFs() {
@@ -90,7 +97,8 @@ namespace Plusnx::Core {
         if (!loader)
             return {};
 
-        return loader->ExtractFilesInto(declared.filename());
+        const SysFs::SysPath gamePath{std::format("{:016X}", loader->titleId)};
+        return loader->ExtractFilesInto(!gamePath.empty() ? gamePath : declared.filename());
     }
 
     void Application::SaveUserInformation() const {

@@ -43,7 +43,7 @@ namespace Plusnx::SysFs {
         for (const auto& directory : dirs[card]) {
             FSys::RigidDirectory dir(directory);
 
-            if (auto file{dir.OpenFile(fullpath)}; file != nullptr) {
+            if (auto file{dir.OpenFile(fullpath)}) {
                 cachedFiles.emplace_back(file);
                 return cachedFiles.back();
             }
@@ -67,7 +67,7 @@ namespace Plusnx::SysFs {
     void Provider::RemoveCachedFile(const SysPath& path) const {
         for (const auto& file : cachedFiles) {
             if (file->path.parent_path() == path) {
-                std::print("Must be removed immediately: {}\n", file->path.string());
+                std::print("Must be removed immediately: {}\n", file->GetPath());
             }
         }
     }

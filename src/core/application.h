@@ -21,7 +21,7 @@ namespace Plusnx::Core {
         void LoadAGameByIndex(u64 index = 0) const;
 
         // Only selects a game from the collection (does not load it yet)
-        void PickByName(const std::string& game);
+        bool PickByName(const std::string& game);
         // Convert various file formats into a GameFS
         bool ExtractIntoGameFs();
         void SaveUserInformation() const;

@@ -11,8 +11,9 @@ namespace Plusnx::Audio {
         const auto devices{SDL_GetNumAudioDevices(device)};
 
         for (i32 out{}; out < devices; out++) {
-            std::print("Available sound {} device: {}\n", recorder ? "input" : "output", SDL_GetAudioDeviceName(out, recorder));
-            available.push_back(SDL_GetAudioDeviceName(out, recorder));
+            const auto devname{SDL_GetAudioDeviceName(out, recorder)};
+            std::print("Available sound {} device: {}\n", recorder ? "input" : "output", devname);
+            available.push_back(devname);
         }
     }
 

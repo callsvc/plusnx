@@ -49,8 +49,9 @@ namespace Plusnx::Loader {
         virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const { return {}; }
         virtual SysFs::FileBackingPtr GetNpdm() const { return {}; }
 
-        AppType type;
-        u32 validMagic;
+        AppType type{};
+        u64 titleId{};
+        u32 validMagic{};
         LoaderStatus status{LoaderStatus::None};
 
     protected:

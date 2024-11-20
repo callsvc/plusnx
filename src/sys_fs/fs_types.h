@@ -38,6 +38,11 @@ namespace Plusnx::SysFs {
         u64 Read(void* output, const u64 size, const u64 offset = 0) {
             return ReadImpl(output, size, offset);
         }
+
+        template<typename T>
+        u64 Write(T& object, const u64 offset = 0) {
+            return WriteImpl(reinterpret_cast<void*>(&object), sizeof(object), offset);
+        }
         u64 Write(const void* input, const u64 size, const u64 offset = 0) {
             return WriteImpl(input, size, offset);
         }
@@ -45,6 +50,10 @@ namespace Plusnx::SysFs {
         template <typename T>
         FileBacking& operator << (const T& data) {
             Write(&data, sizeof(data));
+            return *this;
+        }
+        FileBacking& operator << (const std::string& string) {
+            Write(string.data(), string.size());
             return *this;
         }
 
@@ -61,10 +70,13 @@ namespace Plusnx::SysFs {
         u64 PutBytes(const std::vector<T>& content, const u64 offset = 0) {
             return WriteImpl(content.data(), content.size() * sizeof(T), offset);
         }
+        auto GetPath() const {
+            return path.string();
+        }
 
         SysPath path;
         FileMode mode;
-        bool expandable{true};
+        bool expandable{};
         virtual u64 GetSize() const = 0;
     protected:
         virtual u64 ReadImpl(void* output, u64 size, u64 offset = 0) = 0;
@@ -76,6 +88,8 @@ namespace Plusnx::SysFs {
     public:
         explicit RoDirectoryBacking(const SysPath& dir) : path(dir) {}
         virtual ~RoDirectoryBacking() = default;
+        virtual void ExtractAllFiles(const SysPath& output);
+        bool Exists(const SysPath& path, bool relative = false) const;
 
         operator std::filesystem::path() const {
             return path;
@@ -83,6 +97,10 @@ namespace Plusnx::SysFs {
 
         virtual FileBackingPtr OpenFile(const SysPath& path, FileMode mode = FileMode::Read) = 0;
         virtual std::vector<SysPath> ListAllFiles() const = 0;
+
+        auto GetPath() const {
+            return path.string();
+        }
         SysPath path;
     };
     class DirectoryBacking : public RoDirectoryBacking {
@@ -106,7 +124,6 @@ namespace Plusnx::SysFs {
     public:
         FileSystem(const SysPath& path) : RoDirectoryBacking(path) {}
 
-        virtual void ExtractAllFiles(const SysPath& output);
     protected:
         static bool WalkDirectories(Directory& directory, SysPath& iterator, const SysPath& target, BaseDirCallback&& callback);
         static bool WalkDirectories(Directory& directory, const SysPath& target, BaseDirCallback&& callback) {

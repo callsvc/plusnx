@@ -5,7 +5,11 @@
 namespace Plusnx::Loader {
     class GameFs final : public AppLoader {
     public:
-        GameFs(const SysFs::FSys::RigidDirectory& directory);
+        GameFs(const std::shared_ptr<SysFs::FSys::RigidDirectory>& directory);
+
+        void RegenerateGfs() const;
+
+        const std::shared_ptr<SysFs::FSys::RigidDirectory> backing;
         void Load(std::shared_ptr<Core::Context>& context) override;
     };
 }

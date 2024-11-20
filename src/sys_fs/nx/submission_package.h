@@ -29,6 +29,7 @@ namespace Plusnx::SysFs::Nx {
         std::shared_ptr<PartitionFilesystem> cnmt;
         std::vector<std::shared_ptr<NcaCore>> GetAllNcas() const;
         std::vector<std::shared_ptr<NcaCore>> GetIndexedNcas(ContentType type, ContentMetaType metaType) const;
+        u64 GetProgramTitleId() const;
     private:
         std::unique_ptr<PartitionFilesystem> pfs;
         std::list<std::shared_ptr<NcaCore>> contents;

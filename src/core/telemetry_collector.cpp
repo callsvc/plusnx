@@ -6,7 +6,7 @@
 
 #include <types.h>
 #include <sys_fs/ctr_backing.h>
-#include <sys_fs/continuous_block.h>
+#include <sys_fs/streamed_file.h>
 #include <core/telemetry_collector.h>
 namespace Plusnx::Core {
     u64 GetCoresTotal() {
@@ -38,7 +38,7 @@ namespace Plusnx::Core {
 
         const auto& visible{strings.str()};
 
-        SysFs::ContinuousBlock writable(output);
+        SysFs::StreamedFile writable(output);
         writable << "Data submission file";
         writable.Write(result.data(), result.size());
         writable << visible.size();

@@ -12,9 +12,14 @@ namespace Plusnx::SysFs::FSys {
     }
 
     FileBackingPtr RigidDirectory::OpenFile(const SysPath& filename, const FileMode mode) {
-        if (!ContainsValue(ListAllFiles(), path / filename))
-            return {};
-        return std::make_shared<RegularFile>(path / filename, mode);
+        auto filepath{filename};
+        if (!filepath.has_parent_path())
+            filepath = path / filepath;
+
+        if (mode == FileMode::Read)
+            if (!Exists(filepath))
+                return {};
+        return std::make_shared<RegularFile>(filepath, mode);
     }
 
     std::vector<SysPath> RigidDirectory::ListAllFiles() const {
@@ -35,14 +40,31 @@ namespace Plusnx::SysFs::FSys {
         DiscoverDirectory(path);
         return content;
     }
+    std::shared_ptr<RigidDirectory> RigidDirectory::CreateSubDirectory(const SysPath& dirname) const {
+        if (!is_directory(path))
+            return {};
+        auto dirpath{dirname};
+        if (!dirpath.has_parent_path())
+            dirpath = path / dirpath;
+        const auto subdir{std::make_shared<RigidDirectory>(dirpath, true)};
+        if (!is_directory(subdir->path))
+            return {};
+        return subdir;
+    }
 
     FileBackingPtr RigidDirectory::CreateFile(const SysPath& file) {
-        assert(file.parent_path() == path);
-        if (exists(file))
-            return OpenFile(file, FileMode::Write);
+        auto filepath{file};
+        if (!filepath.has_parent_path())
+            filepath = path / filepath;
 
-        RegularFile createFile(file, FileMode::Write);
-        return OpenFile(file, FileMode::Write);
+        if (filepath.parent_path() != path)
+            filepath = path / filepath;
+
+        if (exists(filepath))
+            return OpenFile(filepath, FileMode::Write);
+
+        RegularFile createFile(filepath, FileMode::Write);
+        return OpenFile(filepath, FileMode::Write);
     }
 
     void RigidDirectory::UnlikeFile(const SysPath& file) {

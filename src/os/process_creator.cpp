@@ -6,7 +6,7 @@ namespace Plusnx::Os {
     void ProcessCreator::DumpControlContent() const {
         const auto tempDir{std::filesystem::temp_directory_path()};
         if (romfs && nacp)
-            romfs->ExtractAllFiles(tempDir / std::format("{:X}", nacp->titleId));
+            romfs->ExtractAllFiles(tempDir / std::format("{:016X}", nacp->titleId));
     }
 
     void ProcessCreator::Initialize() {

@@ -17,7 +17,7 @@ namespace Plusnx::Loader {
 
         std::unique_ptr<SysFs::Nx::SubmissionPackage> nsp;
 
-        std::unique_ptr<SysFs::Nx::PartitionFilesystem> exefs;
+        std::shared_ptr<SysFs::Nx::PartitionFilesystem> exefs;
         std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> romfs;
         std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> control;
     private:

@@ -68,7 +68,6 @@ namespace Plusnx::Core {
             std::filesystem::remove(output);
 
         auto config{SysFs::FSys::RegularFile(output, SysFs::FileMode::Write)};
-        config.expandable = {};
         const toml::value values(table);
 
         const auto sanitized{format(values)};

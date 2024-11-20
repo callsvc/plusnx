@@ -81,8 +81,8 @@ target_sources(plusnx-core PUBLIC
     sys_fs/ext/nso_modules.h
     sys_fs/layered_fs.cpp
     sys_fs/layered_fs.h
-    sys_fs/continuous_block.cpp
-    sys_fs/continuous_block.h
+    sys_fs/streamed_file.cpp
+    sys_fs/streamed_file.h
     sys_fs/meta_program.cpp
     sys_fs/meta_program.h
     sys_fs/ctr_backing.cpp

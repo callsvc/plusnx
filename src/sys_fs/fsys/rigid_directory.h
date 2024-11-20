@@ -9,6 +9,7 @@ namespace Plusnx::SysFs::FSys {
 
         FileBackingPtr OpenFile(const SysPath& filename, FileMode mode = FileMode::Read) override;
         std::vector<SysPath> ListAllFiles() const override;
+        std::shared_ptr<RigidDirectory> CreateSubDirectory(const SysPath& dirname) const;
 
         FileBackingPtr CreateFile(const SysPath& file) override;
         void UnlikeFile(const SysPath& file) override;

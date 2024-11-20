@@ -7,8 +7,10 @@
 #include <sys_fs/nx/readonly_filesystem.h>
 
 #include <details/perf_measure.h>
-#include <loader/eshop_title.h>
 #include <sys_fs/ext/nso_modules.h>
+
+#include <loader/game_fs.h>
+#include <loader/eshop_title.h>
 namespace Plusnx::Loader {
     EShopTitle::EShopTitle(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& _nsp) :
         AppLoader(AppType::Nsp, ConstMagic<u32>("PFS0")),
@@ -24,10 +26,25 @@ namespace Plusnx::Loader {
 
         if (nsp)
             GetAllContent();
+
+        titleId = nsp->GetProgramTitleId();
     }
 
     bool EShopTitle::ExtractFilesInto(const SysFs::SysPath& path) const {
-        SysFs::FSys::RigidDirectory gameFs(path, true);
+        const auto gameFs{std::make_shared<SysFs::FSys::RigidDirectory>(path, true)};
+        for (const auto& dirpath : {"exefs", "romfs", "control"}) {
+            if (const auto directory{gameFs->CreateSubDirectory(dirpath)}; !directory)
+                throw runtime_plusnx_except("Failed to create directory: {}", SysFs::SysPath{gameFs->path / dirpath}.string());
+        }
+
+        exefs->ExtractAllFiles(gameFs->path / "exefs");
+        romfs->ExtractAllFiles(gameFs->path / "romfs");
+        if (control)
+            control->ExtractAllFiles(gameFs->path / "control");
+
+        const auto nspExtracted{std::make_unique<GameFs>(std::move(gameFs))};
+        nspExtracted->RegenerateGfs();
+
         return true;
     }
 
@@ -68,12 +85,11 @@ namespace Plusnx::Loader {
                     romfs = std::make_shared<SysFs::Nx::ReadOnlyFilesystem>(backingNcaFile);
                     continue;
                 }
-                auto partition{std::make_unique<SysFs::Nx::PartitionFilesystem>(backingNcaFile)};
-                if (IsAExeFsPartition(partition))
+                if (auto partition{std::make_shared<SysFs::Nx::PartitionFilesystem>(backingNcaFile)}; IsAExeFsPartition(partition))
                     exefs = std::move(partition);
             }
         }
-        if (const auto ncaCtrl = nsp->GetIndexedNcas(SysFs::Nx::ContentType::Control, metaType); !ncaCtrl.empty())
+        if (const auto ncaCtrl{nsp->GetIndexedNcas(SysFs::Nx::ContentType::Control, metaType)}; !ncaCtrl.empty())
             for (const auto& [type, file] : ncaCtrl.front()->GetBackingFiles())
                 if (type == SysFs::Nx::FsType::RomFs)
                     control = std::make_unique<SysFs::Nx::ReadOnlyFilesystem>(file);

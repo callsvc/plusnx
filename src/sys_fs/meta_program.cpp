@@ -42,7 +42,7 @@ namespace Plusnx::SysFs {
     };
 
     MetaProgram::MetaProgram(const FileBackingPtr& npdm) :
-        metaFile(std::make_unique<ContinuousBlock>(npdm)) {
+        metaFile(std::make_unique<StreamedFile>(npdm)) {
 
         if (metaFile->Read(content) != sizeof(content))
             throw runtime_plusnx_except("Cannot read NPDM content");

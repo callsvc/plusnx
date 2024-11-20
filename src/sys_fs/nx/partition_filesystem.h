@@ -59,5 +59,5 @@ namespace Plusnx::SysFs::Nx {
         std::vector<char> table;
     };
 
-    bool IsAExeFsPartition(const std::unique_ptr<PartitionFilesystem>& pfs);
+    bool IsAExeFsPartition(const std::shared_ptr<PartitionFilesystem>& pfs);
 }

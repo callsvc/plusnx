@@ -5,7 +5,7 @@
 #include <security/signatures.h>
 #include <sys_fs/ctr_backing.h>
 #include <sys_fs/layered_fs.h>
-#include <sys_fs/continuous_block.h>
+#include <sys_fs/streamed_file.h>
 
 #include <sys_fs/nx/content_metadata.h>
 #include <sys_fs/nx/nca_core.h>
@@ -214,7 +214,7 @@ namespace Plusnx::SysFs::Nx {
         if (IsEmpty(expected))
             return {};
 
-        const auto stream{std::make_unique<ContinuousBlock>(backing)};
+        const auto stream{std::make_unique<StreamedFile>(backing)};
         if (!stream)
             throw runtime_plusnx_except("The current NCA does not have valid backing");
 #if 1

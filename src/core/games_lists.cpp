@@ -9,7 +9,7 @@ namespace Plusnx::Core {
 
         for (const auto& directory : lists) {
             for (const auto& already : marked) {
-                auto here{directory.path.string()};
+                auto here{directory.GetPath()};
                 auto there{already.string()};
                 if (here.contains(there))
                     throw runtime_plusnx_except("Recursion detected, the user must be joking");
