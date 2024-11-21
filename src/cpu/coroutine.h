@@ -1,13 +1,19 @@
 #pragma once
 
+#include <thread>
+
+#include <details/allocators.h>
 #include <types.h>
+// Affiliation: Only the thread that initialized the coroutine can destroy it
+#define AFFILIATION_MODE 1
+
 namespace Plusnx::Cpu {
     u64 GetThreadStackSize();
     u64 GetRngValue();
 
     constexpr auto CommonStackSize{4 * 1024 * 1024};
 
-    enum class ReusableState {
+    enum class ReusableState : u32 {
         Free,
         Running,
         Stopped,
@@ -20,13 +26,15 @@ namespace Plusnx::Cpu {
     public:
         Coroutine() = default;
         Coroutine(u64 block, CallBack&& fn);
+        static void Initialize();
+        static void Destroy();
 
         [[noreturn]] static void Start();
         [[noreturn]] static void Finish();
 
         static bool Yield();
 
-        std::vector<u8> stack;
+        std::vector<u8, Details::VirtualAllocator<u8>> stack;
         ReusableState state;
         u64 rng{};
 
@@ -54,8 +62,13 @@ namespace Plusnx::Cpu {
 
         void Go();
         std::map<u64, Coroutine> grths;
+#if AFFILIATION_MODE
+        std::thread::id parent;
+#endif
     };
 
-    extern CoroutinePool ulths;
+    Coroutine& Create(u64 stackSize, CallBack&& cb);
+    void Go();
+
     extern thread_local u64 local_gid;
 }

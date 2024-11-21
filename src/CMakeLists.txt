@@ -104,7 +104,6 @@ target_sources(plusnx-core PUBLIC
     cpu/features.cpp
     cpu/features.h
     cpu/coroutine.cpp
-    cpu/coroutine_impl.s
     cpu/coroutine.h
     cpu/unit_types.h
     generic_kernel/types/kprocess.cpp
@@ -158,6 +157,7 @@ target_sources(plusnx-core PUBLIC
     security/ticket.h
     details/perf_measure.cpp
     details/perf_measure.h
+    details/allocators.h
     driver.cpp
     container.h
     runtime_plusnx_except.cpp
