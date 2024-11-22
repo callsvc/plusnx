@@ -1,5 +1,5 @@
 #include <boost/regex.hpp>
-
+#include <boost/align/align_up.hpp>
 #include <lz4.h>
 #include <ranges>
 
@@ -37,7 +37,7 @@ namespace Plusnx::SysFs::Nx {
 
         if (!modulePath.empty()) {
             std::print("Module built: {}\n", modulePath);
-            moduleName.assign(modulePath);
+            moduleName.emplace(modulePath);
         } else {
             moduleName = backing->path;
         }
@@ -62,25 +62,32 @@ namespace Plusnx::SysFs::Nx {
             std::println();
         }
 
-        if (content.moduleNameSize && moduleName.empty()) {
+        if (content.moduleNameSize && !moduleName) {
             const auto module{backing->GetBytes<char>(content.moduleNameSize, content.moduleNameOffset)};
-            moduleName.assign(module.data());
+            moduleName.emplace(module.data());
         }
     }
 
-    void NsoCore::Load(const u64& vAddr, const bool linker) const {
-        i32 count{};
+    // https://switchbrew.org/wiki/SVC#CreateProcess
+    void NsoCore::Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, const bool hasArguments) {
+        assert(sectionResults.size() == 3);
         for (const auto& [type, sectionHash] : sectionResults) {
             if (!IsEqual(sectionHash, content.hashList[std::to_underlying(type)]))
                 return;
-            if (std::to_underlying(type) != count)
-                return;
-            count++;
         }
-        if (count < 3)
-            return;
 
-        if (linker && vAddr) {}
+        const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, 4096)};
+        if (program.size() < completeImageSize)
+            program.resize(completeImageSize);
+        program.shrink_to_fit();
+
+        if (hasArguments) {
+
+        }
+        process->SetProgramImage(address, {textSection, roSection, dataSection}, program);
+
+        assert(program.size());
+        address += completeImageSize;
     }
 
     void NsoCore::ReadSection(const NsoSection& section, const u64 fileSize, std::span<u8>& output) {
@@ -132,12 +139,12 @@ namespace Plusnx::SysFs::Nx {
         return Loader::SectionType::Invalid;
     }
 
-    bool NsoCore::IsSectionCompressed(Loader::SectionType type) const {
-        assert(static_cast<u32>(type) < 3);
+    bool NsoCore::IsSectionCompressed(const Loader::SectionType type) const {
+        assert(std::to_underlying(type) < 3);
         return content.flags >> std::to_underlying<Loader::SectionType>(type) & 1;
     }
-    bool NsoCore::HashableSection(Loader::SectionType type) const {
-        assert(static_cast<u32>(type) < 3);
+    bool NsoCore::HashableSection(const Loader::SectionType type) const {
+        assert(std::to_underlying(type) < 3);
         // ReSharper disable once CppRedundantParentheses
         return content.flags >> (std::to_underlying<Loader::SectionType>(type) + 3) & 1;
     }

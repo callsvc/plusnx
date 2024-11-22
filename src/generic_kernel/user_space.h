@@ -3,10 +3,18 @@
 #include <generic_kernel/address_space.h>
 #include <generic_kernel/sys_memory_pool.h>
 namespace Plusnx::GenericKernel {
+
+    enum class ProgramCodeType {
+        Text,
+        Ro,
+        Data,
+    };
+
     class UserSpace {
     public:
         UserSpace() = default;
         void CreateProcessMemory(AddressSpaceType type);
+        void MapProgramCodeMemory(ProgramCodeType type, u64 baseAddr, const std::span<u8>& code) const;
 
         u8 Read8(u64 vaddr) const;
         u32 Read32(u64 vaddr) const;
@@ -23,6 +31,6 @@ namespace Plusnx::GenericKernel {
         AddressSpaceType type;
     private:
         void InitSelfTest() const;
-        std::unique_ptr<SysMemoryPool> usPool;
+        std::unique_ptr<SysMemoryPool> pool;
     };
 }

@@ -10,14 +10,25 @@ namespace Plusnx::GenericKernel {
             total = VirtualMemorySpace39::TotalSize;
             size = SwitchMainSize;
         }
-        usPool = std::make_unique<SysMemoryPool>(total, size);
+        pool = std::make_unique<SysMemoryPool>(total, size);
 #if 1
         InitSelfTest();
 #endif
     }
+    void UserSpace::MapProgramCodeMemory(const ProgramCodeType type, const u64 baseAddr, const std::span<u8>& code) const {
+        const auto flags = [&] {
+            if (type == ProgramCodeType::Text)
+                return MemoryProtection::Execute | MemoryProtection::Read;
+            if (type == ProgramCodeType::Ro)
+                return MemoryProtection::Read;
+            return MemoryProtection::Write | MemoryProtection::Read;
+        }();
+
+        pool->CopyUserMemory(baseAddr, flags, MemoryType::Code, code);
+    }
 
     u8 UserSpace::Read8(const u64 vaddr) const {
-        const auto memory{usPool->GetPointer(vaddr)};
+        const auto memory{pool->GetPointer(vaddr)};
         return memory[PageIndex(vaddr)];
     }
 
@@ -32,7 +43,7 @@ namespace Plusnx::GenericKernel {
     }
 
     void UserSpace::Write8(const u64 vaddr, const u8 value) const {
-        const auto memory{usPool->GetPointer(vaddr)};
+        const auto memory{pool->GetPointer(vaddr)};
         memory[PageIndex(vaddr)] = value;
     }
 
@@ -46,11 +57,11 @@ namespace Plusnx::GenericKernel {
 
     constexpr auto RoFlags{MemoryProtection::Read | MemoryProtection::Write};
     void UserSpace::InitSelfTest() const {
-        usPool->Map(0x10000, 0x20000, RoFlags, sizeof(u32));
+        pool->Map(0x10000, 0x20000, RoFlags, sizeof(u32));
 
         Write32(0x10000, 0x41414141);
         assert(Read32(0x10000) == 0x41414141);
 
-        usPool->Unmap(0x10000, sizeof(u32));
+        pool->Unmap(0x10000, sizeof(u32));
     }
 }

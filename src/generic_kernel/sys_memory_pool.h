@@ -9,9 +9,10 @@ namespace Plusnx::GenericKernel {
 
     enum class MemoryType : u32 {
         Free,
-        Stack = 0x005C3C0B,
+        Code = 0x00DC7E03, // Mapped during #CreateProcess
+        Alias = 0x00482907,
         Kernel = 0x00002013,
-        Alias = 0x00482907
+        Stack = 0x005C3C0B,
     };
     struct VAddrPool {
         MemoryType type;
@@ -23,12 +24,15 @@ namespace Plusnx::GenericKernel {
         SysMemoryPool(u64 virtualSize, u64 backingSize);
         ~SysMemoryPool();
 
+        void MapPages(u64 vaddr, u64 addr, u32 flags, u64& size) const;
         void Map(u64 vaddr, u64 addr, u32 flags, u64 size);
+        void CopyUserMemory(u64 vaddr, u32 flags, MemoryType type, const std::span<u8>& userData);
+
         void Unmap(u64 vaddr, u64 size);
 
         u8* GetPointer(u64 vaddr) const;
     private:
-        uintptr_t GetTarget(const u64 vaddr, const u32 vm = 1) const {
+        uintptr_t PickMemoryAddr(const u64 vaddr, const u32 vm = 1) const {
             return reinterpret_cast<uintptr_t>(pools.at(vm).pointer) + vaddr;
         }
 

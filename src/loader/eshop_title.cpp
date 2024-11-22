@@ -52,10 +52,9 @@ namespace Plusnx::Loader {
         if (!exefs)
             return;
 
-        [[maybe_unused]] const auto& process{context->process};
+        const auto& process{context->process};
         auto modules{exefs->ListAllFiles()};
 
-        constexpr u64 baseAddr{};
         modules.erase(std::ranges::find(modules, "main.npdm"));
 
         SysFs::Ext::NsoModules nsoHolder;
@@ -71,8 +70,8 @@ namespace Plusnx::Loader {
                 files.emplace_back(exefs->OpenFile(target));
             }
         }
-
-        nsoHolder.LoadProgramImage(baseAddr, files);
+        u64 starts{};
+        nsoHolder.LoadProgramImage(process, starts, files);
     }
 
     void EShopTitle::GetAllContent() {

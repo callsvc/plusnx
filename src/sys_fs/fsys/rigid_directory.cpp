@@ -41,23 +41,19 @@ namespace Plusnx::SysFs::FSys {
         return content;
     }
     std::shared_ptr<RigidDirectory> RigidDirectory::CreateSubDirectory(const SysPath& dirname) const {
-        if (!is_directory(path))
-            return {};
         auto dirpath{dirname};
         if (!dirpath.has_parent_path())
             dirpath = path / dirpath;
-        const auto subdir{std::make_shared<RigidDirectory>(dirpath, true)};
-        if (!is_directory(subdir->path))
+
+        if (!is_directory(dirpath))
             return {};
-        return subdir;
+
+        return std::make_shared<RigidDirectory>(dirpath, true);
     }
 
     FileBackingPtr RigidDirectory::CreateFile(const SysPath& file) {
         auto filepath{file};
-        if (!filepath.has_parent_path())
-            filepath = path / filepath;
-
-        if (filepath.parent_path() != path)
+        if (!filepath.has_parent_path() || filepath.parent_path() != path)
             filepath = path / filepath;
 
         if (exists(filepath))

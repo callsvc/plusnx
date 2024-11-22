@@ -15,7 +15,7 @@ namespace Plusnx::Details {
             return boost::alignment::align_up(count * sizeof(T), 4096);
         }
 
-        static T * allocate(const std::size_t count) {
+        static T* allocate(const std::size_t count) {
             auto result{mmap(nullptr, GetAlignedSize(count), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)};
             if (result == MAP_FAILED) {
                 throw std::bad_alloc();

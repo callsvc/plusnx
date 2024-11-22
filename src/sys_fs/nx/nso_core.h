@@ -42,7 +42,9 @@ namespace Plusnx::SysFs::Nx {
     class NsoCore {
     public:
         NsoCore(const FileBackingPtr& nso);
-        void Load(const u64& vAddr, bool linker = true) const;
+        void Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, bool hasArguments = true);
+
+        std::optional<std::string> moduleName;
     private:
         bool IsSectionCompressed(Loader::SectionType type) const;
         bool HashableSection(Loader::SectionType type) const;
@@ -50,7 +52,6 @@ namespace Plusnx::SysFs::Nx {
         Loader::SectionType GetSectionType(const NsoSection& section) const;
 
         std::map<Loader::SectionType, std::array<u8, 0x20>> sectionResults;
-        std::string moduleName;
 
         FileBackingPtr backing;
 

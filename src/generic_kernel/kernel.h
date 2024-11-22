@@ -25,7 +25,7 @@ namespace Plusnx::GenericKernel {
         std::shared_ptr<Types::KProcess> CreateNewProcess();
         u64 CreateProcessId();
 
-        std::unique_ptr<UserSpace> us;
+        std::unique_ptr<UserSpace> userspace;
     private:
         struct {
             std::atomic<u64> pid, tid;
