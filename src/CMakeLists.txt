@@ -116,8 +116,8 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/user_space.h
     generic_kernel/address_space.cpp
     generic_kernel/address_space.h
-    generic_kernel/sys_memory_pool.cpp
-    generic_kernel/sys_memory_pool.h
+    generic_kernel/guest_buffer.cpp
+    generic_kernel/guest_buffer.h
     generic_kernel/constants.h
     loader/app_loader.cpp
     loader/app_loader.h

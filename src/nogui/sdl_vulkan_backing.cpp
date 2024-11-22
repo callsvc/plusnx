@@ -4,7 +4,7 @@
 #include <nogui/sdl_vulkan_backing.h>
 namespace Plusnx::NoGui {
     constexpr auto VulkanSdlFlags{SDL_WINDOW_VULKAN};
-    SdlVulkanBacking::SdlVulkanBacking() : SdlWindow(VulkanSdlFlags | DefaultWindowFlags) {
+    SdlVulkanBacking::SdlVulkanBacking() : SdlWindow(VulkanSdlFlags) {
         u32 count;
         SDL_Vulkan_GetInstanceExtensions(window, &count, nullptr);
         required.resize(count);

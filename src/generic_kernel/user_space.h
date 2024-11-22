@@ -1,7 +1,7 @@
 #pragma once
 
 #include <generic_kernel/address_space.h>
-#include <generic_kernel/sys_memory_pool.h>
+#include <generic_kernel/guest_buffer.h>
 namespace Plusnx::GenericKernel {
 
     enum class ProgramCodeType {
@@ -9,12 +9,18 @@ namespace Plusnx::GenericKernel {
         Ro,
         Data,
     };
+    struct CodeAllocationRecord {
+        ProgramCodeType type;
+        u64 base;
+        u64 size;
+        u64 used;
+    };
 
     class UserSpace {
     public:
         UserSpace() = default;
         void CreateProcessMemory(AddressSpaceType type);
-        void MapProgramCodeMemory(ProgramCodeType type, u64 baseAddr, const std::span<u8>& code) const;
+        void MapProgramCode(ProgramCodeType type, u64 baseAddr, const std::span<u8>& code);
 
         u8 Read8(u64 vaddr) const;
         u32 Read32(u64 vaddr) const;
@@ -31,6 +37,7 @@ namespace Plusnx::GenericKernel {
         AddressSpaceType type;
     private:
         void InitSelfTest() const;
-        std::unique_ptr<SysMemoryPool> pool;
+        std::unique_ptr<GuestBuffer> nxmem;
+        std::vector<CodeAllocationRecord> records;
     };
 }

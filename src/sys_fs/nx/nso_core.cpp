@@ -77,9 +77,14 @@ namespace Plusnx::SysFs::Nx {
         }
 
         const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, 4096)};
-        if (program.size() < completeImageSize)
+        if (program.size() < completeImageSize) {
             program.resize(completeImageSize);
-        program.shrink_to_fit();
+            program.shrink_to_fit();
+
+            std::construct_at(&textSection, program.begin().base(), textSection.size());
+            std::construct_at(&roSection, &program[textSection.size()], roSection.size());
+            std::construct_at(&dataSection, &program[roSection.size()], dataSection.size());
+        }
 
         if (hasArguments) {
 

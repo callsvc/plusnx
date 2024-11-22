@@ -44,6 +44,8 @@ namespace Plusnx::Cpu {
             u64 r15, r14, r13, r12;
             u64 rbx;
             u64 rbp;
+            u32 mxcsr;
+            u16 fpu;
 #endif
         } thread;
 
@@ -56,6 +58,7 @@ namespace Plusnx::Cpu {
     class CoroutinePool {
     public:
         static void Swap(Coroutine& prev, Coroutine& next);
+        static void SaveRestoreAndJump(void* prev, void* next);
         Coroutine& Create(u64 stackSize, CallBack&& cb);
 
         void PrintStates();

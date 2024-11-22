@@ -6,32 +6,37 @@
 #include <sys_fs/fsys/regular_file.h>
 #include <cpu/coroutine.h>
 
-__attribute__((naked)) void Switch(void* previous, void* next) {
-#if defined(__x86_64__)
-    __asm("mov %rsp, 0x0(%rdi)");
-    __asm("mov %r15, 0x8(%rdi)");
-    __asm("mov %r14, 0x10(%rdi)");
-    __asm("mov %r13, 0x18(%rdi)");
-    __asm("mov %r12, 0x20(%rdi)");
-    __asm("mov %rbx, 0x28(%rsp)");
-    __asm("mov %rbp, 0x30(%rdi)");
-
-    __asm("mov 0x0(%rsi), %rsp");
-    __asm("mov 0x8(%rsi), %r15");
-    __asm("mov 0x10(%rsi), %r14");
-    __asm("mov 0x18(%rsi), %r13");
-    __asm("mov 0x20(%rsi), %r12");
-    __asm("mov 0x28(%rsi), %rbx");
-    __asm("mov 0x30(%rsi), %rbp");
-    __asm("ret");
-#else
-    __asm("ret");
-#endif
-}
-
 namespace Plusnx::Cpu {
     std::unique_ptr<CoroutinePool> storage;
     thread_local u64 local_gid;
+
+#if defined(__x86_64__)
+    // https://www.felixcloutier.com/x86/stmxcsr
+    // https://www.felixcloutier.com/x86/fldcw
+
+    __attribute__((naked)) void CoroutinePool::SaveRestoreAndJump(void* prev, void* next) {
+        __asm("mov %rsp, 0x0(%rdi)");
+        __asm("mov %r15, 0x8(%rdi)");
+        __asm("mov %r14, 0x10(%rdi)");
+        __asm("mov %r13, 0x18(%rdi)");
+        __asm("mov %r12, 0x20(%rdi)");
+        __asm("mov %rbx, 0x28(%rsp)");
+        __asm("mov %rbp, 0x30(%rdi)");
+        __asm("stmxcsr 0x38(%rdi)");
+        __asm("fstcw 0x3C(%rdi)");
+
+        __asm("mov 0x0(%rsi), %rsp");
+        __asm("mov 0x8(%rsi), %r15");
+        __asm("mov 0x10(%rsi), %r14");
+        __asm("mov 0x18(%rsi), %r13");
+        __asm("mov 0x20(%rsi), %r12");
+        __asm("mov 0x28(%rsi), %rbx");
+        __asm("mov 0x30(%rsi), %rbp");
+        __asm("ldmxcsr 0x38(%rsi)");
+        __asm("fldcw 0x3C(%rsi)");
+        __asm("ret");
+    }
+#endif
 
     u64 GetThreadStackSize() {
         u64 pthSize{};
@@ -160,7 +165,7 @@ namespace Plusnx::Cpu {
         prev.Deactivate();
         next.Activate();
 
-        Switch(&prev.thread, &next.thread);
+        SaveRestoreAndJump(&prev.thread, &next.thread);
     }
     Coroutine& CoroutinePool::Create(const u64 stackSize, CallBack&& cb) {
         for (auto& threads: grths | std::views::values) {

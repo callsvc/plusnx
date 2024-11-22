@@ -2,7 +2,8 @@
 
 #include <core/process_qol.h>
 namespace Plusnx::Core {
-    ProcessQol::ProcessQol(const SysFs::SysPath &database) {
+    ProcessQol::ProcessQol(const SysFs::SysPath& database) {
+        sqlite3_initialize();
         std::print("Loaded SQLite3 library version: {}\n", sqlite3_libversion());
         const std::string& pathname{database};
         constexpr auto traits{SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE};
@@ -18,6 +19,8 @@ namespace Plusnx::Core {
         if (stmt)
             sqlite3_finalize(stmt);
         sqlite3_close_v2(db);
+
+        sqlite3_shutdown();
     }
 
     std::string GetUserName() {

@@ -132,12 +132,13 @@ namespace Plusnx::SysFs::Nx {
     }
 
     Security::K128 NcaCore::GetTitleKey() const {
-        Security::K128 title{};
-        if (!rights)
-            return title;
+        if (IsEmpty(content.rights))
+            return {};
 
         Security::K128 titleKek{};
         keys->GetIndexedKey(Security::IndexedKeyType::KekTitle, GetKeyRevision(), titleKek.data(), titleKek.size());
+        Security::K128 title{};
+
         keys->GetTitleKey(content.rights, title.data(), title.size());
 
         Security::CipherCast decrypt(titleKek.data(), titleKek.size(), Security::OperationMode::EcbAes, true);

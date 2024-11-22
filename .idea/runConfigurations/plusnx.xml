@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="plusnx" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="plusnx" TARGET_NAME="plusnx" CONFIG_NAME="Release" RUN_TARGET_PROJECT_NAME="plusnx" RUN_TARGET_NAME="plusnx">
+    <envs>
+      <env name="ASAN_OPTIONS" value="suppressions=Plusnx.supp " />
+    </envs>
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>

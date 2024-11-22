@@ -18,7 +18,8 @@ namespace Plusnx::Loader {
                 return "NSO";
             case AppType::GameFs:
                 return "GameFS";
-            default: return {};
+            default:
+                throw runtime_plusnx_except("Unknown app type");
         }
     }
 

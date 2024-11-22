@@ -30,6 +30,8 @@ namespace Plusnx::Core {
     }
 
     Application::~Application() {
+        context->nxOs.reset();
+
         if (ui) {
             auto gui{std::move(ui)};
         }

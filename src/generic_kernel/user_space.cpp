@@ -1,4 +1,5 @@
 #include <generic_kernel/constants.h>
+#include <sys_fs/fs_types.h>
 #include <generic_kernel/user_space.h>
 namespace Plusnx::GenericKernel {
     void UserSpace::CreateProcessMemory(const AddressSpaceType type) {
@@ -10,12 +11,12 @@ namespace Plusnx::GenericKernel {
             total = VirtualMemorySpace39::TotalSize;
             size = SwitchMainSize;
         }
-        pool = std::make_unique<SysMemoryPool>(total, size);
+        nxmem = std::make_unique<GuestBuffer>(total, size);
 #if 1
         InitSelfTest();
 #endif
     }
-    void UserSpace::MapProgramCodeMemory(const ProgramCodeType type, const u64 baseAddr, const std::span<u8>& code) const {
+    void UserSpace::MapProgramCode(const ProgramCodeType type, const u64 baseAddr, const std::span<u8>& code) {
         const auto flags = [&] {
             if (type == ProgramCodeType::Text)
                 return MemoryProtection::Execute | MemoryProtection::Read;
@@ -24,11 +25,14 @@ namespace Plusnx::GenericKernel {
             return MemoryProtection::Write | MemoryProtection::Read;
         }();
 
-        pool->CopyUserMemory(baseAddr, flags, MemoryType::Code, code);
+        nxmem->Allocate(baseAddr, flags, MemoryType::Code, code);
+
+        records.emplace_back(type, baseAddr, code.size(), nxmem->GetUsedResourceSize());
+        std::print("Amount of allocated data: {}\n", SysFs::GetReadableSize(records.back().used));
     }
 
     u8 UserSpace::Read8(const u64 vaddr) const {
-        const auto memory{pool->GetPointer(vaddr)};
+        const auto memory{nxmem->GetGuestSpan(vaddr)};
         return memory[PageIndex(vaddr)];
     }
 
@@ -43,7 +47,7 @@ namespace Plusnx::GenericKernel {
     }
 
     void UserSpace::Write8(const u64 vaddr, const u8 value) const {
-        const auto memory{pool->GetPointer(vaddr)};
+        const auto memory{nxmem->GetGuestSpan(vaddr)};
         memory[PageIndex(vaddr)] = value;
     }
 
@@ -57,11 +61,11 @@ namespace Plusnx::GenericKernel {
 
     constexpr auto RoFlags{MemoryProtection::Read | MemoryProtection::Write};
     void UserSpace::InitSelfTest() const {
-        pool->Map(0x10000, 0x20000, RoFlags, sizeof(u32));
+        nxmem->Map(0x10000, 0x20000, RoFlags, sizeof(u32));
 
         Write32(0x10000, 0x41414141);
         assert(Read32(0x10000) == 0x41414141);
 
-        pool->Unmap(0x10000, sizeof(u32));
+        nxmem->Unmap(0x10000, sizeof(u32));
     }
 }

@@ -13,10 +13,10 @@ namespace Plusnx::GenericKernel::Types {
     }
 
     void KProcess::SetProgramImage(const u64 baseAddr, std::array<std::span<u8>, 3> sections, const std::vector<u8>& program) const {
-        ptb->MapProgramCodeMemory(ProgramCodeType::Text, baseAddr, std::span(sections[0]));
+        ptb->MapProgramCode(ProgramCodeType::Text, baseAddr, std::span(sections[0]));
 
         const auto roOffset{boost::alignment::align_up(baseAddr + sections[0].size(), 4096)};
-        ptb->MapProgramCodeMemory(ProgramCodeType::Ro, roOffset, std::span(sections[1]));
+        ptb->MapProgramCode(ProgramCodeType::Ro, roOffset, std::span(sections[1]));
 
         auto deducedBssSize{program.size()};
         for (const auto& section : sections)
@@ -24,6 +24,6 @@ namespace Plusnx::GenericKernel::Types {
         const auto dataOffset{boost::alignment::align_up(roOffset + sections[1].size(), 4096)};
 
         const std::span initialized{sections.back().data(), sections.back().size() + deducedBssSize};
-        ptb->MapProgramCodeMemory(ProgramCodeType::Data, dataOffset, initialized);
+        ptb->MapProgramCode(ProgramCodeType::Data, dataOffset, initialized);
     }
 }

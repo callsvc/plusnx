@@ -26,7 +26,7 @@ i32 main(const i32 argc, const char** argv) {
         if (*argv)
             return strlen(*argv);
 
-    const auto app{std::make_unique<Core::Application>()};
+    auto app{std::make_unique<Core::Application>()};
     app->Initialize(std::move(sdlVkWindow));
 
     desc.add_options()
@@ -73,5 +73,10 @@ i32 main(const i32 argc, const char** argv) {
         SDL_WaitEvent(&event);
 #endif
     }
+
+    {
+        const std::unique_ptr asan{std::move(app)};
+    }
+
     return {};
 }
