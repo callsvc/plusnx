@@ -73,9 +73,9 @@ namespace Plusnx::SysFs::Nx {
         u32 hashSize;
         u32 maxLayers;
         struct HierarchicalIntegrityVerificationLevelInformation {
-            u64 logicalOffset;
-            u64 hashDataSize;
-            u32 blockSize;
+            u64 offset;
+            u64 size; // HashDataSize
+            u32 blockSize; // BlockSize (in log2)
             u32 pad0;
         };
         std::array<HierarchicalIntegrityVerificationLevelInformation, 6> levels;

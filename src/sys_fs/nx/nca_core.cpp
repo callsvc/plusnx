@@ -29,7 +29,9 @@ namespace Plusnx::SysFs::Nx {
             assert(content.size == nca->GetSize());
         }
 
-        assert(content.keyGenerationOld == 2);
+        if (content.keyGenerationOld != 2)
+            std::print("Unrecognized legacy key version {}\n", content.keyGenerationOld);
+
         if (!content.fixedGeneration) {
             // https://gbatemp.net/threads/nca-signatures-verification-failed-tinfoil-nsp.533433/
             Security::Signatures verifier(Security::SignatureOperationType::NcaHdrSignatureFixed);
@@ -97,8 +99,9 @@ namespace Plusnx::SysFs::Nx {
         }
         if (header.hashType == HashType::HierarchicalIntegrityHash) {
             assert(header.hashIntegrity.magic == ConstMagic<u32>("IVFC"));
-            offset += header.hashIntegrity.levels.back().logicalOffset;
-            size = header.hashIntegrity.levels.back().hashDataSize;
+            assert(header.hashIntegrity.maxLayers == 7);
+            offset += header.hashIntegrity.levels.back().offset;
+            size = header.hashIntegrity.levels.back().size;
         }
 
         auto EmplaceBacking = [&] (const FileBackingPtr& file) {
@@ -175,7 +178,7 @@ namespace Plusnx::SysFs::Nx {
         const auto legacy{static_cast<u64>(content.keyGenerationOld)};
         auto generation{static_cast<u64>(content.generation)};
         generation = std::max(legacy, generation);
-        return std::max(generation - 1, 0UL);
+        return std::min(generation - 1, generation);
     }
 
     std::vector<FileBackingPtr> NcaCore::GetBackingFiles(const bool partition) const {

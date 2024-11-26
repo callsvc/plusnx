@@ -29,7 +29,7 @@ namespace Plusnx::Os {
                 case Loader::AppType::Nsp:
                     return std::make_shared<Loader::EShopTitle>(context->keys, file);
                 case Loader::AppType::Xci:
-                    return std::make_shared<Loader::Cartridge>(file);
+                    return std::make_shared<Loader::Cartridge>(context->keys, file);
                 case Loader::AppType::Nca:
                     return std::make_shared<Loader::ContentArchive>(context->keys, file);
                 case Loader::AppType::Nro:
