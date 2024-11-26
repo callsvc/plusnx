@@ -14,7 +14,7 @@ namespace Plusnx::GenericKernel::Types {
         void Initialize();
         void Destroy();
 
-        void SetProgramImage(u64 baseAddr, std::array<std::span<u8>, 3> sections, const std::vector<u8>& program) const;
+        void SetProgramImage(u64& baseAddr, std::array<std::span<u8>, 3> sections, std::vector<u8>&& program) const;
 
         void* entry{nullptr};
         KThread* eThread{nullptr};

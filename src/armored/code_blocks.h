@@ -15,15 +15,16 @@ namespace Plusnx::Armored {
 
     class CodeBlocks {
     public:
-        CodeBlocks(const std::shared_ptr<EmitterInterface>& arm, u64 count);
+        CodeBlocks(const std::shared_ptr<EmitterInterface>& arm);
+        void Initialize(u64 count);
         ~CodeBlocks();
 
         void Expand(u64 holes);
         void Protect(u64 starts, u64 ends, CodeBlockProtectionStatus action) const;
 
-        void* segment{};
+        void* executable{};
         u64 size{};
-        CodeBlockStatus status;
+        CodeBlockStatus status{};
     private:
         std::shared_ptr<EmitterInterface> emitter;
     };

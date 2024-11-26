@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/container/small_vector.hpp>
 #include <boost/container/flat_map.hpp>
 #include <generic_kernel/constants.h>
 namespace Plusnx::GenericKernel {
@@ -10,10 +11,15 @@ namespace Plusnx::GenericKernel {
         Kernel = 0x00002013,
         Stack = 0x005C3C0B,
     };
-    struct VAddrPool {
+    struct MapReserve {
         MemoryType type;
-        u8* base;
+        u8* user;
         u64 size;
+    };
+
+    struct FlatMap {
+        u64 vaddr;
+        u8* base;
     };
 
     class GuestBuffer {
@@ -28,15 +34,16 @@ namespace Plusnx::GenericKernel {
         void Allocate(u64 vaddr, u32 flags, MemoryType type, const std::span<u8>& userdata);
         u64 GetUsedResourceSize();
 
+        std::pair<u8*, MapReserve> Search(u64 vaddr);
         std::span<u8> GetGuestSpan(u64 vaddr);
     private:
-        std::optional<std::span<u8>> VirtToGuest(u64 vaddr, u64 size);
-
         std::span<u8> backing;
         std::span<u8> guest;
 
         // https://www.boost.org/doc/libs/1_62_0/doc/html/container/non_standard_containers.html#container.non_standard_containers.flat_xxx
-        boost::container::flat_map<u8*, VAddrPool> descriptor;
-        i32 mfd;
+        // boost::container::flat_map<u8*, MapReserve> descriptor;
+        std::map<u8*, MapReserve> descriptor;
+        boost::container::small_vector<FlatMap, 10> flatmap;
+        i32 resource;
     };
 }

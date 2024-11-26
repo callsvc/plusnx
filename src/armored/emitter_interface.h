@@ -8,7 +8,7 @@ namespace Plusnx::Armored {
         EmitterInterface(const std::shared_ptr<EmitterDetails>& info) : details(info) {}
         virtual ~EmitterInterface() = default;
 
-        void ChangeBlockScheme(CodeBlocks* segment = nullptr);
+        void ChangeBlockScheme(const std::shared_ptr<CodeBlocks>& cb = nullptr);
         virtual void EmitNop() = 0;
         void WriteI(const std::span<u8>& instruction);
         template <typename T>
@@ -19,7 +19,7 @@ namespace Plusnx::Armored {
 
         u64 pc{};
 
-        CodeBlocks* blocks{nullptr};
+        std::weak_ptr<CodeBlocks> blocks;
         std::shared_ptr<EmitterDetails> details;
     };
 }

@@ -16,7 +16,6 @@ target_sources(plusnx PRIVATE
 )
 
 target_sources(plusnx-core PUBLIC
-    armored/armor_types.cpp
     armored/armor_types.h
     armored/code_blocks.cpp
     armored/code_blocks.h
@@ -28,7 +27,6 @@ target_sources(plusnx-core PUBLIC
     armored/arm64_emitter_context.h
     armored/emitter_interface.cpp
     armored/emitter_interface.h
-    armored/emitter_details.cpp
     armored/emitter_details.h
     armored/arm64_details.cpp
     armored/arm64_details.h
@@ -166,5 +164,5 @@ target_sources(plusnx-core PUBLIC
     types.h
 )
 
-target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static)
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt)
 target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

@@ -5,12 +5,14 @@
 namespace Plusnx::GenericKernel {
     constexpr u64 SwitchPageSize{4096};
 
-    inline auto ClearPage(const u64 address) {
+    inline auto ClearSwitchPage(const u64 address) {
         return address & ~(SwitchPageSize - 1);
     }
-    inline auto PageIndex(const u64 address) {
-        constexpr auto clear{SwitchPageSize - 1};
-        return address & clear;
+    inline auto IndexPage(const u64 address, const u64 size) {
+        auto pageBitsCount{std::countl_zero(size)};
+        pageBitsCount = sizeof(std::uint64_t) * 8 - pageBitsCount - 1;
+        // ReSharper disable once CppRedundantParentheses
+        return address & ((1 << pageBitsCount) - 1);
     }
 
     namespace MemoryProtection {

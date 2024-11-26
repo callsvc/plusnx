@@ -19,6 +19,10 @@ namespace Plusnx::Armored {
         if (blocks.contains(core.ccid))
             return;
 
-        blocks.emplace(core.ccid, CodeBlocks(jitter, configuration.codeSectionSize));
+        const auto cpuBlock(std::make_shared<CodeBlocks>(jitter));
+        jitter->ChangeBlockScheme(cpuBlock);
+        cpuBlock->Initialize(configuration.codeSectionSize);
+
+        blocks.emplace(core.ccid,  cpuBlock);
     }
 }

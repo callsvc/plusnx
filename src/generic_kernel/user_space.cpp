@@ -16,7 +16,7 @@ namespace Plusnx::GenericKernel {
         InitSelfTest();
 #endif
     }
-    void UserSpace::MapProgramCode(const ProgramCodeType type, const u64 baseAddr, const std::span<u8>& code) {
+    void UserSpace::MapProgramCode(const ProgramCodeType type, const u64 baseAddr, const std::span<u8> &code) {
         const auto flags = [&] {
             if (type == ProgramCodeType::Text)
                 return MemoryProtection::Execute | MemoryProtection::Read;
@@ -32,8 +32,7 @@ namespace Plusnx::GenericKernel {
     }
 
     u8 UserSpace::Read8(const u64 vaddr) const {
-        const auto memory{nxmem->GetGuestSpan(vaddr)};
-        return memory[PageIndex(vaddr)];
+        return nxmem->GetGuestSpan(vaddr)[IndexPage(vaddr, SwitchPageSize)];
     }
 
     u32 UserSpace::Read32(const u64 vaddr) const {
@@ -47,8 +46,7 @@ namespace Plusnx::GenericKernel {
     }
 
     void UserSpace::Write8(const u64 vaddr, const u8 value) const {
-        const auto memory{nxmem->GetGuestSpan(vaddr)};
-        memory[PageIndex(vaddr)] = value;
+        nxmem->GetGuestSpan(vaddr)[IndexPage(vaddr, SwitchPageSize)] = value;
     }
 
     void UserSpace::Write32(const u64 vaddr, const u32 value) const {

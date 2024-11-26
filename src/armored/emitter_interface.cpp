@@ -2,13 +2,13 @@
 #include <armored/emitter_interface.h>
 
 namespace Plusnx::Armored {
-    void EmitterInterface::ChangeBlockScheme(CodeBlocks* segment) {
-        blocks = segment;
+    void EmitterInterface::ChangeBlockScheme(const std::shared_ptr<CodeBlocks>& cb) {
+        blocks = cb;
         pc = {};
     }
 
     void EmitterInterface::WriteI(const std::span<u8>& instruction) {
-        auto section{static_cast<u8*>(blocks->segment) + pc};
+        auto section{static_cast<u8*>(blocks.lock()->executable) + pc};
 
         assert(instruction.size() == details->GetInstructionSize());
 

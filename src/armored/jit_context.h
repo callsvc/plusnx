@@ -23,6 +23,6 @@ namespace Plusnx::Armored {
         Cpu::Features caps;
 
         JitConfigs configuration;
-        std::map<u64, CodeBlocks> blocks;
+        std::map<u64, std::shared_ptr<CodeBlocks>> blocks;
     };
 }
