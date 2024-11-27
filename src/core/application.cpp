@@ -26,7 +26,7 @@ namespace Plusnx::Core {
         games = std::make_unique<GamesLists>(assets->games);
         games->Initialize();
 
-        appQol = std::make_unique<ProcessQol>(assets->user.path / "quality.db");
+        appQol = std::make_unique<ProcessQol>(assets->user.path / "sessions.db");
     }
 
     Application::~Application() {

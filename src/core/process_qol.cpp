@@ -34,11 +34,13 @@ namespace Plusnx::Core {
     void ProcessQol::ChangeGame(const GameInformation &game) {
         namespace chr = std::chrono;
         const auto current{std::format("{}", chr::floor<chr::seconds>(chr::system_clock::now()))};
-        const auto command{std::format("INSERT INTO Played(SessionText) VALUES('{} started the game named {} at {}');)", GetUserName(), game.title, current)};
 
-        assert(sqlite3_prepare_v2(db, command.data(), -1, &stmt, nullptr) == SQLITE_OK);
+        const auto playing{std::format("{} started the game named {} at {}", GetUserName(), game.title, current)};
+
+        assert(sqlite3_prepare_v2(db, "INSERT INTO Played(SessionText) VALUES(?);)", -1, &stmt, nullptr) == SQLITE_OK);
+        sqlite3_bind_text(stmt, 1, playing.c_str(), playing.size(), SQLITE_STATIC);
+
         sqlite3_step(stmt);
-
         sqlite3_reset(stmt);
     }
     std::vector<std::string> ProcessQol::GetPlayedSessions(u64 maxCount) {

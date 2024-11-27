@@ -51,6 +51,7 @@ namespace Plusnx::Loader {
 
         std::unique_ptr<SysFs::Nx::PartitionFilesystem> pfs;
         SysFs::FileBackingPtr GetNpdm() const override;
+        std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const override;
     private:
         void ListAllNca(const std::unique_ptr<SysFs::Nx::PartitionFilesystem>& partition);
 

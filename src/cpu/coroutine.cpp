@@ -76,7 +76,7 @@ namespace Plusnx::Cpu {
         }
     }
 
-    Coroutine::Coroutine(u64 block, CallBack &&fn) {
+    Coroutine::Coroutine(u64 block, CallBack&& fn) {
         if (!block)
             block = GetThreadStackSize();
         function = std::move(fn);

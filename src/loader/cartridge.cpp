@@ -67,6 +67,13 @@ namespace Plusnx::Loader {
         return {};
     }
 
+    std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem>
+    Cartridge::GetRomFs(const bool isControl) const {
+        if (isControl)
+            return control;
+        return romfs;
+    }
+
     void Cartridge::ListAllNca(const std::unique_ptr<SysFs::Nx::PartitionFilesystem>& partition) {
         auto files{partition->ListAllFiles()};
         if (files.empty())
@@ -139,7 +146,7 @@ namespace Plusnx::Loader {
 
         for (const auto& [index, metas] : std::ranges::views::enumerate(cnmts)) {
             if (metas.programId != titleId)
-                std::print("Metadata of index {}, appears to have an unknown or altered program ID, correct value {}, found value {}", index, metas.programId, titleId);
+                std::print("Metadata of index {}, appears to have an unknown or altered program ID, correct value {}, found value {}\n", index, titleId, metas.programId);
         }
     }
 }
