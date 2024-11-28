@@ -1,10 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <filesystem>
-
-#include <core/configs.h>
+#include <sys_fs/assets.h>
 #include <sys_fs/provider.h>
+#include <core/configs.h>
 #include <video/tegrax1_gpu.h>
 #include <audio/sound.h>
 
@@ -24,17 +22,14 @@ namespace Plusnx::Platform {
     class Host1x;
 }
 namespace Plusnx::Core {
-    enum SystemPaths {
-        BaseDirectoryFs
-    };
 
-    class Context {
-    public:
+    struct Context {
         Context();
-        [[nodiscard]] SysFs::SysPath GetSystemPath(SystemPaths tagged) const;
 
-        bool IsFromSystemPath(const SysFs::SysPath& path) const;
+        void Initialize(const std::shared_ptr<Context>& context);
+        void Destroy();
 
+        std::shared_ptr<SysFs::Assets> assets;
         std::shared_ptr<Configs> configs;
         std::shared_ptr<SysFs::Provider> provider;
         std::shared_ptr<Security::Keyring> keys;
@@ -47,6 +42,7 @@ namespace Plusnx::Core {
         Services::Settings::LanguageType language{};
         std::optional<GameInformation> details;
 
+        std::shared_ptr<GenericKernel::Kernel> kernel;
         std::shared_ptr<Os::NxSys> nxOs;
 
         // The main kernel object, necessary to run applications,

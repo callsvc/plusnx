@@ -11,45 +11,39 @@
 #include <core/telemetry_collector.h>
 #include <core/application.h>
 namespace Plusnx::Core {
-    Application::Application() :
-        context(std::make_shared<Context>()) {
-        std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
-        assets = std::make_shared<SysFs::Assets>(context);
-        context->configs->Initialize(assets->user.path / "plusnx.toml");
-        context->configs->ExportConfigs(assets->temp.path / "plusnx-bkp.toml");
+    Application::Application() : context(std::make_shared<Context>()) {
+        std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
         context->keys = std::make_shared<Security::Keyring>(context);
 
-        kernel = std::make_shared<GenericKernel::Kernel>();
-
-        games = std::make_unique<GamesLists>(assets->games);
+        games = std::make_unique<GamesLists>(context->assets->games);
         games->Initialize();
 
-        appQol = std::make_unique<ProcessQol>(assets->user.path / "sessions.db");
+        appQol = std::make_unique<ProcessQol>(context->assets->GetPlusnxFilename(SysFs::PlusnxDirectoryType::Database));
     }
 
     Application::~Application() {
-        context->nxOs.reset();
-
         if (ui) {
             auto gui{std::move(ui)};
         }
     }
 
     void Application::Initialize(std::shared_ptr<Video::GraphicsSupportContext>&& support) {
+        context->kernel = std::make_shared<GenericKernel::Kernel>();
         context->gpu->Initialize(support);
+
+        ui = std::move(support);
 
         context->process = [&] {
             if (const auto last = context->process)
                 last->Destroy();
 
-            auto process{kernel->CreateNewProcess()};
+            auto process{context->kernel->CreateNewProcess()};
             process->Initialize();
             return process;
         }();
 
-        ui = std::move(support);
         context->nxOs = std::make_shared<Os::NxSys>(context);
     }
 
@@ -63,12 +57,16 @@ namespace Plusnx::Core {
 
         if (context->details)
             appQol->ChangeGame(*context->details);
-        [[maybe_unused]] const auto notes{appQol->GetPlayedSessions(10)};
+
+        for (const auto& recent : appQol->GetPlayedSessions(10)) {
+            std::print("Section registered as: {}\n", recent);
+        }
     }
 
     bool Application::PickByName(const std::string& game) {
         const auto& pack{games->GetAllGames()};
         std::optional<boost::regex> regex;
+
         try {
             regex.emplace(game, boost::regex::grep);
             declared = game;
@@ -84,6 +82,7 @@ namespace Plusnx::Core {
         }
         if (!filter.empty())
             chosen = filter.front();
+
         return !chosen.empty();
     }
 
@@ -107,7 +106,7 @@ namespace Plusnx::Core {
         TelemetryCollector collector;
         collector.Query();
 
-        const auto target{assets->temp.path / "telemetry.enc"};
+        const auto target{context->assets->GetPlusnxFilename(SysFs::PlusnxDirectoryType::Telemetry)};
         const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
         collector.CommitToFile(outputFile);
     }

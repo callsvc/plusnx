@@ -21,7 +21,7 @@ namespace Plusnx::Os {
         std::error_code err;
 
         backing = [&] -> SysFs::FileBackingPtr {
-            if (context->IsFromSystemPath(path)) {
+            if (context->assets->IsFromSystemPath(path)) {
                 const auto target{absolute(path, err)};
                 if (!err.value())
                     return context->provider->OpenSystemFile(SysFs::RootId, target);

@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <core/games_lists.h>
-#include <sys_fs/assets.h>
 #include <video/graphics_types.h>
 #include <generic_kernel/types/kprocess.h>
 
@@ -30,9 +29,7 @@ namespace Plusnx::Core {
         void UpdateFrame() const;
 
         std::shared_ptr<Context> context;
-        std::shared_ptr<SysFs::Assets> assets;
 
-        std::shared_ptr<GenericKernel::Kernel> kernel;
         std::unique_ptr<ProcessQol> appQol;
     private:
         SysFs::SysPath declared;

@@ -85,6 +85,13 @@ target_sources(plusnx-core PUBLIC
     sys_fs/meta_program.h
     sys_fs/ctr_backing.cpp
     sys_fs/ctr_backing.h
+    input/app_controller.cpp
+    input/app_controller.h
+    input/sdl_inputs.cpp
+    input/sdl_inputs.h
+    input/controller_types.h
+    input/shared_hid_memory.cpp
+    input/shared_hid_memory.h
     core/application.cpp
     core/application.h
     core/context.cpp
@@ -108,6 +115,8 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/types/kprocess.h
     generic_kernel/types/kthread.cpp
     generic_kernel/types/kthread.h
+    generic_kernel/types/kshared_memory.cpp
+    generic_kernel/types/kshared_memory.h
     generic_kernel/kernel.cpp
     generic_kernel/kernel.h
     generic_kernel/user_space.cpp

@@ -7,7 +7,7 @@
 
 #include <os/process_creator.h>
 namespace Plusnx::Core {
-    class Context;
+    struct Context;
 }
 
 namespace Plusnx::Os {

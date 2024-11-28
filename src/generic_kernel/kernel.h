@@ -11,10 +11,12 @@
 namespace Plusnx::GenericKernel {
     namespace Types {
         class KProcess;
+        class KSharedMemory;
     }
     enum class KType {
         KProcess,
-        KThread
+        KThread,
+        KSharedMemory
     };
 
     class Kernel {
