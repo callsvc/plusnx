@@ -1,6 +1,6 @@
 #pragma once
 
-#include <armored/armor_types.h>
+#include <armored/arm_types.h>
 #include <armored/emitter_interface.h>
 namespace Plusnx::Armored {
     // Special class to allocate all pages required by the JIT

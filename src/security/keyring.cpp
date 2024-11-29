@@ -13,7 +13,7 @@ namespace Plusnx::Security {
         return Key256Type::Invalid;
     }
     IndexedKeyType GetIndexKeyType(const std::string_view& key) {
-        for (const auto [index, name] : std::ranges::views::enumerate(kekKeysPrefix)) {
+        for (const auto& [index, name] : std::ranges::views::enumerate(kekKeysPrefix)) {
             if (key.contains(name))
                 return static_cast<IndexedKeyType>(index);
         }
@@ -28,7 +28,7 @@ namespace Plusnx::Security {
         for (const auto &name: kekKeysPrefix)
             indexed.emplace(GetIndexKeyType(name), std::map<u32, K128>{});
 
-        auto ReadKeys = [&](const std::string &keyPath, const KeyType type, const std::string &tag) {
+        auto ReadKeys = [&](const std::string& keyPath, const KeyType type, const std::string& tag) {
             if (const auto keyFile{provider->OpenSystemFile(SysFs::RootId, keyPath)})
                 ReadKeysPairs(keyFile, type);
             if ((type == KeyType::Production && prods.empty()) || (type == KeyType::Title && titles.empty())) {

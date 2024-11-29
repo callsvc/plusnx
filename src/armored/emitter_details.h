@@ -1,6 +1,6 @@
 #pragma once
 
-#include <armored/armor_types.h>
+#include <armored/arm_types.h>
 namespace Plusnx::Armored {
     class EmitterDetails {
     public:

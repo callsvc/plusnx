@@ -15,6 +15,7 @@ namespace Plusnx::Core {
     Application::Application() : context(std::make_shared<Context>()) {
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
+        context->Initialize(context);
         context->keys = std::make_shared<Security::Keyring>(context);
 
         games = std::make_unique<GamesLists>(context->assets->games);
@@ -27,6 +28,7 @@ namespace Plusnx::Core {
         if (ui) {
             auto gui{std::move(ui)};
         }
+        context->Destroy();
     }
 
     void Application::Initialize(std::shared_ptr<Video::GraphicsSupportContext>&& support) {

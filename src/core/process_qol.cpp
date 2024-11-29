@@ -44,7 +44,8 @@ namespace Plusnx::Core {
         sqlite3_reset(stmt);
     }
     std::vector<std::string> ProcessQol::GetPlayedSessions(u64 maxCount) {
-        std::vector<std::string> result(maxCount / 2);
+        std::vector<std::string> result;
+        result.reserve(maxCount / 2);
 
         assert(sqlite3_prepare_v2(db, "SELECT * FROM Played", -1, &stmt, nullptr) == SQLITE_OK);
 

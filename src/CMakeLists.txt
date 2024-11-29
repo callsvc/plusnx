@@ -16,7 +16,7 @@ target_sources(plusnx PRIVATE
 )
 
 target_sources(plusnx-core PUBLIC
-    armored/armor_types.h
+    armored/arm_types.h
     armored/code_blocks.cpp
     armored/code_blocks.h
     armored/cpu_context.cpp
@@ -111,6 +111,9 @@ target_sources(plusnx-core PUBLIC
     cpu/coroutine.cpp
     cpu/coroutine.h
     cpu/unit_types.h
+    generic_kernel/base/auto_types.h
+    generic_kernel/base/kauto_object.cpp
+    generic_kernel/base/kauto_object.h
     generic_kernel/types/kprocess.cpp
     generic_kernel/types/kprocess.h
     generic_kernel/types/kthread.cpp

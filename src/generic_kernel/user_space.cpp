@@ -1,5 +1,5 @@
-#include <generic_kernel/constants.h>
 #include <sys_fs/fs_types.h>
+#include <generic_kernel/constants.h>
 #include <generic_kernel/user_space.h>
 namespace Plusnx::GenericKernel {
     void UserSpace::CreateProcessMemory(const AddressSpaceType type) {
@@ -16,21 +16,6 @@ namespace Plusnx::GenericKernel {
         InitSelfTest();
 #endif
     }
-    void UserSpace::MapProgramCode(const ProgramCodeType type, const u64 baseAddr, const std::span<u8> &code) {
-        const auto flags = [&] {
-            if (type == ProgramCodeType::Text)
-                return MemoryProtection::Execute | MemoryProtection::Read;
-            if (type == ProgramCodeType::Ro)
-                return MemoryProtection::Read;
-            return MemoryProtection::Write | MemoryProtection::Read;
-        }();
-
-        nxmem->Allocate(baseAddr, flags, MemoryType::Code, code);
-
-        records.emplace_back(type, baseAddr, code.size(), nxmem->GetUsedResourceSize());
-        std::print("Amount of allocated data: {}\n", SysFs::GetReadableSize(records.back().used));
-    }
-
     u8 UserSpace::Read8(const u64 vaddr) const {
         return nxmem->GetGuestSpan(vaddr)[IndexPage(vaddr, SwitchPageSize)];
     }
@@ -65,5 +50,21 @@ namespace Plusnx::GenericKernel {
         assert(Read32(0x10000) == 0x41414141);
 
         nxmem->Unmap(0x10000, sizeof(u32));
+    }
+
+    void UserSpace::MapProgramCode(const ProgramCodeType type, const u64 baseAddr, const std::span<u8>& code) {
+        const auto flags = [&] {
+            if (type == ProgramCodeType::Text)
+                return MemoryProtection::Execute | MemoryProtection::Read;
+            if (type == ProgramCodeType::Ro)
+                return MemoryProtection::Read;
+            return MemoryProtection::Write | MemoryProtection::Read;
+        }();
+
+        nxmem->Allocate(baseAddr, flags, MemoryType::Code, code);
+        if (const auto resource{nxmem->GetUsedResourceSize()}) {
+            records.emplace_back(type, baseAddr, code.size(), resource);
+            std::print("Amount of allocated data: {}\n", SysFs::GetReadableSize(records.back().used));
+        }
     }
 }

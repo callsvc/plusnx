@@ -4,7 +4,7 @@
 #include <input/sdl_inputs.h>
 namespace Plusnx::Input {
     SdlInputs::SdlInputs() {
-        assert(SDL_Init(SDL_INIT_JOYSTICK) == 0);
+        assert(SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0);
 
     }
 

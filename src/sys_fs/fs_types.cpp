@@ -29,14 +29,14 @@ namespace Plusnx::SysFs {
         return std::format("{:.4} {}", size, formats[format]);
     }
 
-    void RoDirectoryBacking::ExtractAllFiles(const SysPath &output) {
+    void RoDirectoryBacking::ExtractAllFiles(const SysPath& output) {
         const auto cachedFiles{ListAllFiles()};
         std::vector<u8> buffering(8 * 1024 * 1024);
 
         std::print("Extracting the contents of FS {}\n", GetPath());
         for (auto filename: cachedFiles) {
             const auto file{std::make_unique<StreamedFile>(OpenFile(filename))};
-            const auto directory{std::make_unique<FSys::RigidDirectory>(output)};
+            const auto directory{std::make_unique<FSys::RigidDirectory>(output, true)};
 
             if (filename.has_relative_path())
                 filename = filename.relative_path();

@@ -13,11 +13,6 @@ namespace Plusnx::GenericKernel {
         class KProcess;
         class KSharedMemory;
     }
-    enum class KType {
-        KProcess,
-        KThread,
-        KSharedMemory
-    };
 
     class Kernel {
     public:
@@ -25,9 +20,11 @@ namespace Plusnx::GenericKernel {
         ~Kernel();
 
         std::shared_ptr<Types::KProcess> CreateNewProcess();
+        std::shared_ptr<Types::KProcess> GetCurrentProcess();
+
         u64 CreateProcessId();
 
-        std::unique_ptr<UserSpace> userspace;
+        std::unique_ptr<UserSpace> memory;
     private:
         struct {
             std::atomic<u64> pid, tid;
@@ -37,10 +34,4 @@ namespace Plusnx::GenericKernel {
         std::list<std::shared_ptr<Types::KProcess>> listProc;
     };
 
-    class KBaseType {
-    protected:
-        KBaseType(Kernel& generic, const KType base) : kernel(generic), type(base) {}
-        Kernel& kernel;
-        KType type;
-    };
 }

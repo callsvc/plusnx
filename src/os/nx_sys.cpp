@@ -46,7 +46,7 @@ namespace Plusnx::Os {
             assert(npdm.addressType == AddrType::AddressSpace64Bit);
             npdm.DisplayBinaryInformation();
 #endif
-            process->ptb->CreateProcessMemory(npdm.addressType);
+            process->thisMm->CreateProcessMemory(npdm.addressType);
         }
 
         creator.emplace(*this);

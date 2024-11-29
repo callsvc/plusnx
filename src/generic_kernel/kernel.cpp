@@ -16,7 +16,7 @@ namespace Plusnx::GenericKernel {
                 nice(0);
         }
 
-        userspace = std::make_unique<UserSpace>();
+        memory = std::make_unique<UserSpace>();
     }
 
     Kernel::~Kernel() {
@@ -33,4 +33,7 @@ namespace Plusnx::GenericKernel {
         return seed.pid++;
     }
 
+    std::shared_ptr<Types::KProcess> Kernel::GetCurrentProcess() {
+        return listProc.back();
+    }
 }

@@ -1,14 +1,14 @@
 #pragma once
 #include <list>
 
-#include <generic_kernel/kernel.h>
 #include <generic_kernel/types/kthread.h>
 
 #include <generic_kernel/user_space.h>
 #include <sys_fs/meta_program.h>
 
+#include <generic_kernel/base/auto_types.h>
 namespace Plusnx::GenericKernel::Types {
-    class KProcess : public KBaseType {
+    class KProcess : public Base::KSynchronizationObject {
     public:
         explicit KProcess(Kernel& kernel);
         void Initialize();
@@ -22,7 +22,8 @@ namespace Plusnx::GenericKernel::Types {
         u64 pid{};
 
         std::list<KThread> threads;
-        std::unique_ptr<UserSpace>& ptb;
+        // https://medium.com/@boutnaru/linux-kernel-mm-struct-fafe50b57837
+        std::unique_ptr<UserSpace>& thisMm;
         SysFs::MetaProgram npdm{};
     };
 }
