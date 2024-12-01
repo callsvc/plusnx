@@ -17,7 +17,8 @@ namespace Plusnx::GenericKernel {
 #endif
     }
     u8 UserSpace::Read8(const u64 vaddr) const {
-        return nxmem->GetGuestSpan(vaddr)[IndexPage(vaddr, SwitchPageSize)];
+        const auto memory{nxmem->GetGuestSpan(vaddr)};
+        return memory[IndexPage(vaddr)];
     }
 
     u32 UserSpace::Read32(const u64 vaddr) const {
@@ -31,7 +32,8 @@ namespace Plusnx::GenericKernel {
     }
 
     void UserSpace::Write8(const u64 vaddr, const u8 value) const {
-        nxmem->GetGuestSpan(vaddr)[IndexPage(vaddr, SwitchPageSize)] = value;
+        auto memory{nxmem->GetGuestSpan(vaddr)};
+        memory[IndexPage(vaddr)] = value;
     }
 
     void UserSpace::Write32(const u64 vaddr, const u32 value) const {

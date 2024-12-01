@@ -46,6 +46,15 @@ namespace Plusnx::SysFs::Nx {
         path = backing->path;
 
         CreateFilesystemEntries();
+
+        for (const auto& [type, file] : GetBackingFiles()) {
+            if (auto testType = file->GetBytes(16); !testType.empty()) {
+                if (type == FsType::PartitionFs)
+                    assert(std::memcmp(testType.data(), "PFS0", 4) == 0);
+                else if (type == FsType::RomFs)
+                    assert(std::memcmp(testType.data(), "P\0\0\0", 4) == 0);
+            }
+        }
     }
 
     bool NcaCore::ValidateMagic(const u32 magic) {
@@ -75,14 +84,6 @@ namespace Plusnx::SysFs::Nx {
                 throw runtime_exception("The entry in the NCA at index {} appears to be corrupted", index);
             }
             CreateBackingFile(entry, header);
-
-            const auto [type, file] = GetBackingFiles().front();
-            if (auto testType = file->GetBytes(16); !testType.empty()) {
-                if (type == FsType::PartitionFs)
-                    assert(std::memcmp(testType.data(), "PFS0", 4) == 0);
-                else if (type == FsType::RomFs)
-                    assert(std::memcmp(testType.data(), "PFS0", 4));
-            }
         }
     }
 
@@ -104,7 +105,7 @@ namespace Plusnx::SysFs::Nx {
             size = header.hashIntegrity.levels.back().size;
         }
 
-        auto EmplaceBacking = [&] (const FileBackingPtr& file) {
+        auto EmplaceBacking = [&] (FileBackingPtr&& file) {
             if (header.type == FsType::RomFs) {
                 romfsList.emplace_back(std::move(file));
             } else if (header.type == FsType::PartitionFs) {
@@ -156,7 +157,8 @@ namespace Plusnx::SysFs::Nx {
 
         const Security::K128 encryptedKey = [&] {
             Security::K128 key{};
-            keys->GetIndexedKey(GetAreaType(content.areaIndex), keyRevision, key.data(), key.size());
+            if (!keys->GetIndexedKey(GetAreaType(content.areaIndex), keyRevision, key.data(), key.size()))
+                throw runtime_exception("Key not found");
 
             u32 indexArea{};
             if (encType == EncryptionType::AesCtrEx ||

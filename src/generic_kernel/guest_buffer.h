@@ -11,10 +11,13 @@ namespace Plusnx::GenericKernel {
         Kernel = 0x00002013,
         Stack = 0x005C3C0B,
     };
-    struct MapReserve {
-        MemoryType type{};
-        u8* user{};
+
+    // https://switchbrew.org/wiki/Kernel#KMemoryBlockInfo
+    struct KMemoryBlockInfo {
+        u8* baseAddress{nullptr};
         u64 size{};
+        MemoryType state{MemoryType::Free};
+        u32 permission{};
     };
 
     struct FlatMap {
@@ -34,16 +37,16 @@ namespace Plusnx::GenericKernel {
         void Allocate(u64 vaddr, u32 flags, MemoryType type, const std::span<u8>& userdata);
         u64 GetUsedResourceSize();
 
-        std::pair<u8*, MapReserve> Search(u64 vaddr);
+        std::pair<u8*, KMemoryBlockInfo> Search(u64 vaddr);
         std::span<u8> GetGuestSpan(u64 vaddr);
     private:
         std::span<u8> backing;
         std::span<u8> guest;
 
         // https://www.boost.org/doc/libs/1_62_0/doc/html/container/non_standard_containers.html#container.non_standard_containers.flat_xxx
-        // boost::container::flat_map<u8*, MapReserve> descriptor;
-        std::map<u8*, MapReserve> descriptor;
+        // boost::container::flat_map<u8*, KMemoryBlockInfo> blocks;
+        std::map<u8*, KMemoryBlockInfo> blocks;
         boost::container::small_vector<FlatMap, 10> flatmap;
-        i32 resource;
+        i32 sharedFd;
     };
 }

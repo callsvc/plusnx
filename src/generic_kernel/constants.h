@@ -3,12 +3,12 @@
 #include <types.h>
 #include <sys/mman.h>
 namespace Plusnx::GenericKernel {
-    constexpr u64 SwitchPageSize{4096};
+    constexpr u64 SwitchPageSize{4 * 1024};
 
     inline auto ClearSwitchPage(const u64 address) {
         return address & ~(SwitchPageSize - 1);
     }
-    inline auto IndexPage(const u64 address, const u64 size) {
+    inline auto IndexPage(const u64 address, const u64 size = SwitchPageSize) {
         auto pageBitsCount{std::countl_zero(size)};
         pageBitsCount = sizeof(std::uint64_t) * 8 - pageBitsCount - 1;
         // ReSharper disable once CppRedundantParentheses

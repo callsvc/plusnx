@@ -29,7 +29,7 @@ namespace Plusnx::SysFs::Nx {
             indexedNca[NcaType{nextNca->type, meta.type}].emplace_back(nextNca);
         }
     }
-    void SubmissionPackage::ImportTicket(const SysPath &filename) const {
+    void SubmissionPackage::ImportTicket(const SysPath& filename) const {
         const auto tikFile{pfs->OpenFile(filename)};
         keys->AddTicket(std::make_unique<Security::Ticket>(tikFile));
     }

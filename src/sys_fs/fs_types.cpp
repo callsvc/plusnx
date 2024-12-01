@@ -16,17 +16,20 @@ namespace Plusnx::SysFs {
         return callback(directory, iterator);
     }
 
-    std::string GetReadableSize(const u64 amount) {
+    std::string GetReadableSize(const u64 size) {
         constexpr std::array formats{"B", "KiB", "MiB", "GiB"};
         u64 format{};
 
-        auto size{static_cast<double>(amount)};
-        for (; size > 0x400; size /= 0x400)
-            format++;
+        auto value = [&format, size] {
+            auto result{static_cast<double>(size)};
+            for (; result > 0x400; result /= 0x400)
+                format++;
+
+            return result;
+        }();
         if (format > std::size(formats))
             return {};
-
-        return std::format("{:.4} {}", size, formats[format]);
+        return std::format("{:.4} {}", value, formats[format]);
     }
 
     void RoDirectoryBacking::ExtractAllFiles(const SysPath& output) {

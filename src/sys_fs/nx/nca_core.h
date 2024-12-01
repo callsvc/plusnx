@@ -152,7 +152,7 @@ namespace Plusnx::SysFs::Nx {
 
         ContentType type;
         SysPath path;
-        bool rights;
+        bool rights{};
 
     private:
         void CreateFilesystemEntries();
