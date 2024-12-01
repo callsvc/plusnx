@@ -7,7 +7,7 @@ namespace Plusnx::Video::VkRender {
         u32 layersCount;
 
         if (vk::enumerateInstanceLayerProperties(&layersCount, nullptr) != vk::Result::eSuccess)
-            throw runtime_plusnx_except("VK: Failed to capture the supported layers");
+            throw runtime_exception("VK: Failed to capture the supported layers");
 
         if (!layersCount)
             return;

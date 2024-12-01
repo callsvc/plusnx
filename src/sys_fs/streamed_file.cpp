@@ -10,7 +10,7 @@ namespace Plusnx::SysFs {
         if (type == CounterType::Write)
             return wrPos += count;
 
-        throw runtime_plusnx_except("Invalid skip operation");
+        throw runtime_exception("Invalid skip operation");
     }
     u64 StreamedFile::GetCursor(const CounterType type) const {
         return type == CounterType::Read ? rdPos : wrPos;
@@ -23,7 +23,7 @@ namespace Plusnx::SysFs {
     u64 StreamedFile::ReadImpl(void* output, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
         if (rdPos + offset > GetSize()) {
-            throw runtime_plusnx_except("Offset out");
+            throw runtime_exception("Offset out");
         }
         const auto result{backing->Read(output, size, rdPos + offset)};
 

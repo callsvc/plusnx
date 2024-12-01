@@ -13,7 +13,6 @@ namespace Plusnx::GenericKernel::Base {
         std::lock_guard lock(refLock);
         assert(refs);
 
-        if (!refs)
-            ;
+        if (!refs) {}
     }
 }

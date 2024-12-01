@@ -23,7 +23,7 @@ namespace Plusnx::Loader {
                 return "32GB";
 
             default:
-                throw runtime_plusnx_except("Unknown memory size");
+                throw runtime_exception("Unknown memory size");
         }
     }
 
@@ -58,7 +58,7 @@ namespace Plusnx::Loader {
         }
     }
 
-    void Cartridge::Load(std::shared_ptr<Core::Context>& context) {
+    void Cartridge::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
     }
 
     SysFs::FileBackingPtr Cartridge::GetNpdm() const {

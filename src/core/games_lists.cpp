@@ -12,7 +12,7 @@ namespace Plusnx::Core {
                 auto here{directory.GetPath()};
                 auto there{already.string()};
                 if (here.contains(there))
-                    throw runtime_plusnx_except("Recursion detected, the user must be joking");
+                    throw runtime_exception("Recursion detected, the user must be joking");
             }
             auto content{directory.ListAllFiles()};
             marked.emplace_back(directory.path);

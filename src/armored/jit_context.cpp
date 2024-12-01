@@ -6,7 +6,7 @@ namespace Plusnx::Armored {
     JitContext::JitContext(const GuestCpuType guest) {
         type = guest;
         if (type == GuestCpuType::Arm32) {
-            throw runtime_plusnx_except("The JIT for ARM32 has not been implemented yet");
+            throw runtime_exception("The JIT for ARM32 has not been implemented yet");
         }
 
         details = std::make_shared<Arm64Details>();

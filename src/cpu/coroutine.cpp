@@ -14,7 +14,7 @@ namespace Plusnx::Cpu {
     // https://www.felixcloutier.com/x86/stmxcsr
     // https://www.felixcloutier.com/x86/fldcw
 
-    __attribute__((naked)) void CoroutinePool::SaveRestoreAndJump(void* prev, void* next) {
+    __attribute__((naked)) void CoroutinePool::SaveRestoreAndJump([[maybe_unused]] void* prev, [[maybe_unused]] void* next) {
         __asm("mov %rsp, 0x0(%rdi)");
         __asm("mov %r15, 0x8(%rdi)");
         __asm("mov %r14, 0x10(%rdi)");
@@ -68,7 +68,7 @@ namespace Plusnx::Cpu {
 #endif
         for (const auto& gthread: storage->grths | std::views::values) {
             if (gthread.rng && gthread.state == ReusableState::Running)
-                throw runtime_plusnx_except("Coroutine {} is still running", gthread.rng);
+                throw runtime_exception("Coroutine {} is still running", gthread.rng);
         }
 
         {

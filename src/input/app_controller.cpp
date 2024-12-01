@@ -2,9 +2,7 @@
 #include <input/app_controller.h>
 
 namespace Plusnx::Input {
-    AppController::AppController(const std::shared_ptr<Core::Context>& context) :
-        hidBridge(std::make_shared<SharedHidBridge>(context)) {
-
+    AppController::AppController(const std::shared_ptr<Core::Context>& context) : kHid(std::make_unique<GenericKernel::Types::KSharedMemory>(*context->kernel)) {
         pthread_setname_np(pthread_self(), "Input Thread");
     }
     void AppController::Initialize(std::unique_ptr<FrontendUserControllerDriver>&& controller) {

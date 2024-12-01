@@ -8,6 +8,7 @@ namespace Plusnx::SysFs {
         switch (mode) {
             case FileMode::Write:
                 encrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, false);
+                [[fallthrough]];
             case FileMode::Read:
                 decrypt.emplace(key.data(), key.size(), Security::OperationMode::CtrAes, true);
             default: {}
@@ -44,7 +45,7 @@ namespace Plusnx::SysFs {
 
     u64 CtrBacking::WriteImpl(const void* input, const u64 size, const u64 offset) {
         if (!encrypt || mode != FileMode::Write)
-            throw runtime_plusnx_except("This CTR bank is not writable");
+            throw runtime_exception("This CTR bank is not writable");
         assert(offset % 16 == 0);
         UpdateNonce(offset + file.offset);
 

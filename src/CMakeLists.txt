@@ -90,8 +90,6 @@ target_sources(plusnx-core PUBLIC
     input/sdl_inputs.cpp
     input/sdl_inputs.h
     input/controller_types.h
-    input/shared_hid_memory.cpp
-    input/shared_hid_memory.h
     core/application.cpp
     core/application.h
     core/context.cpp
@@ -170,8 +168,8 @@ target_sources(plusnx-core PUBLIC
     details/allocators.h
     driver.cpp
     container.h
-    runtime_plusnx_except.cpp
-    runtime_plusnx_except.h
+    runtime_exception.cpp
+    runtime_exception.h
     types.cpp
     types.h
 )

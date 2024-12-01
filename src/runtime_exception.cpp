@@ -2,7 +2,7 @@
 #include <execinfo.h>
 
 #include <ranges>
-#include <runtime_plusnx_except.h>
+#include <runtime_exception.h>
 #include <types.h>
 namespace Plusnx {
     inline void GetCallStack(std::vector<void*>& tracer, std::map<void*, std::string>& symbols) {
@@ -29,7 +29,7 @@ namespace Plusnx {
     }
 
     constexpr auto SymbolNameSize{0x50};
-    void runtime_plusnx_except::PrintPrettyMessage() const {
+    void runtime_exception::PrintPrettyMessage() const {
         for (const auto& function : GetStackTrace()) {
             std::print("{}\n", function);
         }
@@ -39,7 +39,7 @@ namespace Plusnx {
 #endif
     }
 
-    std::vector<std::string> runtime_plusnx_except::GetStackTrace() {
+    std::vector<std::string> runtime_exception::GetStackTrace() {
         std::vector<std::string> result;
 
         std::vector<void*> tracer(32);

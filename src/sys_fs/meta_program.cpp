@@ -45,7 +45,7 @@ namespace Plusnx::SysFs {
         metaFile(std::make_unique<StreamedFile>(npdm)) {
 
         if (metaFile->Read(content) != sizeof(content))
-            throw runtime_plusnx_except("Cannot read NPDM content");
+            throw runtime_exception("Cannot read NPDM content");
         assert(content.magic == metaMagics[0]);
         title.emplace(content.titleName.data());
 

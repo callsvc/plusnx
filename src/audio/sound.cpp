@@ -16,6 +16,10 @@ namespace Plusnx::Audio {
 
         output = std::make_unique<OutputDevice>();
         input = std::make_unique<InputDevice>();
+
+#if 1
+        output->Start();
+#endif
     }
 
     Sound::~Sound() {

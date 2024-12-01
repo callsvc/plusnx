@@ -11,14 +11,14 @@
 
 namespace Plusnx {
     using namespace std::chrono_literals;
-    class runtime_plusnx_except final : public std::runtime_error {
+    class runtime_exception final : public std::runtime_error {
     public:
         template <typename... Args>
-        runtime_plusnx_except(const std::format_string<Args...>& format, Args&&... args) :
+        runtime_exception(const std::format_string<Args...>& format, Args&&... args) :
             std::runtime_error(std::format(format, std::forward<Args>(args)...)) {
             PrintPrettyMessage();
         }
-        runtime_plusnx_except(const std::string& error) : std::runtime_error(error) {
+        runtime_exception(const std::string& error) : std::runtime_error(error) {
             PrintPrettyMessage();
         }
 

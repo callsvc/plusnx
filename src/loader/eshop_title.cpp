@@ -21,7 +21,7 @@ namespace Plusnx::Loader {
 
 #if 1
         if (const auto damaged = VerifyTitleIntegrity())
-            throw runtime_plusnx_except("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
+            throw runtime_exception("The NSP file is apparently corrupted, damaged file: {}", damaged->string());
 #endif
 
         if (nsp)
@@ -34,7 +34,7 @@ namespace Plusnx::Loader {
         const auto gameFs{std::make_shared<SysFs::FSys::RigidDirectory>(path, true)};
         for (const auto& dirpath : {"exefs", "romfs", "control"}) {
             if (const auto directory{gameFs->CreateSubDirectory(dirpath)}; !directory)
-                throw runtime_plusnx_except("Failed to create directory: {}", SysFs::SysPath{gameFs->path / dirpath}.string());
+                throw runtime_exception("Failed to create directory: {}", SysFs::SysPath{gameFs->path / dirpath}.string());
         }
 
         exefs->ExtractAllFiles(gameFs->path / "exefs");

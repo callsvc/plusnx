@@ -8,6 +8,6 @@ namespace Plusnx::Audio {
         Device::Stop();
     }
 
-    void InputDevice::HandleAudioEvent(const std::span<u8>& stream) {
+    void InputDevice::HandleAudioEvent([[maybe_unused]] const std::span<u8>& stream) {
     }
 }

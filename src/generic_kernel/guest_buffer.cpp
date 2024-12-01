@@ -10,7 +10,6 @@
 #include <generic_kernel/guest_buffer.h>
 namespace Plusnx::GenericKernel {
     constexpr auto MemoryBackingName{"BackingMemory"};
-
     GuestBuffer::GuestBuffer(const u64 virtSize, const u64 backSize) {
         constexpr auto flags{MemoryProtection::Read | MemoryProtection::Write};
         resource = shm_open(MemoryBackingName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);

@@ -19,7 +19,7 @@ namespace Plusnx::Loader {
             case AppType::GameFs:
                 return "GameFS";
             default:
-                throw runtime_plusnx_except("Unknown app type");
+                throw runtime_exception("Unknown app type");
         }
     }
 
@@ -53,7 +53,7 @@ namespace Plusnx::Loader {
     void AppLoader::DisplaySection(const SectionType type) const {
         std::stringstream ss;
         if (type == SectionType::Text)
-            throw runtime_plusnx_except("Text sections are not supported");
+            throw runtime_exception("Text sections are not supported");
 
         ss << StringViewBuilder(GetExeSection(type));
         std::print("{}\n", ss.str());

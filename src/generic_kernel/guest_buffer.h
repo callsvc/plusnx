@@ -12,9 +12,9 @@ namespace Plusnx::GenericKernel {
         Stack = 0x005C3C0B,
     };
     struct MapReserve {
-        MemoryType type;
-        u8* user;
-        u64 size;
+        MemoryType type{};
+        u8* user{};
+        u64 size{};
     };
 
     struct FlatMap {

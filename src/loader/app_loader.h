@@ -46,7 +46,7 @@ namespace Plusnx::Loader {
         virtual void Load(std::shared_ptr<Core::Context>& context) = 0;
 
         virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const { return {}; }
-        virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs(bool isControl) const { return {}; }
+        virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs([[maybe_unused]] bool isControl) const { return {}; }
         virtual SysFs::FileBackingPtr GetNpdm() const { return {}; }
 
         AppType type{};
@@ -58,7 +58,7 @@ namespace Plusnx::Loader {
         bool CheckHeader(const SysFs::FileBackingPtr& file);
         static void DisplayRomFsContent(const std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem>& content);
 
-        virtual std::span<u8> GetExeSection(SectionType type) const { return {}; }
+        virtual std::span<u8> GetExeSection([[maybe_unused]] SectionType type) const { return {}; }
         void DisplaySection(SectionType type) const;
     };
 }

@@ -13,32 +13,29 @@ namespace Plusnx::SysFs {
     };
 
     struct NpdmHeader {
-        u32 magic; // Always "META"
-        union {
-            Security::KeyGeneration value;
-            std::array<u8, 4> generation;
-        };
-        u32 pad1;
+        u32 magic{}; // Always "META"
+        i32 keyGeneration{};
+        u32 pad0{};
 
         struct Flags {
-            u32 is64BitInstruction : 1;
-            GenericKernel::AddressSpaceType addressSpace : 3;
-            u32 optimizeMemoryAllocation : 1;
-            u32 disableDeviceAsMerge : 1;
-            u32 enableAliasRegionExtraSize : 1;
-            u32 pad0 : 1; // [19.0.0+] PreventCodeReads
-        } flags;
+            u32 is64BitInstruction : 1 = {};
+            GenericKernel::AddressSpaceType addressSpace : 3 = {};
+            u32 optimizeMemoryAllocation : 1 = {};
+            u32 disableDeviceAsMerge : 1 = {};
+            u32 enableAliasRegionExtraSize : 1 = {};
+            u32 pad0 : 1 = {}; // [19.0.0+] PreventCodeReads
+        } flags{};
 
-        u8 pad2;
-        u8 mainThreadPriority;
-        u8 defaultCoreId;
-        u32 pad3;
-        u32 systemResourceSize;
-        u32 version;
-        u32 mainThreadStackSize;
-        std::array<char, 0x50> titleName;
-        SectionAddr aci0;
-        SectionAddr acid;
+        u8 pad1{};
+        u8 mainThreadPriority{};
+        u8 defaultCoreId{};
+        u32 pad2{};
+        u32 systemResourceSize{};
+        u32 version{};
+        u32 mainThreadStackSize{};
+        std::array<char, 0x50> titleName{"Application"};
+        SectionAddr aci0{};
+        SectionAddr acid{};
     };
     static_assert(sizeof(NpdmHeader) == 0x80);
 

@@ -40,12 +40,12 @@ namespace Plusnx::Cpu {
 
         struct {
 #if defined(__x86_64__)
-            u64 rsp;
-            u64 r15, r14, r13, r12;
-            u64 rbx;
-            u64 rbp;
-            u32 mxcsr;
-            u16 fpu;
+            u64 rsp{};
+            u64 r15{}, r14{}, r13{}, r12{};
+            u64 rbx{};
+            u64 rbp{};
+            u32 mxcsr{};
+            u16 fpu{};
 #endif
         } thread;
 

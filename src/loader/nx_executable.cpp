@@ -68,12 +68,12 @@ namespace Plusnx::Loader {
                 return content.ro;
             if (type == SectionType::Data)
                 return content.data;
-            throw runtime_plusnx_except("Invalid section type");
+            throw runtime_exception("Invalid section type");
         }();
 
         const std::span result(&program[offset], size);
         if (nro->Read(result.data(), result.size(), fileOffset) != size)
-            throw runtime_plusnx_except("Cannot read section");
+            throw runtime_exception("Cannot read section");
 
         return result;
     }
@@ -98,6 +98,6 @@ namespace Plusnx::Loader {
         if (type == SectionType::Data)
             return dataSection;
 
-        throw runtime_plusnx_except("The BSS section is invalid for this type of executable");
+        throw runtime_exception("The BSS section is invalid for this type of executable");
     }
 }

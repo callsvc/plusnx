@@ -24,7 +24,7 @@ namespace Plusnx::SysFs::Nx {
 
             cipher->Decrypt(content, counter, SectorSize);
             if (!ValidateMagic(content.magic))
-                throw runtime_plusnx_except("Corrupted or invalid NCA");
+                throw runtime_exception("Corrupted or invalid NCA");
 
             assert(content.size == nca->GetSize());
         }
@@ -72,7 +72,7 @@ namespace Plusnx::SysFs::Nx {
             checksum.Finish(result);
 
             if (!IsEmpty(content.headersSum[index]) && !IsEqual(result, content.headersSum[index])) {
-                throw runtime_plusnx_except("The entry in the NCA at index {} appears to be corrupted", index);
+                throw runtime_exception("The entry in the NCA at index {} appears to be corrupted", index);
             }
             CreateBackingFile(entry, header);
 
@@ -220,7 +220,7 @@ namespace Plusnx::SysFs::Nx {
 
         const auto stream{std::make_unique<StreamedFile>(backing)};
         if (!stream)
-            throw runtime_plusnx_except("The current NCA does not have valid backing");
+            throw runtime_exception("The current NCA does not have valid backing");
 #if 1
         // Skipping files larger than 512MiB for now
         if (stream->GetSize() > 512 * 1024 * 1024)

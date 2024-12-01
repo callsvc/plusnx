@@ -13,7 +13,7 @@ namespace Plusnx::Loader {
     }
     void GameFs::RegenerateGfs() const {
         const auto files{backing->ListAllFiles()};
-        auto metaGfs{SysFs::StreamedFile(backing->CreateFile("meta-gfs.txt"))};
+        auto metaGfs{SysFs::StreamedFile(backing->CreateFile("gamefs.txt"))};
         for (const auto& file : files) {
             metaGfs << std::format("{}\n", file.string());
         }
