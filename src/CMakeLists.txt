@@ -2,46 +2,177 @@ cmake_minimum_required(VERSION 3.29)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(plusnx)
+target_include_directories(plusnx-core PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/>
+    $<INSTALL_INTERFACE:>
+)
+
 target_sources(plusnx PRIVATE
-    audio/speaker.cpp
-    audio/speaker.h
-    video/gpu.cpp
-    video/gpu.h
-    video/vk/vulkan_types.cpp
-    video/vk/vulkan_types.h
-    video/vk/instance.cpp
-    video/vk/instance.h
+    main.cpp
+    nogui/sdl_vulkan_backing.cpp
+    nogui/sdl_vulkan_backing.h
+    nogui/sdl_window.cpp
+    nogui/sdl_window.h
+)
+
+target_sources(plusnx-core PUBLIC
+    armored/arm_types.h
+    armored/code_blocks.cpp
+    armored/code_blocks.h
+    armored/cpu_context.cpp
+    armored/cpu_context.h
+    armored/jit_context.cpp
+    armored/jit_context.h
+    armored/arm64_emitter_context.cpp
+    armored/arm64_emitter_context.h
+    armored/emitter_interface.cpp
+    armored/emitter_interface.h
+    armored/emitter_details.h
+    armored/arm64_details.cpp
+    armored/arm64_details.h
+    audio/output_device.cpp
+    audio/output_device.h
+    audio/input_device.cpp
+    audio/input_device.h
+    audio/output_device.cpp
+    audio/output_device.h
+    audio/device.cpp
+    audio/device.h
+    audio/sound.cpp
+    audio/sound.h
+    platform/hostx1.cpp
+    platform/hostx1.h
+    platform/syncpoint_ctl.cpp
+    platform/syncpoint_ctl.h
+    video/tegrax1_gpu.cpp
+    video/tegrax1_gpu.h
+    video/vk_render/app_instance.cpp
+    video/vk_render/app_instance.h
+    video/vk_render/graphics_device.cpp
+    video/vk_render/graphics_device.h
+    video/graphics_types.h
     sys_fs/provider.cpp
     sys_fs/provider.h
     sys_fs/assets.cpp
     sys_fs/assets.h
     sys_fs/fs_types.h
+    sys_fs/fs_types.cpp
     sys_fs/fsys/rigid_directory.cpp
     sys_fs/fsys/rigid_directory.h
+    sys_fs/fsys/regular_file.cpp
+    sys_fs/fsys/regular_file.h
     sys_fs/nx/partition_filesystem.cpp
     sys_fs/nx/partition_filesystem.h
-    nogui/sdl_vulkan_backing.cpp
-    nogui/sdl_vulkan_backing.h
+    sys_fs/nx/readonly_filesystem.cpp
+    sys_fs/nx/readonly_filesystem.h
+    sys_fs/nx/submission_package.cpp
+    sys_fs/nx/submission_package.h
+    sys_fs/nx/nca_core.cpp
+    sys_fs/nx/nca_core.h
+    sys_fs/nx/nso_core.cpp
+    sys_fs/nx/nso_core.h
+    sys_fs/nx/content_metadata.cpp
+    sys_fs/nx/content_metadata.h
+    sys_fs/ext/fake_romfs.cpp
+    sys_fs/ext/fake_romfs.h
+    sys_fs/ext/nso_modules.cpp
+    sys_fs/ext/nso_modules.h
+    sys_fs/layered_fs.cpp
+    sys_fs/layered_fs.h
+    sys_fs/streamed_file.cpp
+    sys_fs/streamed_file.h
+    sys_fs/meta_program.cpp
+    sys_fs/meta_program.h
+    sys_fs/ctr_backing.cpp
+    sys_fs/ctr_backing.h
+    input/app_controller.cpp
+    input/app_controller.h
+    input/sdl_inputs.cpp
+    input/sdl_inputs.h
+    input/controller_types.h
     core/application.cpp
     core/application.h
     core/context.cpp
     core/context.h
     core/games_lists.cpp
     core/games_lists.h
+    core/telemetry_collector.cpp
+    core/telemetry_collector.h
+    core/configs.cpp
+    core/configs.h
+    core/process_qol.cpp
+    core/process_qol.h
     cpu/core_container.cpp
     cpu/core_container.h
+    cpu/features.cpp
+    cpu/features.h
+    cpu/coroutine.cpp
+    cpu/coroutine.h
     cpu/unit_types.h
-    kmo/types/kprocess.cpp
-    kmo/types/kprocess.h
-    kmo/types/kthread.cpp
-    kmo/types/kthread.h
-    kmo/kernel.cpp
-    kmo/kernel.h
-    main.cpp
+    generic_kernel/base/auto_types.h
+    generic_kernel/base/kauto_object.cpp
+    generic_kernel/base/kauto_object.h
+    generic_kernel/types/kprocess.cpp
+    generic_kernel/types/kprocess.h
+    generic_kernel/types/kthread.cpp
+    generic_kernel/types/kthread.h
+    generic_kernel/types/kshared_memory.cpp
+    generic_kernel/types/kshared_memory.h
+    generic_kernel/kernel.cpp
+    generic_kernel/kernel.h
+    generic_kernel/user_space.cpp
+    generic_kernel/user_space.h
+    generic_kernel/address_space.cpp
+    generic_kernel/address_space.h
+    generic_kernel/guest_buffer.cpp
+    generic_kernel/guest_buffer.h
+    generic_kernel/constants.h
+    loader/app_loader.cpp
+    loader/app_loader.h
+    loader/eshop_title.cpp
+    loader/eshop_title.h
+    loader/cartridge.cpp
+    loader/cartridge.h
+    loader/nx_executable.cpp
+    loader/nx_executable.h
+    loader/game_fs.cpp
+    loader/game_fs.h
+    loader/main_executable.cpp
+    loader/main_executable.h
+    loader/content_archive.cpp
+    loader/content_archive.h
+    os/nx_sys.cpp
+    os/nx_sys.h
+    os/process_creator.cpp
+    os/process_creator.h
+    os/sdk/control_property.cpp
+    os/sdk/control_property.h
+    os/make_loader.cpp
+    os/make_loader.h
+    services/settings/languages.cpp
+    services/settings/languages.h
+    security/checksum.cpp
+    security/checksum.h
+    security/cipher_cast.cpp
+    security/cipher_cast.h
+    security/key_types.cpp
+    security/key_types.h
+    security/keyring.cpp
+    security/keyring.h
+    security/signatures.cpp
+    security/signatures.h
+    security/ticket.cpp
+    security/ticket.h
+    details/perf_measure.cpp
+    details/perf_measure.h
+    details/allocators.h
     driver.cpp
     container.h
+    runtime_exception.cpp
+    runtime_exception.h
+    types.cpp
     types.h
 )
 
-target_link_libraries(plusnx PRIVATE Vulkan::Headers Vulkan::Vulkan SDL2)
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt)
+target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

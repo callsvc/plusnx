@@ -1,3 +1,21 @@
 [submodule "externals/Vulkan-Headers"]
 	path = externals/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "externals/boost"]
+	path = externals/boost
+	url = https://github.com/callsvc/boost.git
+[submodule "externals/mbedtls"]
+	path = externals/mbedtls
+	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "externals/toml11"]
+	path = externals/toml11
+	url = https://github.com/ToruNiina/toml11.git
+[submodule "externals/sqlite3"]
+	path = externals/sqlite3
+	url = https://github.com/callsvc/sqlite3.git
+[submodule "externals/lz4"]
+	path = externals/lz4
+	url = https://github.com/lz4/lz4.git
+[submodule "externals/fmt"]
+	path = externals/fmt
+	url = https://github.com/fmtlib/fmt.git

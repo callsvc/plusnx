@@ -1,20 +1,24 @@
 #pragma once
-
 #include <unordered_map>
 
-#include <types.h>
 #include <sys_fs/fs_types.h>
+#include <sys_fs/fsys/regular_file.h>
 namespace Plusnx::SysFs {
 
-    constexpr std::string rootPathId{"system"};
+    constexpr std::string RootId{"Root"};
     class Provider {
     public:
         Provider();
         [[nodiscard]] SysPath GetRoot() const;
 
-        void RegisterSystemPath(const SysPath& directory);
+        void RegisterSystemPath(const std::string& card, const SysPath& directory);
+        FileBackingPtr OpenSystemFile(const std::string& card, const SysPath& fullpath);
+        FileBackingPtr CreateSystemFile(const std::string& card, const SysPath& fullpath);
+        void RemoveCachedFile(const SysPath& path) const;
+
+        std::unordered_map<std::string, std::vector<SysPath>> dirs;
+        std::vector<FileBackingPtr> cachedFiles;
     private:
-        std::unordered_map<std::string, SysPath> dirs;
         u64 opened{};
         u64 fileMax{};
     };
