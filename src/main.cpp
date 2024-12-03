@@ -55,6 +55,8 @@ i32 main(const i32 argc, const char** argv) {
 
     app->ClearUiEvents();
 
+    std::print("Total memory in use: {}\n", SysFs::GetReadableSize(app->GetTotalMemoryUsage() * 1024));
+
     while (!quit) {
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)

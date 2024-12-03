@@ -1,13 +1,14 @@
 #include <print>
 #include <unistd.h>
+#include <sys/resource.h>
 #include <boost/regex.hpp>
 
 #include <security/keyring.h>
-#include <core/context.h>
 
 #include <os/nx_sys.h>
 #include <os/make_loader.h>
 
+#include <core/context.h>
 #include <core/telemetry_collector.h>
 #include <core/application.h>
 namespace Plusnx::Core {
@@ -111,6 +112,29 @@ namespace Plusnx::Core {
         const auto target{context->assets->GetPlusnxFilename(SysFs::PlusnxDirectoryType::Telemetry)};
         const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
         collector.CommitToFile(outputFile);
+    }
+
+    u64 Application::GetTotalMemoryUsage() {
+        SysFs::FSys::RegularFile status{"/proc/self/status"};
+        if (!status)
+            return {};
+
+        auto content{status.GetChars(4 * 512)};
+        const std::string process{content.data(), content.size()};
+
+        const boost::regex vmm{R"(VmRSS:\s+(\d+)\s+kB)"};
+
+        boost::smatch match;
+        if (regex_search(process, match, vmm)) {
+            u64 result{};
+            if (const auto vmSize(match[1].str()); !vmSize.empty())
+                std::from_chars(vmSize.begin().base(), vmSize.end().base(), result);
+            return result;
+        }
+
+        rusage rusage;
+        getrusage(RUSAGE_SELF, &rusage);
+        return rusage.ru_maxrss;
     }
 
     void Application::ClearUiEvents() const {

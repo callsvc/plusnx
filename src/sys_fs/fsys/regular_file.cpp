@@ -50,9 +50,10 @@ namespace Plusnx::SysFs::FSys {
 #if !defined(_NDEBUG)
         std::memset(output, 0, size);
 #endif
+        errno = 0;
 
         const auto content{static_cast<u8 *>(output)};
-        const std::array<SysPath, 1> SpecialInvalidSizeFiles{"/dev/urandom"};
+        const std::array<SysPath, 2> SpecialInvalidSizeFiles{"/dev/urandom", "/proc/self/status"};
         const auto realFile{!ContainsValue(SpecialInvalidSizeFiles, path)};
 
         while (copied < size) {
@@ -61,14 +62,15 @@ namespace Plusnx::SysFs::FSys {
                 return stride;
 
             const auto result{pread64(descriptor, &content[copied], stride, falling)};
-            if (static_cast<u64>(result) != stride && errno) {
-                throw runtime_exception("Error reading {:#x} bytes from descriptor {}, due to {}\n", size, descriptor, GetOsErrorString());
-            }
-            if (static_cast<u64>(result) < stride)
-                break;
 
             copied += result;
             falling += result;
+
+            if (static_cast<u64>(result) < stride) {
+                if (result <= 0 && errno)
+                    throw runtime_exception("Error reading {:X} bytes from descriptor {}, due to {}", size, descriptor, GetOsErrorString());
+                break;
+            }
         }
         return copied;
     }
@@ -83,6 +85,7 @@ namespace Plusnx::SysFs::FSys {
                 if (errno)
                     throw runtime_exception(GetOsErrorString());
         }
+
         return pwrite64(descriptor, input, size, offset);
     }
 }

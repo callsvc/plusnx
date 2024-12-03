@@ -54,7 +54,7 @@ namespace Plusnx::SysFs::Nx {
     }
 
     StringTable::StringTable(const u32 offset, const u32 size, const FileBackingPtr& pfs) : offset(offset), size(size) {
-        table = pfs->GetBytes<char>(size, offset);
+        table = pfs->GetChars(size, offset);
     }
     std::string StringTable::ReadString(const u32 offset) const {
         if (offset > table.size())

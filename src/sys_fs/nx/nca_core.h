@@ -63,8 +63,7 @@ namespace Plusnx::SysFs::Nx {
             u64 size;
         };
         std::array<LayerRegion, 2> regions;
-        std::array<LayerRegion, 3> pad0;
-        std::array<u8, 0x80> pad1;
+        std::array<u8, 0xB0> pad0;
 
     };
     struct IntegrityMetaInfo {
@@ -163,7 +162,7 @@ namespace Plusnx::SysFs::Nx {
         u64 GetKeyRevision() const;
 
         std::optional<Security::CipherCast> cipher;
-        const std::shared_ptr<Security::Keyring>& keys;
+        const std::shared_ptr<Security::Keyring> keys;
         const FileBackingPtr backing;
 
         NcaHeader content;

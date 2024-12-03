@@ -37,7 +37,7 @@ namespace Plusnx::SysFs::Nx {
     }
 
     void AppendEntryName(const FileBackingPtr& romfs, SysPath& path, const u64 length, const u64 offset) {
-        const auto dirName{romfs->GetBytes<char>(boost::alignment::align_up(length, 4), offset)};
+        const auto dirName{romfs->GetChars(boost::alignment::align_up(length, 4), offset)};
         path.append(std::string_view(dirName.data(), length));
     }
 

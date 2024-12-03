@@ -96,13 +96,16 @@ namespace Plusnx::SysFs::Nx {
             offset += header.hash256.regions.back().offset;
             size = header.hash256.regions.back().size;
 
-            assert(size < entry.endOffset * 0x200);
         }
         if (header.hashType == HashType::HierarchicalIntegrityHash) {
             assert(header.hashIntegrity.magic == ConstMagic<u32>("IVFC"));
             assert(header.hashIntegrity.maxLayers == 7);
+
             offset += header.hashIntegrity.levels.back().offset;
             size = header.hashIntegrity.levels.back().size;
+        }
+        if (offset + size > entry.endOffset * 0x200) {
+            assert(size < content.size);
         }
 
         auto EmplaceBacking = [&] (FileBackingPtr&& file) {
@@ -113,7 +116,7 @@ namespace Plusnx::SysFs::Nx {
             }
         };
 
-        std::array<u8, 16> ctr{};
+        std::array<u8, 0x10> ctr{};
         const auto generation{boost::endian::endian_reverse(header.generation)};
         const auto secure{boost::endian::endian_reverse(header.secureValue)};
         std::memcpy(&ctr[0], &secure, 4);

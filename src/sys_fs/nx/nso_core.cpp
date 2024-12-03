@@ -63,7 +63,7 @@ namespace Plusnx::SysFs::Nx {
         }
 
         if (content.moduleNameSize && !moduleName) {
-            const auto module{backing->GetBytes<char>(content.moduleNameSize, content.moduleNameOffset)};
+            const auto module{backing->GetChars(content.moduleNameSize, content.moduleNameOffset)};
             moduleName.emplace(module.data());
         }
     }

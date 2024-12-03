@@ -9,8 +9,7 @@
 #include <runtime_exception.h>
 namespace Plusnx {
     using u64 = std::uint64_t;
-
-    void ActivateTrap();
+    using i64 = std::int64_t;
 
     using u32 = std::uint32_t;
     using i32 = std::int32_t;
@@ -19,6 +18,8 @@ namespace Plusnx {
     using i16 = std::int16_t;
     using u8 = std::uint8_t;
     using i8 = std::int8_t;
+
+    void ActivateTrap();
 
     template<typename T> requires(std::is_integral_v<T>)
     class Range {

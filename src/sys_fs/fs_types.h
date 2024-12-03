@@ -57,6 +57,16 @@ namespace Plusnx::SysFs {
             return *this;
         }
 
+        std::vector<char> GetChars(const u64 requested, const u64 offset = 0) {
+            std::vector<char> content(requested);
+            const auto result{ReadImpl(content.data(), content.size(), offset)};
+
+            if (result != content.size()) {
+                content.resize(result);
+                content.shrink_to_fit();
+            }
+            return content;
+        }
         template <typename T = char> requires std::is_trivial_v<T>
         std::vector<T> GetBytes(const u64 requested, const u64 offset = 0) {
             if (requested > GetSize())

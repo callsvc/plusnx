@@ -27,7 +27,7 @@ namespace Plusnx::SysFs {
 
             return result;
         }();
-        if (format > std::size(formats))
+        if (format >= std::size(formats))
             return {};
         return std::format("{:.4} {}", value, formats[format]);
     }

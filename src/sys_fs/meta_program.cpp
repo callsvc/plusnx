@@ -89,7 +89,7 @@ namespace Plusnx::SysFs {
 
     void MetaProgram::DisplayBinaryInformation() const {
         std::print("Used address space: {} Bits\n", GetHostBitsCount(addressType));
-        std::print("Main stack size: {:#x}\n", content.mainThreadStackSize);
+        std::print("Main stack size: {:X}\n", content.mainThreadStackSize);
         std::print("Thread priority range: {}\n", std::string(priorities.first));
         std::print("Default initial CPU ID: {}\n", content.defaultCoreId);
         std::print("Title Name: {}\n", *title);

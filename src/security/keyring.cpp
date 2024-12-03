@@ -76,7 +76,7 @@ namespace Plusnx::Security {
         assert(type == KeyType::Title ? titles.empty() : prods.empty());
         std::vector<std::string_view> pairs;
 
-        const auto content{file->GetBytes<char>(file->GetSize())};
+        const auto content{file->GetChars(file->GetSize())};
 
         split(pairs, std::string_view(content.data(), content.size()), boost::is_any_of("=\n"));
         if (pairs.size() % 2)
