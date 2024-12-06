@@ -23,7 +23,7 @@ namespace Plusnx::SysFs {
             u32 optimizeMemoryAllocation : 1 = {};
             u32 disableDeviceAsMerge : 1 = {};
             u32 enableAliasRegionExtraSize : 1 = {};
-            u32 pad0 : 1 = {}; // [19.0.0+] PreventCodeReads
+            u32 preventCodeReads : 1 = {}; // [19.0.0+]
         } flags{};
 
         u8 pad1{};
@@ -77,6 +77,8 @@ namespace Plusnx::SysFs {
         MetaProgram(const FileBackingPtr& npdm);
 
         void DisplayBinaryInformation() const;
+
+        void Populate(GenericKernel::Svc::CreateProcessParameter& creation) const;
 
         GenericKernel::AddressSpaceType addressType{};
         std::optional<std::string> title;

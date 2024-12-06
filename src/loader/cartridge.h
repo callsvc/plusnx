@@ -47,7 +47,7 @@ namespace Plusnx::Loader {
     class Cartridge final : public AppLoader {
     public:
         Cartridge(const std::shared_ptr<Security::Keyring>& _keys, const SysFs::FileBackingPtr& xci);
-        void Load(std::shared_ptr<Core::Context>& context) override;
+        std::optional<ProcessLoadResult> Load(std::shared_ptr<Core::Context>& context) override;
 
         std::unique_ptr<SysFs::Nx::PartitionFilesystem> pfs;
         SysFs::FileBackingPtr GetNpdm() const override;

@@ -58,7 +58,8 @@ namespace Plusnx::Loader {
         }
     }
 
-    void Cartridge::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
+    std::optional<ProcessLoadResult> Cartridge::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
+        return {};
     }
 
     SysFs::FileBackingPtr Cartridge::GetNpdm() const {

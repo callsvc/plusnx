@@ -48,9 +48,9 @@ namespace Plusnx::Loader {
         return true;
     }
 
-    void EShopTitle::Load(std::shared_ptr<Core::Context>& context) {
+    std::optional<ProcessLoadResult> EShopTitle::Load(std::shared_ptr<Core::Context>& context) {
         if (!exefs)
-            return;
+            return {};
 
         const auto& process{context->process};
         auto modules{exefs->ListAllFiles()};
@@ -58,20 +58,27 @@ namespace Plusnx::Loader {
         modules.erase(std::ranges::find(modules, "main.npdm"));
 
         SysFs::Ext::NsoModules nsoHolder;
-        std::vector<SysFs::FileBackingPtr> files;
+        const auto files{nsoHolder.OrderExecutableFiles(exefs)};
 
-        // We need to maintain the order of these objects in memory layout
-        std::vector<SysFs::SysPath> modulesArray{"rtld", "sdk"};
-        for (u32 sub{}; sub <= 6; sub++)
-            modulesArray.emplace_back(std::format("subsdk{}", sub));
+        u64 startsAddr{process->creation->codeAddr};
 
-        for (const auto& target : modulesArray) {
-            if (ContainsValue(modules, target)) {
-                files.emplace_back(exefs->OpenFile(target));
-            }
+        // Do not allocate the process, just to verify how the memory layout will be
+        if (const auto [base, size] = nsoHolder.LoadProgramImage(process, startsAddr, files, false); base && size) {
+            assert(base + size == startsAddr);
+
+            process->creation->codeNumPages = size / GenericKernel::SwitchPageSize;
         }
-        u64 starts{};
-        nsoHolder.LoadProgramImage(process, starts, files);
+
+        process->mm->CreateProcessMemory(process);
+
+        startsAddr = process->creation->codeAddr;
+        if (const auto [entryPoint, allocatedSize] = nsoHolder.LoadProgramImage(process, startsAddr, files); allocatedSize) {
+            assert(process->creation->codeNumPages * GenericKernel::SwitchPageSize == allocatedSize);
+            process->entry = reinterpret_cast<void*>(process->mm->code.data() + entryPoint);
+            return ProcessLoadResult{entryPoint, allocatedSize};
+        }
+
+        return {};
     }
 
     void EShopTitle::GetAllContent() {

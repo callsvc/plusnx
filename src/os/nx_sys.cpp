@@ -1,7 +1,8 @@
 #include <generic_kernel/user_space.h>
-#include <os/nx_sys.h>
+#include <generic_kernel/svc/parameter_types.h>
 
 #include <os/make_loader.h>
+#include <os/nx_sys.h>
 namespace Plusnx::Os {
     using AddrType = GenericKernel::AddressSpaceType;
 
@@ -16,6 +17,15 @@ namespace Plusnx::Os {
                 throw runtime_exception("The {} does not have a valid ExeFS, preventing it from loading", Loader::GetTypeName(type));
         }
     }
+
+    void NxSys::PopulateProcessParameters(const SysFs::MetaProgram& npdm) const {
+        GenericKernel::Svc::CreateProcessParameter creation{};
+        npdm.Populate(creation);
+
+        const auto& process{context->process};
+        process->creation.emplace(creation);
+    }
+
     void NxSys::LoadApplicationFile(const SysFs::SysPath& path) {
         assert(std::filesystem::exists(path));
         std::error_code err;
@@ -45,12 +55,16 @@ namespace Plusnx::Os {
                 context->configs->ence = npdm.addressType == GenericKernel::AddressSpaceType::AddressSpace64Bit;
             assert(npdm.addressType == AddrType::AddressSpace64Bit);
             npdm.DisplayBinaryInformation();
+
+            PopulateProcessParameters(npdm);
 #endif
-            process->thisMm->CreateProcessMemory(npdm.addressType);
+            assert(process->creation);
         }
 
         creator.emplace(*this);
         creator->Initialize();
+
+        context->process->AllocateTlsHeapRegion();
 
         context->details.emplace(creator->GetQolGame());
     }

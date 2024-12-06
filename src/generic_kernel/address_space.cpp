@@ -1,4 +1,7 @@
+#include <generic_kernel/types/kprocess.h>
 #include <generic_kernel/address_space.h>
+
+#include <boost/align/align_up.hpp>
 
 #if !defined(NATIVE_CODE_EXECUTION)
 #define NATIVE_CODE_EXECUTION 0
@@ -17,5 +20,27 @@ namespace Plusnx::GenericKernel {
             return 36;
 
         return 32;
+    }
+
+    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& guest, const std::array<RegionProperties*, 0x5>& regions) {
+        const auto& creation{process->creation};
+
+        if (creation->addressType != AddressSpaceType::AddressSpace64Bit)
+            return;
+
+        const auto codeSize{creation->codeNumPages * SwitchPageSize};
+        const auto base{guest->guest};
+
+        // CODE
+        *regions[0] = {base.data(), boost::alignment::align_up(codeSize, RegionAlignment)};
+        // ALIAS
+        *regions[1] = {regions[0]->end().base(), VirtualMemorySpace39::AliasSize};
+        // HEAP
+        *regions[2] = {regions[1]->end().base(), VirtualMemorySpace39::HeapSize};
+        // STACK
+        *regions[3] = {regions[2]->end().base(), VirtualMemorySpace39::StackSize};
+        // TLS/IO
+        *regions[4] = {regions[3]->end().base(), VirtualMemorySpace39::TlsIoSize};
+
     }
 }

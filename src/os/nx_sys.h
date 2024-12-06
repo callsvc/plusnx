@@ -7,7 +7,7 @@
 
 #include <os/process_creator.h>
 namespace Plusnx::Core {
-    struct Context;
+    class Context;
 }
 
 namespace Plusnx::Os {
@@ -24,6 +24,8 @@ namespace Plusnx::Os {
         std::shared_ptr<Core::Context> context;
 
     private:
+        void PopulateProcessParameters(const SysFs::MetaProgram& npdm) const;
+
         std::optional<ProcessCreator> creator;
     };
 }

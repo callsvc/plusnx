@@ -7,9 +7,9 @@ namespace Plusnx::GenericKernel::Types {
     class KSharedMemory : public Base::KAutoObject {
     public:
         KSharedMemory(Kernel& kernel);
-        ~KSharedMemory();
 
-        u8* Allocate(std::span<u8> map, const std::shared_ptr<KProcess>& required) const;
+        u8* Allocate(u8* vaddr, u64 size, const std::shared_ptr<KProcess>& process) const;
+        void Free(u8* vaddr, u64 size, const std::shared_ptr<KProcess>& process) const;
 
     private:
         u64 ownerProcessId;

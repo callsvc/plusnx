@@ -69,28 +69,27 @@ namespace Plusnx::SysFs::Nx {
     }
 
     // https://switchbrew.org/wiki/SVC#CreateProcess
-    void NsoCore::Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, const bool hasArguments) {
+    void NsoCore::Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, [[maybe_unused]] const bool hasArguments, const bool allocate) {
         assert(sectionResults.size() == 3);
         for (const auto& [type, sectionHash] : sectionResults) {
             if (!IsEqual(sectionHash, content.hashList[std::to_underlying(type)]))
                 return;
         }
 
-        const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, 4096)};
-        if (program.size() < completeImageSize) {
-            program.resize(completeImageSize);
-            program.shrink_to_fit();
+        if (!allocate) {
+            const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, 4096)};
+            if (program.size() < completeImageSize) {
+                program.resize(completeImageSize);
+                program.shrink_to_fit();
 
-            std::construct_at(&textSection, program.begin().base(), textSection.size());
-            std::construct_at(&roSection, &program[textSection.size()], roSection.size());
-            std::construct_at(&dataSection, &program[roSection.size()], dataSection.size());
+                std::construct_at(&textSection, program.begin().base(), textSection.size());
+                std::construct_at(&roSection, &program[textSection.size()], roSection.size());
+                std::construct_at(&dataSection, &program[roSection.size()], dataSection.size());
+            }
         }
 
-        if (hasArguments) {
-
-        }
         assert(program.size());
-        process->SetProgramImage(address, {textSection, roSection, dataSection}, std::move(program));
+        process->SetProgramImage(address, {textSection, roSection, dataSection}, program, allocate);
     }
 
     void NsoCore::ReadSection(const NsoSection& section, const u64 fileSize, std::span<u8>& output) {

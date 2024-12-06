@@ -7,7 +7,7 @@
 
 #include <cpu/core_container.h>
 #include <generic_kernel/user_space.h>
-
+#include <generic_kernel/memory/k_slab_heap.h>
 namespace Plusnx::GenericKernel {
     namespace Types {
         class KProcess;
@@ -24,7 +24,10 @@ namespace Plusnx::GenericKernel {
 
         u64 CreateProcessId();
 
+        std::unique_ptr<GuestBuffer> nxmemory;
         std::unique_ptr<UserSpace> memory;
+
+        std::unique_ptr<Memory::KSlabHeap> slabHeap;
     private:
         struct {
             std::atomic<u64> pid, tid;

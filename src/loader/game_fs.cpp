@@ -19,5 +19,5 @@ namespace Plusnx::Loader {
         }
     }
 
-    void GameFs::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {}
+    std::optional<ProcessLoadResult> GameFs::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) { return {}; }
 }

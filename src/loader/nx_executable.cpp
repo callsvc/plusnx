@@ -78,8 +78,9 @@ namespace Plusnx::Loader {
         return result;
     }
 
-    void NxExecutable::Load(std::shared_ptr<Core::Context>& context) {
+    std::optional<ProcessLoadResult> NxExecutable::Load(std::shared_ptr<Core::Context>& context) {
         [[maybe_unused]] auto& process{context->process};
+        return {};
     }
     std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> NxExecutable::GetRomFs(const bool isControl) const {
         if (!isControl)

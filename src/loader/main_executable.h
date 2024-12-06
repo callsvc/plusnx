@@ -5,7 +5,7 @@ namespace Plusnx::Loader {
     class MainExecutable final : public AppLoader {
     public:
         MainExecutable(const SysFs::FileBackingPtr& nso);
-        void Load(std::shared_ptr<Core::Context>& context) override;
+        std::optional<ProcessLoadResult> Load(std::shared_ptr<Core::Context>& context) override;
 
     private:
         std::unique_ptr<SysFs::Nx::NsoCore> nso;

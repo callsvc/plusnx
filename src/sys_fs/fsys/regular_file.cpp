@@ -68,7 +68,7 @@ namespace Plusnx::SysFs::FSys {
 
             if (static_cast<u64>(result) < stride) {
                 if (result <= 0 && errno)
-                    throw runtime_exception("Error reading {:X} bytes from descriptor {}, due to {}", size, descriptor, GetOsErrorString());
+                    throw runtime_exception("Failed to read {} bytes from descriptor {}, error description: {}", size, descriptor, GetOsErrorString());
                 break;
             }
         }

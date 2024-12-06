@@ -16,7 +16,9 @@ namespace Plusnx::GenericKernel {
                 nice(0);
         }
 
-        memory = std::make_unique<UserSpace>();
+        nxmemory = std::make_unique<GuestBuffer>();
+        memory = std::make_unique<UserSpace>(nxmemory);
+        slabHeap = std::make_unique<Memory::KSlabHeap>(*this, UserSlabBase, UserSlabHeapItemSize, UserSlabHeapSize);
     }
 
     Kernel::~Kernel() {
@@ -32,7 +34,6 @@ namespace Plusnx::GenericKernel {
     u64 Kernel::CreateProcessId() {
         return seed.pid++;
     }
-
     std::shared_ptr<Types::KProcess> Kernel::GetCurrentProcess() {
         return listProc.back();
     }

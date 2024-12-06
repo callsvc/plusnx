@@ -7,7 +7,7 @@ namespace Plusnx::Loader {
     public:
         ContentArchive(const std::shared_ptr<Security::Keyring>& keys, const SysFs::FileBackingPtr& nca);
 
-        void Load(std::shared_ptr<Core::Context>& context) override;
+        std::optional<ProcessLoadResult> Load(std::shared_ptr<Core::Context>& context) override;
     private:
         std::unique_ptr<SysFs::Nx::NcaCore> nca;
     };

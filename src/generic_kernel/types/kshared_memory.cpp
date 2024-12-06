@@ -11,11 +11,14 @@ namespace Plusnx::GenericKernel::Types {
         permissions.user = MemoryProtection::Read;
     }
 
-    KSharedMemory::~KSharedMemory() {}
+    u8* KSharedMemory::Allocate(u8* vaddr, const u64 size, const std::shared_ptr<KProcess>& process) const {
+        const auto memoryPermissions{process->pid == ownerProcessId ? permissions.owner : permissions.user};
+        auto* result{kernel.nxmemory->Allocate(vaddr, vaddr, size, memoryPermissions)};
+        return result;
+    }
 
-    // ReSharper disable once CppDFAConstantFunctionResult
-    u8* KSharedMemory::Allocate([[maybe_unused]] std::span<u8> map, const std::shared_ptr<KProcess>& required) const {
-        [[maybe_unused]] auto memoryPermissions{required->pid == ownerProcessId ? permissions.owner : permissions.user};
-        return {};
+    void KSharedMemory::Free(u8* vaddr, const u64 size, const std::shared_ptr<KProcess>& process) const {
+        assert(process->pid);
+        kernel.nxmemory->Free(vaddr, size);
     }
 }

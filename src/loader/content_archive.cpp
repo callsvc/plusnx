@@ -6,13 +6,14 @@ namespace Plusnx::Loader {
         nca(std::make_unique<SysFs::Nx::NcaCore>(keys, nca)) {
     }
 
-    void ContentArchive::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
+    std::optional<ProcessLoadResult> ContentArchive::Load([[maybe_unused]] std::shared_ptr<Core::Context>& context) {
         const auto files{nca->GetBackingFiles()};
 
         if (nca->type != SysFs::Nx::ContentType::Program) {
-            return;
+            return {};
         }
         for ([[maybe_unused]] const auto& [type, file] : files) {
         }
+        return {};
     }
 }

@@ -112,12 +112,19 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/base/auto_types.h
     generic_kernel/base/kauto_object.cpp
     generic_kernel/base/kauto_object.h
+    generic_kernel/base/k_tls_page.cpp
+    generic_kernel/base/k_tls_page.h
+    generic_kernel/base/k_recursive_lock.cpp
+    generic_kernel/base/k_recursive_lock.h
+    generic_kernel/memory/k_slab_heap.cpp
+    generic_kernel/memory/k_slab_heap.h
     generic_kernel/types/kprocess.cpp
     generic_kernel/types/kprocess.h
     generic_kernel/types/kthread.cpp
     generic_kernel/types/kthread.h
     generic_kernel/types/kshared_memory.cpp
     generic_kernel/types/kshared_memory.h
+    generic_kernel/svc/parameter_types.h
     generic_kernel/kernel.cpp
     generic_kernel/kernel.h
     generic_kernel/user_space.cpp

@@ -42,7 +42,7 @@ namespace Plusnx::SysFs::Nx {
     class NsoCore {
     public:
         NsoCore(const FileBackingPtr& nso);
-        void Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, bool hasArguments = true);
+        void Load(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, bool hasArguments = true, bool allocate = true);
 
         std::optional<std::string> moduleName;
     private:

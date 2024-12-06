@@ -1,5 +1,6 @@
 #include <print>
 
+#include <generic_kernel/svc/parameter_types.h>
 #include <sys_fs/meta_program.h>
 namespace Plusnx::SysFs {
     std::pair<Range<u32>, Range<u32>> CreateThreadInfoRange(const u32 value) {
@@ -104,6 +105,26 @@ namespace Plusnx::SysFs {
 
         std::print("Count of allowed system calls: {}\n", count);
         std::print("Memory reserved for the system: {}\n", GetReadableSize(content.systemResourceSize));
+    }
+
+    void MetaProgram::Populate(GenericKernel::Svc::CreateProcessParameter& creation) const {
+        std::strncpy(creation.name.data(), content.titleName.data(), creation.name.size());
+        creation.category = GenericKernel::Svc::ProcessCategory::RegularTitle;
+
+        if (const auto value = titleId)
+            creation.titleId = *value;
+
+        creation.systemResourceNumPages = content.systemResourceSize / GenericKernel::SwitchPageSize;
+        creation.is64BitInstruction = content.flags.is64BitInstruction;
+        creation.addressType = content.flags.addressSpace;
+        creation.isApplication = true;
+
+        constexpr auto CodeStartOffset{0x500000UL};
+        if (creation.is64BitInstruction) {
+            creation.codeAddr = 0x8000000UL + CodeStartOffset;
+        } else {
+            creation.codeAddr = 0x200000UL + CodeStartOffset;
+        }
     }
 
     void MetaProgram::SetKac(const std::vector<u32>& descriptors) {

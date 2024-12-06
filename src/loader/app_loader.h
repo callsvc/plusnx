@@ -38,12 +38,18 @@ namespace Plusnx::Loader {
         BrokenFile
     };
 
+    struct ProcessLoadResult {
+        u64 base{};
+        u64 size{};
+        bool success{};
+    };
+
     class AppLoader {
     public:
         virtual ~AppLoader() = default;
 
         AppLoader(const AppType app, const u32 magic = 0) : type(app), validMagic(magic) {}
-        virtual void Load(std::shared_ptr<Core::Context>& context) = 0;
+        virtual std::optional<ProcessLoadResult> Load(std::shared_ptr<Core::Context>& context) = 0;
 
         virtual bool ExtractFilesInto([[maybe_unused]] const SysFs::SysPath& path) const { return {}; }
         virtual std::shared_ptr<SysFs::Nx::ReadOnlyFilesystem> GetRomFs([[maybe_unused]] bool isControl) const { return {}; }
