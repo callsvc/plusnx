@@ -23,6 +23,7 @@ namespace Plusnx::Core {
     void Context::Destroy() {
         {
             auto ctxNxOs{std::move(nxOs)};
+            process.reset();
             auto ctxKernel{std::move(kernel)};
         }
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <list>
-#include <map>
+#include <tsl/robin_map.h>
 
 #include <types.h>
 namespace Plusnx::GenericKernel {
@@ -20,6 +20,6 @@ namespace Plusnx::GenericKernel::Memory {
     private:
         Kernel& kernel;
         std::list<u64> slotObjects;
-        std::map<u8*, u64> allocated;
+        tsl::robin_map<u8*, u64> allocated;
     };
 }

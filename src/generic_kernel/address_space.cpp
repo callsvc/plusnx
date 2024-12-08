@@ -22,17 +22,17 @@ namespace Plusnx::GenericKernel {
         return 32;
     }
 
-    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& guest, const std::array<RegionProperties*, 0x5>& regions) {
+    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& buffer, const std::array<RegionProperties*, 0x5>& regions) {
         const auto& creation{process->creation};
 
         if (creation->addressType != AddressSpaceType::AddressSpace64Bit)
             return;
 
         const auto codeSize{creation->codeNumPages * SwitchPageSize};
-        const auto base{guest->guest};
+        const auto base{buffer->guest};
 
         // CODE
-        *regions[0] = {base.data(), boost::alignment::align_up(codeSize, RegionAlignment)};
+        *regions[0] = {base->data(), boost::alignment::align_up(codeSize, RegionAlignment)};
         // ALIAS
         *regions[1] = {regions[0]->end().base(), VirtualMemorySpace39::AliasSize};
         // HEAP

@@ -34,7 +34,7 @@ namespace Plusnx::SysFs {
 
     FileBackingPtr Provider::OpenSystemFile(const std::string& card, const SysPath& fullpath) {
         for (std::weak_ptr file : cachedFiles) {
-            if (auto aliveFile = file.lock())
+            if (std::shared_ptr aliveFile{file})
                 if (aliveFile->path == fullpath)
                     return aliveFile;
         }

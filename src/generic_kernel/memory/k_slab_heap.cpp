@@ -22,7 +22,7 @@ namespace Plusnx::GenericKernel::Memory {
         slotObjects.pop_front();
 
         auto* tlsBase{kernel.memory->tlsIo.begin().base() + object};
-        auto* backBase{kernel.nxmemory->backing.data() + object};
+        auto* backBase{kernel.nxmemory->backing->data() + object};
         kernel.nxmemory->Allocate(tlsBase, backBase, MemoryProtection::Read | MemoryProtection::Write, itemSize, MemoryType::ThreadLocal);
         std::memset(tlsBase, 0, itemSize);
 

@@ -1,6 +1,6 @@
 #include <print>
 
-#include <generic_kernel/svc/parameter_types.h>
+#include <generic_kernel/svc/svc_types.h>
 #include <sys_fs/meta_program.h>
 namespace Plusnx::SysFs {
     std::pair<Range<u32>, Range<u32>> CreateThreadInfoRange(const u32 value) {

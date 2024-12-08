@@ -90,6 +90,10 @@ namespace Plusnx::SysFs::Nx {
 
         assert(program.size());
         process->SetProgramImage(address, {textSection, roSection, dataSection}, program, allocate);
+
+        if (allocate) {
+            program.clear();
+        }
     }
 
     void NsoCore::ReadSection(const NsoSection& section, const u64 fileSize, std::span<u8>& output) {

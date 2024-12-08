@@ -14,12 +14,12 @@ namespace Plusnx::GenericKernel {
     constexpr auto permissions{MemoryProtection::Read | MemoryProtection::Write};
 
     GuestBuffer::~GuestBuffer() {
-        if (backing.data() != MAP_FAILED)
-            if (munmap(backing.data(), backing.size()) != 0)
+        if (backing->data() != MAP_FAILED)
+            if (munmap(backing->data(), backing->size()) != 0)
                 return;
 
-        if (guest.data() != MAP_FAILED)
-            if (munmap(guest.data(), guest.size()) != 0)
+        if (guest->data() != MAP_FAILED)
+            if (munmap(guest->data(), guest->size()) != 0)
                 return;
 
         shm_unlink(MemoryBackingName);
@@ -29,30 +29,23 @@ namespace Plusnx::GenericKernel {
         sharedFd = shm_open(MemoryBackingName, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         ftruncate(sharedFd, backSize);
 
-        backing = std::span{static_cast<u8*>(mmap(nullptr, backSize, permissions, MAP_SHARED, sharedFd, 0)), backSize};
-        guest = std::span{static_cast<u8*>(mmap(nullptr, virtSize, permissions, MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE, -1, 0)), virtSize};
+        auto* region{static_cast<u8*>(mmap(nullptr, backSize, permissions, MAP_SHARED, sharedFd, 0))};
+        backing.emplace(region, backSize);
 
-        if (const auto pointer = guest; pointer.data()) {
-            if (pointer.data() != MAP_FAILED)
-                madvise(pointer.data(), virtSize, MADV_HUGEPAGE);
+        region = static_cast<u8*>(mmap(nullptr, virtSize, permissions, MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE, -1, 0));
+        guest.emplace(region, virtSize);
+        if (const auto pointer{guest}; pointer->data()) {
+            if (pointer->data() != MAP_FAILED)
+                madvise(pointer->data(), virtSize, MADV_HUGEPAGE);
         }
 
-        blocks.emplace(guest.data(), KMemoryBlockInfo{});
-        blocks.emplace(guest.end().base(), KMemoryBlockInfo{});
+        blocks.emplace(guest->data(), KMemoryBlockInfo{});
+        blocks.emplace(guest->end().base(), KMemoryBlockInfo{});
     }
 
-    u8* GuestBuffer::Allocate(u8* vaddr, u8* addr, const u32 flags, const u64 size, const MemoryType type) {
+    u8* GuestBuffer::Allocate(u8* vaddr, u8* addr, const u32 flags, u64 size, const MemoryType type) {
         std::scoped_lock guard(lock);
 
-        return Map(vaddr, addr, flags, size, type);
-    }
-
-    void GuestBuffer::Free(u8* address, const u64 size) {
-        std::scoped_lock guard(lock);
-        Unmap(address, size);
-    }
-
-    u8* GuestBuffer::Map(u8* vaddr, u8* addr, const u32 flags, u64 size, const MemoryType type) {
         size = boost::alignment::align_up(size, SwitchPageSize);
 
         auto [location, block] = Search(vaddr);
@@ -80,7 +73,7 @@ namespace Plusnx::GenericKernel {
 
         u8* allocated{};
         if (assignable) {
-            allocated = static_cast<u8*>(mmap(vaddr, size, permissions, MAP_SHARED | MAP_FIXED, sharedFd, static_cast<u64>(addr - backing.begin().base())));
+            allocated = static_cast<u8*>(mmap(vaddr, size, permissions, MAP_SHARED | MAP_FIXED, sharedFd, static_cast<u64>(addr - backing->begin().base())));
             if (allocated == MAP_FAILED) {
                 return {};
             }
@@ -104,7 +97,9 @@ namespace Plusnx::GenericKernel {
         block->permission = flags;
     }
 
-    void GuestBuffer::Unmap(u8* address, u64 size) {
+    void GuestBuffer::Free(u8* address, u64 size) {
+        std::scoped_lock guard(lock);
+
         if (!blocks.contains(address))
             return;
         size = boost::alignment::align_up(size, SwitchPageSize);
@@ -123,7 +118,7 @@ namespace Plusnx::GenericKernel {
         auto [base, block] = Search(vaddr);
 
         if (blocks.contains(base)) {
-            const auto& [baseAddress, size, state, _] = blocks.at(base);
+            const auto& [baseAddress, size, state, _] = blocks[base];
             assert(state != MemoryType::Free);
             if (size)
                 return std::span(baseAddress, size);
@@ -147,8 +142,7 @@ namespace Plusnx::GenericKernel {
             --base;
         if (base->first) {
             flatmap.emplace_back(base->first, &base->second);
-
-            return std::make_pair(flatmap.back().vaddr, flatmap.back().block);
+            return std::make_pair(base->first, &base->second);
         }
         return {};
     }

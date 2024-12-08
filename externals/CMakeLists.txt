@@ -10,6 +10,7 @@ endif()
 add_subdirectory(sqlite3)
 add_subdirectory(boost)
 add_subdirectory(fmt)
+add_subdirectory(robin-map)
 
 set(LZ4_BUILD_CLI OFF CACHE BOOL "Build lz4 program" OFF)
 set(BUILD_STATIC_LIBS ON CACHE BOOL "Build static libraries" ON)

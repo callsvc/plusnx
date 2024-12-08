@@ -8,9 +8,10 @@ namespace Plusnx::SysFs::Ext {
         const auto _modulesFiles{exefs->ListAllFiles()};
 
         // We need to maintain the order of these objects in memory layout
-        std::vector<SysPath> modulesArray{"rtld", "main", "sdk"};
+        std::vector<SysPath> modulesArray{"rtld", "main"};
         for (u32 sub{}; sub <= 6; sub++)
             modulesArray.emplace_back(std::format("subsdk{}", sub));
+        modulesArray.emplace_back("sdk");
 
         for (const auto& target : modulesArray) {
             if (ContainsValue(_modulesFiles, target)) {

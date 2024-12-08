@@ -5,7 +5,7 @@
 #include <sys_fs/provider.h>
 #include <sys_fs/fsys/rigid_directory.h>
 namespace Plusnx::Core {
-    class Context;
+    struct Context;
 }
 
 namespace Plusnx::SysFs {

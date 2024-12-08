@@ -7,14 +7,6 @@ target_include_directories(plusnx-core PUBLIC
     $<INSTALL_INTERFACE:>
 )
 
-target_sources(plusnx PRIVATE
-    main.cpp
-    nogui/sdl_vulkan_backing.cpp
-    nogui/sdl_vulkan_backing.h
-    nogui/sdl_window.cpp
-    nogui/sdl_window.h
-)
-
 target_sources(plusnx-core PUBLIC
     armored/arm_types.h
     armored/code_blocks.cpp
@@ -23,13 +15,15 @@ target_sources(plusnx-core PUBLIC
     armored/cpu_context.h
     armored/jit_context.cpp
     armored/jit_context.h
-    armored/arm64_emitter_context.cpp
-    armored/arm64_emitter_context.h
-    armored/emitter_interface.cpp
-    armored/emitter_interface.h
-    armored/emitter_details.h
-    armored/arm64_details.cpp
-    armored/arm64_details.h
+    armored/backend/arm64_emitter_context.cpp
+    armored/backend/arm64_emitter_context.h
+    armored/backend/x86_64_emitter_context.cpp
+    armored/backend/x86_64_emitter_context.h
+    armored/backend/emitter_generator.cpp
+    armored/backend/emitter_generator.h
+    armored/backend/emitter_interface.h
+    armored/frontend/arm64_translator.cpp
+    armored/frontend/arm64_translator.h
     audio/output_device.cpp
     audio/output_device.h
     audio/input_device.cpp
@@ -124,7 +118,10 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/types/kthread.h
     generic_kernel/types/kshared_memory.cpp
     generic_kernel/types/kshared_memory.h
-    generic_kernel/svc/parameter_types.h
+    generic_kernel/svc/svc_types.h
+    generic_kernel/svc/svc_process.cpp
+    generic_kernel/svc/svc_process.cpp
+    generic_kernel/svc/svc_process.h
     generic_kernel/kernel.cpp
     generic_kernel/kernel.h
     generic_kernel/user_space.cpp
@@ -181,5 +178,13 @@ target_sources(plusnx-core PUBLIC
     types.h
 )
 
-target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt)
+target_sources(plusnx PRIVATE
+    main.cpp
+    nogui/sdl_vulkan_backing.cpp
+    nogui/sdl_vulkan_backing.h
+    nogui/sdl_window.cpp
+    nogui/sdl_window.h
+)
+
+target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt tsl::robin_map)
 target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

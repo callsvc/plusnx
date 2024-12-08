@@ -1,7 +1,7 @@
 #pragma once
 
 #include <generic_kernel/address_space.h>
-#include <generic_kernel/svc/parameter_types.h>
+#include <generic_kernel/svc/svc_types.h>
 namespace Plusnx::GenericKernel {
 
     enum class ProgramCodeType {

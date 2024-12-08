@@ -1,8 +1,11 @@
 #pragma once
 
 #include <armored/arm_types.h>
-#include <armored/emitter_interface.h>
+
 namespace Plusnx::Armored {
+    namespace Backend {
+        class EmitterGenerator;
+    }
     // Special class to allocate all pages required by the JIT
     enum class CodeBlockStatus {
         Success,
@@ -15,17 +18,18 @@ namespace Plusnx::Armored {
 
     class CodeBlocks {
     public:
-        CodeBlocks(const std::shared_ptr<EmitterInterface>& arm);
-        void Initialize(u64 count);
+        CodeBlocks(const std::shared_ptr<Backend::EmitterGenerator>& generator);
+        void Initialize(u64 code);
         ~CodeBlocks();
 
-        void Expand(u64 holes);
-        void Protect(u64 starts, u64 ends, CodeBlockProtectionStatus action) const;
+        void Expand(u64 pages);
+        void Protect(u8* begin, const u8* end, CodeBlockProtectionStatus action) const;
 
-        void* executable{};
+        u8* exec{nullptr};
         u64 size{};
         CodeBlockStatus status{};
+
     private:
-        std::shared_ptr<EmitterInterface> emitter;
+        std::shared_ptr<Backend::EmitterGenerator> emitter;
     };
 }

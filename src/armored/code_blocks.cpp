@@ -1,57 +1,69 @@
 #include <sys/mman.h>
+
+#include <armored/backend/x86_64_emitter_context.h>
 #include <armored/code_blocks.h>
 namespace Plusnx::Armored {
-    CodeBlocks::CodeBlocks(const std::shared_ptr<EmitterInterface>& arm) : emitter(arm) {}
-    void CodeBlocks::Initialize(const u64 count) {
-        if (count)
-            Expand(count / sysconf(_SC_PAGE_SIZE));
+    CodeBlocks::CodeBlocks(const std::shared_ptr<Backend::EmitterGenerator>& generator) : emitter(generator) {}
 
-        Protect(0, 0, CodeBlockProtectionStatus::Disable);
-        const u64 instructions{count / emitter->details->GetInstructionSize()};
+    void CodeBlocks::Initialize(const u64 code) {
+        if (code)
+            Expand(code / sysconf(_SC_PAGE_SIZE));
 
-        for (u64 robot{}; instructions % 8 == 0 && robot < instructions; robot += 8) {
+        Protect(exec, exec + code, CodeBlockProtectionStatus::Disable);
+        const u64 instructions{code / emitter->backing->GetInstructionSize(true)};
+
+        for (u64 slot{}; instructions % 8 == 0 && slot < instructions; slot += 8) {
             emitter->EmitNop();
             emitter->EmitNop();
+
             emitter->EmitNop();
             emitter->EmitNop();
+
             emitter->EmitNop();
             emitter->EmitNop();
+
             emitter->EmitNop();
             emitter->EmitNop();
         }
-        Protect(0, 0, CodeBlockProtectionStatus::Disable);
+        Protect(exec, exec + code, CodeBlockProtectionStatus::Enable);
     }
 
     CodeBlocks::~CodeBlocks() {
-        emitter->ChangeBlockScheme();
-        assert(munmap(executable, size) == 0);
+        emitter->blockMap = {};
+        emitter->codeMap = {};
+        assert(munmap(exec, size) == 0);
     }
 
-    void CodeBlocks::Protect(const u64 starts, u64 ends, const CodeBlockProtectionStatus action) const {
-        auto flags{PROT_READ | PROT_WRITE | PROT_EXEC};
-        if (action == CodeBlockProtectionStatus::Enable)
-            flags &= ~PROT_EXEC;
+    void CodeBlocks::Protect(u8* begin, const u8* end, const CodeBlockProtectionStatus action) const {
+        const auto flags = [&] {
+            auto base{PROT_READ | PROT_WRITE | PROT_EXEC};
+            if (action == CodeBlockProtectionStatus::Enable)
+                base &= ~PROT_WRITE;
+            else
+                base &= ~PROT_EXEC;
+            return base;
+        }();
 
-        if (!ends)
-            ends = size;
-
-        assert(mprotect(executable, ends - starts, flags) == 0);
+        if (!end)
+            end = exec + size;
+        assert(mprotect(begin, end - begin, flags) == 0);
     }
 
-    void CodeBlocks::Expand(const u64 holes) {
-        const auto total{holes * sysconf(_SC_PAGE_SIZE)};
+    void CodeBlocks::Expand(const u64 pages) {
+        const auto total{pages * sysconf(_SC_PAGE_SIZE)};
         if (size > total)
             return;
-        constexpr auto flags{PROT_NONE};
-        if (!executable)
-            executable = mmap(nullptr, total, flags, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-        else
-            executable = mremap(executable, total, flags, MREMAP_FIXED);
 
-        if (executable != MAP_FAILED) {
-            size = total;
+        constexpr auto flags{PROT_NONE};
+        if (!exec)
+            exec = static_cast<u8*>(mmap(nullptr, total, flags, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
+        else
+            exec = static_cast<u8*>(mremap(exec, total, flags, MREMAP_FIXED));
+
+        if (exec == MAP_FAILED) {
+            status = CodeBlockStatus::MemoryMappingFailed;
             return;
         }
-        status = CodeBlockStatus::MemoryMappingFailed;
+        size = total;
     }
 }

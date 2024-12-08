@@ -1,10 +1,12 @@
 #pragma once
 
+#include <tsl/robin_map.h>
+
 #include <security/key_types.h>
 #include <security/ticket.h>
 #include <sys_fs/provider.h>
 namespace Plusnx::Core {
-    class Context;
+    struct Context;
 }
 namespace Plusnx::Security {
     enum class Key256Type {
@@ -53,8 +55,8 @@ namespace Plusnx::Security {
         void AddTitlePair(const K128& key, const K128& value);
         void AddProductionPair(std::pair<std::string, std::string>&& keyPair);
 
-        std::unordered_map<K128, K128, K128Hash> titles{};
-        std::unordered_map<std::string, std::string> prods{};
+        tsl::robin_map<K128, K128, K128Hash> titles{};
+        tsl::robin_map<std::string, std::string> prods{};
         std::map<u64, std::unique_ptr<Ticket>> tickets;
 
         std::unordered_map<Key256Type, K256> keys256{};

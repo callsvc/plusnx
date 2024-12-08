@@ -16,5 +16,5 @@ namespace Plusnx::GenericKernel {
     };
 
     u32 GetHostBitsCount(AddressSpaceType type);
-    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& guest, const std::array<RegionProperties*, 0x5>& regions);
+    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& buffer, const std::array<RegionProperties*, 0x5>& regions);
 }

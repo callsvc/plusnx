@@ -8,7 +8,7 @@
 
 #include <generic_kernel/base/auto_types.h>
 #include <generic_kernel/base/k_tls_page.h>
-#include <generic_kernel/svc/parameter_types.h>
+#include <generic_kernel/svc/svc_types.h>
 
 namespace Plusnx::GenericKernel::Types {
     class KProcess : public Base::KSynchronizationObject {

@@ -9,7 +9,7 @@ namespace po = boost::program_options;
 
 void CheckDriversVersion() {
     std::print("SDL version: {}\n", GetSdlVersion());
-    std::print("SDL driver name {}\n", SDL_GetCurrentVideoDriver());
+    std::print("SDL driver name: {}\n", SDL_GetCurrentVideoDriver());
 
     if (IsWaylandPresent())
         if (std::string_view(SDL_GetCurrentVideoDriver()) == "wayland")

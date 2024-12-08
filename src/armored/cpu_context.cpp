@@ -8,6 +8,6 @@ namespace Plusnx::Armored {
         }
 
         std::memset(&ctx, 0, sizeof(ctx));
-        std::memset(&hrc, 0, sizeof(hrc));
+        std::memset(&host, 0, sizeof(host));
     }
 }

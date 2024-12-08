@@ -10,7 +10,7 @@ namespace Plusnx::Os {
 };
 
 namespace Plusnx::Core {
-    class Context;
+    struct Context;
 
     class Application {
     public:

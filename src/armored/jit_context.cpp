@@ -1,7 +1,8 @@
-#include <armored/jit_context.h>
 
-#include <armored/arm64_emitter_context.h>
-#include <armored/arm64_details.h>
+#include <armored/backend/x86_64_emitter_context.h>
+#include <armored/frontend/arm64_translator.h>
+
+#include <armored/jit_context.h>
 namespace Plusnx::Armored {
     JitContext::JitContext(const GuestCpuType guest) {
         type = guest;
@@ -9,8 +10,13 @@ namespace Plusnx::Armored {
             throw runtime_exception("The JIT for ARM32 has not been implemented yet");
         }
 
-        details = std::make_shared<Arm64Details>();
-        jitter = std::make_shared<Arm64EmitterContext>(details);
+        if (type == GuestCpuType::Arm64) {
+            platform = std::make_shared<Frontend::Arm64Translator>();
+#if defined(__x86_64__)
+            jitter = std::make_shared<Backend::X86_64_EmitterContext>(platform);
+#endif
+            platform->Initialize(jitter);
+        }
 
         std::print("Host CPU assigned to JIT {}, CPU rank: {}\n", caps.brand, caps.GetCpuRank());
     }
@@ -20,9 +26,8 @@ namespace Plusnx::Armored {
             return;
 
         const auto cpuBlock(std::make_shared<CodeBlocks>(jitter));
-        jitter->ChangeBlockScheme(cpuBlock);
-        cpuBlock->Initialize(configuration.codeSectionSize);
+        jitter->PushCpuContext(core, cpuBlock, jitParams.codeSectionSize);
 
-        blocks.emplace(core.ccid,  cpuBlock);
+        blocks.emplace(core.ccid, cpuBlock);
     }
 }

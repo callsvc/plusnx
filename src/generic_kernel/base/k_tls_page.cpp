@@ -21,7 +21,7 @@ namespace Plusnx::GenericKernel {
         return available;
     }
 
-    void* KTlsPage::AllocateSlot() {
+    u8* KTlsPage::AllocateSlot() {
         auto* slot = [&] -> u8* {
             auto slotPtr{tls};
             for (auto& free : freeSlots) {
@@ -34,5 +34,14 @@ namespace Plusnx::GenericKernel {
             return {};
         }();
         return slot;
+    }
+
+    void KTlsPage::FreeSlot(u8* slot) {
+        auto slotPtr{slot};
+        for (auto& free : freeSlots) {
+            if (slotPtr == slot)
+                free = true;
+            slotPtr += TlsEntrySize;
+        }
     }
 }

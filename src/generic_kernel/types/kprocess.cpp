@@ -20,7 +20,7 @@ namespace Plusnx::GenericKernel::Types {
                 return;
 
             auto* codeAddr{kernel.memory->code.begin().base() + offset};
-            auto* backAddr{kernel.nxmemory->backing.data() + offset};
+            auto* backAddr{kernel.nxmemory->backing->data() + offset};
             mm->MapProgramCode(type, codeAddr, backAddr, section);
 
             std::print("Amount of allocated data: {}\n", SysFs::GetReadableSize(mm->records.back().used));

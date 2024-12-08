@@ -8,7 +8,8 @@ namespace Plusnx::GenericKernel {
         KTlsPage(Kernel& kernel);
         ~KTlsPage();
         bool HasAvailableSlots() const;
-        void* AllocateSlot();
+        u8* AllocateSlot();
+        void FreeSlot(u8* slot);
 
         u8* tls{nullptr};
         std::array<bool, 8> freeSlots;

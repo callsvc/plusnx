@@ -52,8 +52,8 @@ namespace Plusnx::GenericKernel {
     constexpr auto RoFlags{MemoryProtection::Read | MemoryProtection::Write};
     void UserSpace::InitSelfTest() const {
 
-        auto* guest{nxmemory->guest.data() + 0x10000};
-        auto* base{nxmemory->backing.data() + 0x20000};
+        auto* guest{nxmemory->guest->data() + 0x10000};
+        auto* base{nxmemory->backing->data() + 0x20000};
         auto* memory{nxmemory->Allocate(guest, base, RoFlags, sizeof(u32))};
 
         Write32(guest, 0x41414141);

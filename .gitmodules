@@ -19,3 +19,6 @@
 [submodule "externals/fmt"]
 	path = externals/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "externals/robin-map"]
+	path = externals/robin-map
+	url = https://github.com/Tessil/robin-map.git

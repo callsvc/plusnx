@@ -1,5 +1,5 @@
 #include <generic_kernel/user_space.h>
-#include <generic_kernel/svc/parameter_types.h>
+#include <generic_kernel/svc/svc_types.h>
 
 #include <os/make_loader.h>
 #include <os/nx_sys.h>

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <generic_kernel/address_space.h>
-#include <types.h>
-namespace Plusnx::GenericKernel::Svc {
+#include <generic_kernel/svc/svc_process.h>
 
+namespace Plusnx::GenericKernel::Svc {
     enum class ProcessCategory : u32 {
         RegularTitle,
         Kernel
@@ -23,10 +23,9 @@ namespace Plusnx::GenericKernel::Svc {
                 u32 enableDebug : 1;
                 u32 enableAslr : 1;
                 u32 isApplication : 1;
-                u32 pad0 : 5;
             };
         };
-        u32 resourceLimitHandle; // ResourceLimitHandle (can be zero)
+        u32 resourceLimitHandle;
         u32 systemResourceNumPages;
     };
 
