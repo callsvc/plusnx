@@ -11,8 +11,10 @@ namespace Plusnx::GenericKernel::Base {
     }
     void KAutoObject::DecrementReference() {
         std::lock_guard lock(refLock);
-        assert(refs);
 
-        if (!refs) {}
+        if (!refs)
+            assert(0);
+
+        refs--;
     }
 }

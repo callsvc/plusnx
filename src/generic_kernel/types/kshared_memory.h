@@ -4,7 +4,7 @@
 #include <generic_kernel/base/kauto_object.h>
 #include <generic_kernel/types/kprocess.h>
 namespace Plusnx::GenericKernel::Types {
-    class KSharedMemory : public Base::KAutoObject {
+    class KSharedMemory final : public Base::KAutoObject {
     public:
         KSharedMemory(Kernel& kernel);
 

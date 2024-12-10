@@ -32,8 +32,10 @@ namespace Plusnx::Os {
 
         std::print("Name of the application about to be loaded: {} v{}\n", title, version);
         std::print("Name of the respective publisher: {}\n", publisher);
+
         application->Load(nxOs.context);
     }
+
     Core::GameInformation ProcessCreator::GetQolGame() const {
         Core::GameInformation info;
         info.title = title;

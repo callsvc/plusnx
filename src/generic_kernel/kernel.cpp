@@ -4,8 +4,10 @@
 #include <generic_kernel/kernel.h>
 namespace Plusnx::GenericKernel {
     Kernel::Kernel() {
-        for (u32 core{}; core < Cpu::TotalCoresCount; core++)
-            cpuCores[core].Initialize();
+        for (u32 core{}; core < Cpu::TotalCoresCount; core++) {
+            cpuCores[core].emplace(*this);
+            cpuCores[core]->Initialize();
+        }
 
         // We need the maximum possible CPU time
         const auto type{sched_getscheduler(0)};
@@ -23,7 +25,7 @@ namespace Plusnx::GenericKernel {
 
     Kernel::~Kernel() {
         for (u32 core{}; core < Cpu::TotalCoresCount; core++)
-            cpuCores[core].Destroy();
+            cpuCores[core]->Destroy();
     }
 
     std::shared_ptr<Types::KProcess> Kernel::CreateNewProcess() {
@@ -32,8 +34,39 @@ namespace Plusnx::GenericKernel {
     }
 
     u64 Kernel::CreateProcessId() {
-        return seed.pid++;
+        return processId++;
     }
+
+    u64 Kernel::CreateThreadId() {
+        std::array<char, 16> thread{};
+        pthread_getname_np(pthread_self(), thread.data(), thread.size());
+
+        std::print("A new HOS thread is being created by the thread named {} on core {}\n", std::string_view{thread.data()}, sched_getcpu());
+
+        return threadId++;
+    }
+
+    u64 Kernel::SetupApplicationProcess(const u64 pid) {
+        u64 core{};
+
+        for (const auto& process : listProc) {
+            const auto numCore{process->npdm.mainCore};
+            auto& targetCore{cpuCores[numCore]};
+
+            if (process->pid != pid)
+                continue;
+
+            assert(process->threads.empty());
+            assert(targetCore->state == Cpu::CoreState::Waiting);
+
+            core = targetCore->coreId;
+            corePid.emplace(core, pid);
+            targetCore->state = Cpu::CoreState::Running;
+            targetCore->state.notify_one();
+        }
+        return core;
+    }
+
     std::shared_ptr<Types::KProcess> Kernel::GetCurrentProcess() {
         return listProc.back();
     }

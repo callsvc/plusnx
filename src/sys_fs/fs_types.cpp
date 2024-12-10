@@ -20,7 +20,7 @@ namespace Plusnx::SysFs {
         constexpr std::array formats{"B", "KiB", "MiB", "GiB"};
         u64 format{};
 
-        auto value = [&format, size] {
+        const auto value = [&format, size] {
             auto result{static_cast<double>(size)};
             for (; result > 0x400; result /= 0x400)
                 format++;
@@ -64,8 +64,8 @@ namespace Plusnx::SysFs {
             return ContainsValue(ListAllFiles(), path);
 
         for (const auto& filepath : ListAllFiles()) {
-            const auto filestr{filepath.string()};
-            const auto pathstr{path.string()};
+            const auto& filestr{filepath.string()};
+            const auto& pathstr{path.string()};
 
             if (filestr.contains(pathstr))
                 return true;

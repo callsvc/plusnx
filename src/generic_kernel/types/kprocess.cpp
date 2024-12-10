@@ -4,13 +4,23 @@
 #include <generic_kernel/types/kprocess.h>
 #include <generic_kernel/base/k_recursive_lock.h>
 namespace Plusnx::GenericKernel::Types {
-    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), mm(kernel.memory) {
+    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), handles(kernel), mm(kernel.memory) {
     }
 
     void KProcess::Initialize() {
         pid = kernel.CreateProcessId();
     }
+
     void KProcess::Destroy() {
+        for (const auto thread : threads) {
+            if (const auto handle{handles.GetThread(thread)})
+                handle->Stop();
+        }
+
+        partialTlsSlots.clear();
+        fullTlsPages.clear();
+        threads.clear();
+
         pid = {};
     }
 
@@ -65,5 +75,28 @@ namespace Plusnx::GenericKernel::Types {
             fullTlsPages.emplace_back(std::move(tls));
         else
             partialTlsSlots.emplace_back(std::move(tls));
+    }
+
+    void KProcess::CreateThread() {
+        const auto stackSize{npdm.stackSize};
+
+        u8* stack = [&] {
+            auto* stackRegion{kernel.memory->stack.data()};
+            auto* kernelRegion{kernel.nxmemory->backing->data()};
+
+            kernel.nxmemory->Allocate(stackRegion, kernelRegion, MemoryProtection::Read | MemoryProtection::Write, stackSize, MemoryType::Stack);
+            return stackRegion + stackSize;
+        }();
+
+        std::scoped_lock guard(threadsLock);
+        auto* tls{static_cast<u8*>(exceptionTlsArea)};
+        auto* tentry{static_cast<u8*>(entry)};
+
+        u16 thrHandle{};
+        if (const auto thread{handles.Create<KThread>(thrHandle)}) {
+            thread->Initialize(tentry, tls, stack);
+            threads.emplace_back(thrHandle);
+        }
+
     }
 }

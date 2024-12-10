@@ -83,6 +83,11 @@ namespace Plusnx::SysFs {
         GenericKernel::AddressSpaceType addressType{};
         std::optional<std::string> title;
         std::optional<u64> titleId;
+
+        u64 mainCore{};
+        u64 stackSize{};
+        u64 threadPriority{};
+
     private:
         void SetKac(const std::vector<u32>& descriptors);
 

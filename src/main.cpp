@@ -50,13 +50,13 @@ i32 main(const i32 argc, const char** argv) {
         app->LoadAGameByIndex();
     }
 
-    bool quit{};
-    SDL_Event event;
-
     app->ClearUiEvents();
+    app->StartApplication();
 
     std::print("Total memory in use: {}\n", SysFs::GetReadableSize(app->GetTotalMemoryUsage() * 1024));
 
+    SDL_Event event;
+    bool quit{};
     while (!quit) {
         if (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT)
@@ -70,11 +70,12 @@ i32 main(const i32 argc, const char** argv) {
         // Process at least 1000 interactions before exiting
         if (count++ == 1'000)
             quit = true;
-        std::this_thread::sleep_for(3ms);
+        std::this_thread::sleep_for(2ms);
 #else
         SDL_WaitEvent(&event);
 #endif
     }
+    app->StopApplication();
 
     {
         const std::unique_ptr asan{std::move(app)};

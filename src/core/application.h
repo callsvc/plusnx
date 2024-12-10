@@ -25,6 +25,9 @@ namespace Plusnx::Core {
         bool ExtractIntoGameFs();
         void SaveUserInformation() const;
 
+        void StartApplication() const;
+        void StopApplication() const;
+
         static u64 GetTotalMemoryUsage();
 
         void ClearUiEvents() const;

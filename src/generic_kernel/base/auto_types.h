@@ -13,16 +13,11 @@ namespace Plusnx::GenericKernel::Base {
     };
 
     class KBaseType {
-    protected:
+    public:
         KBaseType(Kernel& generic, const KAutoType base) : kernel(generic), type(base) {}
+        virtual ~KBaseType() = default;
         Kernel& kernel;
         KAutoType type;
     };
 
-    static_assert(sizeof(KBaseType) == 0x10);
-
-    class KSynchronizationObject : public KBaseType {
-    public:
-        KSynchronizationObject(Kernel& generic, const KAutoType type) : KBaseType(generic, type) {}
-    };
 }

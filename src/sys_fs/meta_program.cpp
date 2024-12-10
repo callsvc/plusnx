@@ -48,6 +48,11 @@ namespace Plusnx::SysFs {
         if (metaFile->Read(content) != sizeof(content))
             throw runtime_exception("Cannot read NPDM content");
         assert(content.magic == metaMagics[0]);
+
+        mainCore = content.defaultCoreId;
+        stackSize = content.mainThreadStackSize;
+        threadPriority = content.mainThreadPriority;
+
         title.emplace(content.titleName.data());
 
         if (!title->contains("Application")) {

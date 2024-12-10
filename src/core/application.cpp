@@ -114,6 +114,17 @@ namespace Plusnx::Core {
         collector.CommitToFile(outputFile);
     }
 
+    void Application::StartApplication() const {
+        const auto pid{context->process->pid};
+        context->kernel->SetupApplicationProcess(pid);
+
+    }
+
+    void Application::StopApplication() const {
+        if (const auto process{context->kernel->GetCurrentProcess()})
+            process->Destroy();
+    }
+
     u64 Application::GetTotalMemoryUsage() {
         SysFs::FSys::RegularFile status{"/proc/self/status"};
         if (!status)

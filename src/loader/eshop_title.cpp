@@ -7,7 +7,7 @@
 #include <sys_fs/nx/readonly_filesystem.h>
 
 #include <details/perf_measure.h>
-#include <sys_fs/ext/nso_modules.h>
+#include <sys_fs/extra/nso_modules.h>
 
 #include <loader/game_fs.h>
 #include <loader/eshop_title.h>
@@ -57,7 +57,7 @@ namespace Plusnx::Loader {
 
         modules.erase(std::ranges::find(modules, "main.npdm"));
 
-        SysFs::Ext::NsoModules nsoHolder;
+        SysFs::Extra::NsoModules nsoHolder;
         const auto files{nsoHolder.OrderExecutableFiles(exefs)};
 
         u64 startsAddr{process->creation->codeAddr};

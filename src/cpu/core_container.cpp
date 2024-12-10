@@ -2,6 +2,9 @@
 #include <chrono>
 
 #include <cpu/core_container.h>
+
+#include <generic_kernel/kernel.h>
+
 namespace Plusnx::Cpu {
     using namespace std::chrono_literals;
 
@@ -14,17 +17,29 @@ namespace Plusnx::Cpu {
         while (true) {
             if (stop.stop_requested())
                 return;
-            std::this_thread::sleep_for(4s);
+            state = CoreState::Waiting;
+
+            if (dealer->CheckForActivation(*this))
+                if (!dealer->Run())
+                    break;
+
+            std::this_thread::sleep_for(1s);
         }
+        dealer->DeactivateCore(*this);
     }
 
     void CoreContainer::Initialize() {
+        assert(kernel.corePid.empty());
+        dealer.emplace(kernel);
+
         thread.emplace([&] (const std::stop_token& stop) {
             RunThread(stop);
         });
     }
 
     void CoreContainer::Destroy() {
+        state = CoreState::Stopped;
+        state.notify_one();
         thread->request_stop();
     }
 }

@@ -1,10 +1,10 @@
 #pragma once
 #include <sys_fs/nx/readonly_filesystem.h>
 
-namespace Plusnx::SysFs::Ext {
-    class FakeRomFs final : public Nx::ReadOnlyFilesystem {
+namespace Plusnx::SysFs::Extra {
+    class InsertableRomFs final : public Nx::ReadOnlyFilesystem {
     public:
-        FakeRomFs();
+        InsertableRomFs();
 
         void AddFile(const FileBackingPtr& file);
     };

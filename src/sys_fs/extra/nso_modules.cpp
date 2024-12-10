@@ -1,6 +1,6 @@
-#include <sys_fs/ext/nso_modules.h>
+#include <sys_fs/extra/nso_modules.h>
 
-namespace Plusnx::SysFs::Ext {
+namespace Plusnx::SysFs::Extra {
     std::vector<FileBackingPtr> NsoModules::OrderExecutableFiles(const std::shared_ptr<Nx::PartitionFilesystem>& exefs) {
         std::vector<FileBackingPtr> files;
 

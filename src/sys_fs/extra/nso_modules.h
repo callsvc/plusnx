@@ -2,7 +2,7 @@
 
 #include <sys_fs/nx/partition_filesystem.h>
 #include <sys_fs/nx/nso_core.h>
-namespace Plusnx::SysFs::Ext {
+namespace Plusnx::SysFs::Extra {
     class NsoModules {
     public:
         NsoModules() = default;

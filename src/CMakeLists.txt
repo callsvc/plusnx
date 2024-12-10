@@ -67,10 +67,10 @@ target_sources(plusnx-core PUBLIC
     sys_fs/nx/nso_core.h
     sys_fs/nx/content_metadata.cpp
     sys_fs/nx/content_metadata.h
-    sys_fs/ext/fake_romfs.cpp
-    sys_fs/ext/fake_romfs.h
-    sys_fs/ext/nso_modules.cpp
-    sys_fs/ext/nso_modules.h
+    sys_fs/extra/insertable_romfs.cpp
+    sys_fs/extra/insertable_romfs.h
+    sys_fs/extra/nso_modules.cpp
+    sys_fs/extra/nso_modules.h
     sys_fs/layered_fs.cpp
     sys_fs/layered_fs.h
     sys_fs/streamed_file.cpp
@@ -102,6 +102,8 @@ target_sources(plusnx-core PUBLIC
     cpu/features.h
     cpu/coroutine.cpp
     cpu/coroutine.h
+    cpu/kernel_task.cpp
+    cpu/kernel_task.h
     cpu/unit_types.h
     generic_kernel/base/auto_types.h
     generic_kernel/base/kauto_object.cpp
@@ -110,6 +112,8 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/base/k_tls_page.h
     generic_kernel/base/k_recursive_lock.cpp
     generic_kernel/base/k_recursive_lock.h
+    generic_kernel/base/k_process_handle_table.cpp
+    generic_kernel/base/k_process_handle_table.h
     generic_kernel/memory/k_slab_heap.cpp
     generic_kernel/memory/k_slab_heap.h
     generic_kernel/types/kprocess.cpp
@@ -155,6 +159,8 @@ target_sources(plusnx-core PUBLIC
     os/make_loader.h
     services/settings/languages.cpp
     services/settings/languages.h
+    recompiler/opcodes.cpp
+    recompiler/opcodes.h
     security/checksum.cpp
     security/checksum.h
     security/cipher_cast.cpp
