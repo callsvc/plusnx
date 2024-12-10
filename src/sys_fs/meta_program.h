@@ -84,16 +84,12 @@ namespace Plusnx::SysFs {
         std::optional<std::string> title;
         std::optional<u64> titleId;
 
-        u64 mainCore{};
-        u64 stackSize{};
-        u64 threadPriority{};
-
+        NpdmHeader titleNpdm{};
     private:
         void SetKac(const std::vector<u32>& descriptors);
 
         std::unique_ptr<StreamedFile> metaFile;
 
-        NpdmHeader content{};
 
         std::map<u32, bool> allowedSvc;
         std::pair<Range<u32>, Range<u32>> priorities;

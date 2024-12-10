@@ -4,7 +4,7 @@
 #include <generic_kernel/types/kprocess.h>
 #include <generic_kernel/base/k_recursive_lock.h>
 namespace Plusnx::GenericKernel::Types {
-    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), handles(kernel), mm(kernel.memory) {
+    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), handles(kernel), mm(kernel.user) {
     }
 
     void KProcess::Initialize() {
@@ -29,8 +29,8 @@ namespace Plusnx::GenericKernel::Types {
             if (!allocate)
                 return;
 
-            auto* codeAddr{kernel.memory->code.begin().base() + offset};
-            auto* backAddr{kernel.nxmemory->backing->data() + offset};
+            auto* codeAddr{kernel.user->code.begin().base() + offset};
+            auto* backAddr{kernel.nxmemory->back->data() + offset};
             mm->MapProgramCode(type, codeAddr, backAddr, section);
 
             std::print("Amount of allocated data: {}\n", SysFs::GetReadableSize(mm->records.back().used));
@@ -39,13 +39,11 @@ namespace Plusnx::GenericKernel::Types {
         MapCode(ProgramCodeType::Text, vaddr, std::span(sections[0]));
         const auto roOffset{boost::alignment::align_up(vaddr + sections[0].size(), 4096)};
         MapCode(ProgramCodeType::Ro, roOffset, std::span(sections[1]));
-
         {
             auto overBssSize{program.size()};
             for (const auto& section : sections) {
                 overBssSize -= boost::alignment::align_up(section.size(), 4096);
             }
-
             const auto dataOffset{boost::alignment::align_up(roOffset + sections[1].size(), 4096)};
 
             if (const std::span initialized{sections.back().data(), boost::alignment::align_up(sections.back().size() + overBssSize, 4096)}; initialized.size()) {
@@ -56,8 +54,8 @@ namespace Plusnx::GenericKernel::Types {
     }
 
     void KProcess::AllocateTlsHeapRegion() {
-
         KScopedLock lock(kernel);
+
         // If we have any partially filled TLS
         if (!partialTlsSlots.empty()) {
             const auto& tlsSlot{partialTlsSlots.front()};
@@ -78,13 +76,21 @@ namespace Plusnx::GenericKernel::Types {
     }
 
     void KProcess::CreateThread() {
-        const auto stackSize{npdm.stackSize};
+        const auto stackSize{npdm.titleNpdm.mainThreadStackSize};
 
         u8* stack = [&] {
-            auto* stackRegion{kernel.memory->stack.data()};
-            auto* kernelRegion{kernel.nxmemory->backing->data()};
+            auto* stackRegion{kernel.user->stack.data()};
+            const KMemoryBlockInfo* block{};
+            do {
+                if (block)
+                    stackRegion += block->size;
+                if (const auto [base, kBlock] = kernel.nxmemory->SearchBlock(stackRegion); kBlock)
+                    block = kBlock;
+                else
+                    throw runtime_exception("The kernel did not reserve the stack space for the process");
 
-            kernel.nxmemory->Allocate(stackRegion, kernelRegion, MemoryProtection::Read | MemoryProtection::Write, stackSize, MemoryType::Stack);
+            } while (block->state != MemoryType::Stack);
+            kernel.nxmemory->Allocate(block->base, block->base, stackSize, MemoryType::Stack);
             return stackRegion + stackSize;
         }();
 
@@ -97,6 +103,5 @@ namespace Plusnx::GenericKernel::Types {
             thread->Initialize(tentry, tls, stack);
             threads.emplace_back(thrHandle);
         }
-
     }
 }

@@ -52,8 +52,13 @@ namespace Plusnx::SysFs::FSys {
 #endif
         errno = 0;
 
-        const auto content{static_cast<u8 *>(output)};
-        const std::array<SysPath, 2> SpecialInvalidSizeFiles{"/dev/urandom", "/proc/self/status"};
+        const auto content{static_cast<u8*>(output)};
+        static const std::vector<SysPath> SpecialInvalidSizeFiles{
+            "/dev/urandom",
+            "/proc/self/status",
+            "/proc/self/maps",
+            "/proc/sys/vm/max_map_count"
+        };
         const auto realFile{!ContainsValue(SpecialInvalidSizeFiles, path)};
 
         while (copied < size) {

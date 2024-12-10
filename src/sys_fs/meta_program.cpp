@@ -20,7 +20,7 @@ namespace Plusnx::SysFs {
 
         constexpr auto ThreadInfo{0x30043F7};
 
-        content = NpdmHeader {
+        titleNpdm = NpdmHeader {
             .flags = NpdmHeader::Flags {
                 .is64BitInstruction = true,
                 .addressSpace = GenericKernel::AddressSpaceType::AddressSpace64Bit
@@ -31,7 +31,7 @@ namespace Plusnx::SysFs {
             .mainThreadStackSize = MainThreadStack,
         };
 
-        addressType = content.flags.addressSpace;
+        addressType = titleNpdm.flags.addressSpace;
         std::construct_at(&priorities, CreateThreadInfoRange(ThreadInfo >> 4));
 
     }
@@ -45,15 +45,11 @@ namespace Plusnx::SysFs {
     MetaProgram::MetaProgram(const FileBackingPtr& npdm) :
         metaFile(std::make_unique<StreamedFile>(npdm)) {
 
-        if (metaFile->Read(content) != sizeof(content))
+        if (metaFile->Read(titleNpdm) != sizeof(titleNpdm))
             throw runtime_exception("Cannot read NPDM content");
-        assert(content.magic == metaMagics[0]);
+        assert(titleNpdm.magic == metaMagics[0]);
 
-        mainCore = content.defaultCoreId;
-        stackSize = content.mainThreadStackSize;
-        threadPriority = content.mainThreadPriority;
-
-        title.emplace(content.titleName.data());
+        title.emplace(titleNpdm.titleName.data());
 
         if (!title->contains("Application")) {
             std::print("Loading metadata from an unofficial application\n");
@@ -72,7 +68,7 @@ namespace Plusnx::SysFs {
             if (acid.sec[KernelCapability].size)
                 CaptureAllKacValues(acid.sec[KernelCapability]);
 
-            metaFile->SkipBytes(content.aci0.offset - metaFile->GetCursor());
+            metaFile->SkipBytes(titleNpdm.aci0.offset - metaFile->GetCursor());
         }
         Aci0Header aci0;
         if (metaFile->Read(aci0) == sizeof(aci0)) {
@@ -87,17 +83,17 @@ namespace Plusnx::SysFs {
         SetKac(capabilities);
 
         // Due to the ease of raw patches in NPDM files, we must validate the read parameters before considering them
-        addressType = content.flags.addressSpace;
+        addressType = titleNpdm.flags.addressSpace;
         assert(aci0.magic && titleId);
 
-        assert(content.systemResourceSize < 0x1FE00000);
+        assert(titleNpdm.systemResourceSize < 0x1FE00000);
     }
 
     void MetaProgram::DisplayBinaryInformation() const {
         std::print("Used address space: {} Bits\n", GetHostBitsCount(addressType));
-        std::print("Main stack size: {:X}\n", content.mainThreadStackSize);
+        std::print("Main stack size: {:X}\n", titleNpdm.mainThreadStackSize);
         std::print("Thread priority range: {}\n", std::string(priorities.first));
-        std::print("Default initial CPU ID: {}\n", content.defaultCoreId);
+        std::print("Default initial CPU ID: {}\n", titleNpdm.defaultCoreId);
         std::print("Title Name: {}\n", *title);
 
         u32 count{};
@@ -109,19 +105,19 @@ namespace Plusnx::SysFs {
         }
 
         std::print("Count of allowed system calls: {}\n", count);
-        std::print("Memory reserved for the system: {}\n", GetReadableSize(content.systemResourceSize));
+        std::print("Memory reserved for the system: {}\n", GetReadableSize(titleNpdm.systemResourceSize));
     }
 
     void MetaProgram::Populate(GenericKernel::Svc::CreateProcessParameter& creation) const {
-        std::strncpy(creation.name.data(), content.titleName.data(), creation.name.size());
+        std::strncpy(creation.name.data(), titleNpdm.titleName.data(), creation.name.size());
         creation.category = GenericKernel::Svc::ProcessCategory::RegularTitle;
 
         if (const auto value = titleId)
             creation.titleId = *value;
 
-        creation.systemResourceNumPages = content.systemResourceSize / GenericKernel::SwitchPageSize;
-        creation.is64BitInstruction = content.flags.is64BitInstruction;
-        creation.addressType = content.flags.addressSpace;
+        creation.systemResourceNumPages = titleNpdm.systemResourceSize / GenericKernel::SwitchPageSize;
+        creation.is64BitInstruction = titleNpdm.flags.is64BitInstruction;
+        creation.addressType = titleNpdm.flags.addressSpace;
         creation.isApplication = true;
 
         constexpr auto CodeStartOffset{0x500000UL};

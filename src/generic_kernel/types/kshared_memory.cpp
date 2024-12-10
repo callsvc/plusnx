@@ -13,7 +13,9 @@ namespace Plusnx::GenericKernel::Types {
 
     u8* KSharedMemory::Allocate(u8* vaddr, const u64 size, const std::shared_ptr<KProcess>& process) const {
         const auto memoryPermissions{process->pid == ownerProcessId ? permissions.owner : permissions.user};
-        auto* result{kernel.nxmemory->Allocate(vaddr, vaddr, size, memoryPermissions, MemoryType::Shared)};
+        auto* result{kernel.nxmemory->Allocate(vaddr, vaddr, size, MemoryType::Shared)};
+        if (result)
+            kernel.nxmemory->Protect(vaddr, size, memoryPermissions);
         return result;
     }
 

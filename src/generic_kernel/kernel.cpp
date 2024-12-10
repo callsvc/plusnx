@@ -18,8 +18,8 @@ namespace Plusnx::GenericKernel {
                 nice(0);
         }
 
-        nxmemory = std::make_unique<GuestBuffer>();
-        memory = std::make_unique<UserSpace>(nxmemory);
+        nxmemory = std::make_unique<MemoryNx>(*this);
+        user = std::make_unique<UserSpace>(nxmemory);
         slabHeap = std::make_unique<Memory::KSlabHeap>(*this, UserSlabBase, UserSlabHeapItemSize, UserSlabHeapSize);
     }
 
@@ -50,7 +50,7 @@ namespace Plusnx::GenericKernel {
         u64 core{};
 
         for (const auto& process : listProc) {
-            const auto numCore{process->npdm.mainCore};
+            const auto numCore{process->npdm.titleNpdm.defaultCoreId};
             auto& targetCore{cpuCores[numCore]};
 
             if (process->pid != pid)

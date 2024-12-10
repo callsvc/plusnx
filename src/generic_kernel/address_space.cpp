@@ -22,7 +22,7 @@ namespace Plusnx::GenericKernel {
         return 32;
     }
 
-    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& buffer, const std::array<RegionProperties*, 0x5>& regions) {
+    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<MemoryNx>& buffer, const std::array<RegionProperties*, 0x5>& regions) {
         const auto& creation{process->creation};
 
         if (creation->addressType != AddressSpaceType::AddressSpace64Bit)
@@ -41,6 +41,5 @@ namespace Plusnx::GenericKernel {
         *regions[3] = {regions[2]->end().base(), VirtualMemorySpace39::StackSize};
         // TLS/IO
         *regions[4] = {regions[3]->end().base(), VirtualMemorySpace39::TlsIoSize};
-
     }
 }

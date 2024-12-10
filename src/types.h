@@ -67,6 +67,13 @@ namespace Plusnx {
 
         return result;
     }
+    template <typename T, u64 Size = sizeof(T)>
+    auto TypeValueFromArray(const std::array<u8, Size>& container) {
+        assert(container.size() >= sizeof(T));
+        T value{};
+        std::memcpy(&value, container.data(), sizeof(T));
+        return value;
+    }
 
     bool IsWaylandPresent();
     std::string GetSdlVersion();

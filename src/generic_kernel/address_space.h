@@ -3,7 +3,7 @@
 #include <types.h>
 
 #include <generic_kernel/constants.h>
-#include <generic_kernel/guest_buffer.h>
+#include <generic_kernel/memory_nx.h>
 namespace Plusnx::GenericKernel {
     namespace Types {
         class KProcess;
@@ -16,5 +16,5 @@ namespace Plusnx::GenericKernel {
     };
 
     u32 GetHostBitsCount(AddressSpaceType type);
-    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<GuestBuffer>& buffer, const std::array<RegionProperties*, 0x5>& regions);
+    void CreateUserAddressSpace(const std::shared_ptr<Types::KProcess>& process, const std::unique_ptr<MemoryNx>& buffer, const std::array<RegionProperties*, 0x5>& regions);
 }

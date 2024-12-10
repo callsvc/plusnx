@@ -1,7 +1,10 @@
 #pragma once
 
-#include <types.h>
 #include <sys/mman.h>
+
+#include <boost/align/align_up.hpp>
+
+#include <types.h>
 namespace Plusnx::GenericKernel {
     constexpr u64 SwitchPageSize{4 * 1024};
     constexpr u64 UserSlabHeapItemSize{SwitchPageSize};
@@ -11,11 +14,16 @@ namespace Plusnx::GenericKernel {
     inline auto ClearSwitchPage(const u64 address) {
         return address & ~(SwitchPageSize - 1);
     }
+
     inline auto IndexPage(const u64 address, const u64 size = SwitchPageSize) {
         auto pageBitsCount{std::countl_zero(size)};
         pageBitsCount = sizeof(std::uint64_t) * 8 - pageBitsCount - 1;
         // ReSharper disable once CppRedundantParentheses
         return address & ((1 << pageBitsCount) - 1);
+    }
+
+    inline bool IsAligned(const u64 size, const u64 alignment = SwitchPageSize) {
+        return boost::alignment::align_up(size, alignment) == size;
     }
 
     namespace MemoryProtection {

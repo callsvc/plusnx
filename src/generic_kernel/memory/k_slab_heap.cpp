@@ -21,9 +21,9 @@ namespace Plusnx::GenericKernel::Memory {
         const auto object{slotObjects.front()};
         slotObjects.pop_front();
 
-        auto* tlsBase{kernel.memory->tlsIo.begin().base() + object};
-        auto* backBase{kernel.nxmemory->backing->data() + object};
-        kernel.nxmemory->Allocate(tlsBase, backBase, MemoryProtection::Read | MemoryProtection::Write, itemSize, MemoryType::ThreadLocal);
+        auto* tlsBase{kernel.user->tlsIo.begin().base() + object};
+        auto* backBase{kernel.nxmemory->back->data() + object};
+        kernel.nxmemory->Allocate(tlsBase, backBase, itemSize, MemoryType::ThreadLocal);
         std::memset(tlsBase, 0, itemSize);
 
         allocated.emplace(tlsBase, object);

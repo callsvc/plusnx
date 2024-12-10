@@ -81,5 +81,10 @@ i32 main(const i32 argc, const char** argv) {
         const std::unique_ptr asan{std::move(app)};
     }
 
+    int* hello = new int;
+    *hello = 3;
+    delete hello;
+    *hello = 2;
+
     return {};
 }

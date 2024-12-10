@@ -14,7 +14,7 @@ namespace Plusnx::GenericKernel {
             total = VirtualMemorySpace39::TotalSize;
             size = SwitchMainSize;
 
-            nxmemory->Initialize(total, size);
+            nxmemory->Initialize(size, total);
             CreateUserAddressSpace(process, nxmemory, std::array{&code, &alias, &heap, &stack, &tlsIo});
         }
 
@@ -22,11 +22,11 @@ namespace Plusnx::GenericKernel {
 #if 1
         InitSelfTest();
 #endif
+        nxmemory->Reserve(stack.data(), nxmemory->back->data() + 0xFF100000, 0xF00000);
     }
     u8 UserSpace::Read8(const u8* vaddr) {
         return *vaddr;
     }
-
     u32 UserSpace::Read32(const u8* vaddr) {
         u32 result{};
         result |= Read8(vaddr);
@@ -48,18 +48,16 @@ namespace Plusnx::GenericKernel {
         Write8(vaddr + 3, value >> 24 & 0xFF);
     }
 
-
     constexpr auto RoFlags{MemoryProtection::Read | MemoryProtection::Write};
     void UserSpace::InitSelfTest() const {
-
         auto* guest{nxmemory->guest->data() + 0x10000};
-        auto* base{nxmemory->backing->data() + 0x20000};
-        auto* memory{nxmemory->Allocate(guest, base, RoFlags, sizeof(u32))};
+        auto* base{nxmemory->back->data() + 0x20000};
+        auto* memory{nxmemory->Allocate(guest, base, 4, MemoryType::Alias)};
 
         Write32(guest, 0x41414141);
         assert(Read32(base) == 0x41414141);
 
-        nxmemory->Free(memory, sizeof(u32));
+        nxmemory->Free(memory, 4);
     }
 
     void UserSpace::MapProgramCode(const ProgramCodeType type, u8* vaddr, u8* addr, const std::span<u8>& code) {
@@ -71,11 +69,17 @@ namespace Plusnx::GenericKernel {
             return MemoryProtection::Write | MemoryProtection::Read;
         }();
 
-        if (auto* memory{nxmemory->Allocate(vaddr, addr, MemoryProtection::Read | MemoryProtection::Write, code.size(), MemoryType::Code)}) {
+        if (auto* memory{nxmemory->Allocate(vaddr, addr, code.size(), MemoryType::Code)}) {
             const auto source{code.begin().base()};
             std::memcpy(memory, source, code.size());
 
             nxmemory->Protect(memory, code.size(), flags);
+#if 1
+            if (type == ProgramCodeType::Text)
+                nxmemory->tracker->ContainsCode(addr, code.size());
+            else if (type == ProgramCodeType::Ro)
+                assert(nxmemory->tracker->Strings(addr, code.size()).size());
+#endif
         }
 
         if (const auto resource{nxmemory->GetUsedResourceSize()})

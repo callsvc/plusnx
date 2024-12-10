@@ -2,6 +2,7 @@
 
 #include <generic_kernel/address_space.h>
 #include <generic_kernel/svc/svc_types.h>
+#include <generic_kernel/memory_nx.h>
 namespace Plusnx::GenericKernel {
 
     enum class ProgramCodeType {
@@ -22,7 +23,7 @@ namespace Plusnx::GenericKernel {
 
     class UserSpace {
     public:
-        UserSpace(std::unique_ptr<GuestBuffer>& guest) : nxmemory(guest) {
+        UserSpace(std::unique_ptr<MemoryNx>& guest) : nxmemory(guest) {
         }
         void CreateProcessMemory(const std::shared_ptr<Types::KProcess>& process);
         void MapProgramCode(ProgramCodeType type, u8* vaddr, u8* addr, const std::span<u8>& code);
@@ -51,6 +52,6 @@ namespace Plusnx::GenericKernel {
         RegionProperties tlsIo{};
     private:
         void InitSelfTest() const;
-        std::unique_ptr<GuestBuffer>& nxmemory;
+        std::unique_ptr<MemoryNx>& nxmemory;
     };
 }

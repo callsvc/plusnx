@@ -1,3 +1,4 @@
+#include <armored/frontend/mach_arm64_disas.h>
 #include <armored/backend/arm64_emitter_context.h>
 
 namespace Plusnx::Armored::Backend {
@@ -6,6 +7,6 @@ namespace Plusnx::Armored::Backend {
     }
 
     void Arm64EmitterContext::EmitNop() {
-        WriteI<u32>(0xD503201F);
+        WriteI<u32>(std::to_underlying(Frontend::OpcodeArm64::NoOperation));
     }
 }

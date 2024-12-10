@@ -24,6 +24,8 @@ target_sources(plusnx-core PUBLIC
     armored/backend/emitter_interface.h
     armored/frontend/arm64_translator.cpp
     armored/frontend/arm64_translator.h
+    armored/frontend/mach_arm64_disas.cpp
+    armored/frontend/mach_arm64_disas.h
     audio/output_device.cpp
     audio/output_device.h
     audio/input_device.cpp
@@ -132,8 +134,12 @@ target_sources(plusnx-core PUBLIC
     generic_kernel/user_space.h
     generic_kernel/address_space.cpp
     generic_kernel/address_space.h
-    generic_kernel/guest_buffer.cpp
-    generic_kernel/guest_buffer.h
+    generic_kernel/memory_nx.cpp
+    generic_kernel/memory_nx.h
+    generic_kernel/os_allocator.cpp
+    generic_kernel/os_allocator.h
+    generic_kernel/tracker.cpp
+    generic_kernel/tracker.h
     generic_kernel/constants.h
     loader/app_loader.cpp
     loader/app_loader.h
@@ -193,4 +199,15 @@ target_sources(plusnx PRIVATE
 )
 
 target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt tsl::robin_map)
+if(PLUSNX_ENABLE_LLVM)
+    target_sources(plusnx-core PRIVATE
+        armored/frontend/arm64_disassembler_llvm.cpp
+    )
+    target_include_directories(plusnx-core PRIVATE ${LLVM_INCLUDE_DIRS})
+    target_link_directories(plusnx-core PRIVATE ${LLVM_LIBRARY_DIRS})
+    target_link_libraries(plusnx-core PRIVATE ${LLVM_LIBRARIES})
+else()
+    target_sources(plusnx-core PRIVATE armored/frontend/mach_nullable.cpp)
+endif()
+
 target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

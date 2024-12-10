@@ -26,8 +26,8 @@ namespace Plusnx::GenericKernel {
         u64 CreateThreadId();
         u64 SetupApplicationProcess(u64 pid);
 
-        std::unique_ptr<GuestBuffer> nxmemory;
-        std::unique_ptr<UserSpace> memory;
+        std::unique_ptr<MemoryNx> nxmemory;
+        std::unique_ptr<UserSpace> user;
 
         std::unique_ptr<Memory::KSlabHeap> slabHeap;
 
