@@ -33,7 +33,7 @@ namespace Plusnx::Core {
     }
 
     void Application::Initialize(std::shared_ptr<Video::GraphicsSupportContext>&& support) {
-        context->kernel = std::make_shared<GenericKernel::Kernel>();
+        context->kernel = std::make_shared<Nxk::Kernel>();
         context->gpu->Initialize(support);
 
         ui = std::move(support);

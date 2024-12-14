@@ -22,7 +22,7 @@ namespace Plusnx::SysFs::Extra {
         return files;
     }
 
-    void NsoModules::LoadModule(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, const FileBackingPtr& file, bool allocate) {
+    void NsoModules::LoadModule(const std::shared_ptr<Nxk::Types::KProcess>& process, u64& address, const FileBackingPtr& file, bool allocate) {
         const auto loadAddr{address};
 
         const auto executable{std::make_shared<Nx::NsoCore>(file)};
@@ -36,7 +36,7 @@ namespace Plusnx::SysFs::Extra {
         modules.insert_or_assign(loadAddr, std::move(executable));
     }
 
-    std::pair<u64, u64> NsoModules::LoadProgramImage(const std::shared_ptr<GenericKernel::Types::KProcess>& process, u64& address, const std::vector<FileBackingPtr>& files, const bool allocate) {
+    std::pair<u64, u64> NsoModules::LoadProgramImage(const std::shared_ptr<Nxk::Types::KProcess>& process, u64& address, const std::vector<FileBackingPtr>& files, const bool allocate) {
         const u64 startAddress{address};
 
         const auto linkerAddress = [&] -> u64 {

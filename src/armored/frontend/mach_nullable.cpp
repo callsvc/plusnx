@@ -1,10 +1,11 @@
-#include <armored/frontend/codes_names.h>
+#include <armored/frontend/mach_arm64_disas.h>
 
 namespace Plusnx::Armored::Frontend {
-    Arm64Disassembler::Arm64Disassembler() {}
-    Arm64Disassembler::~Arm64Disassembler() {}
+    MachArm64Disas::MachArm64Disas() {}
+    MachArm64Disas::~MachArm64Disas() {}
 
-    std::string Arm64Disassembler::to_string([[maybe_unused]] const u32 code) {
+    // ReSharper disable once CppMemberFunctionMayBeStatic
+    std::string MachArm64Disas::to_string([[maybe_unused]] const u32 code) {
         return {};
     }
 }

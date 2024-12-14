@@ -107,40 +107,40 @@ target_sources(plusnx-core PUBLIC
     cpu/kernel_task.cpp
     cpu/kernel_task.h
     cpu/unit_types.h
-    generic_kernel/base/auto_types.h
-    generic_kernel/base/kauto_object.cpp
-    generic_kernel/base/kauto_object.h
-    generic_kernel/base/k_tls_page.cpp
-    generic_kernel/base/k_tls_page.h
-    generic_kernel/base/k_recursive_lock.cpp
-    generic_kernel/base/k_recursive_lock.h
-    generic_kernel/base/k_process_handle_table.cpp
-    generic_kernel/base/k_process_handle_table.h
-    generic_kernel/memory/k_slab_heap.cpp
-    generic_kernel/memory/k_slab_heap.h
-    generic_kernel/types/kprocess.cpp
-    generic_kernel/types/kprocess.h
-    generic_kernel/types/kthread.cpp
-    generic_kernel/types/kthread.h
-    generic_kernel/types/kshared_memory.cpp
-    generic_kernel/types/kshared_memory.h
-    generic_kernel/svc/svc_types.h
-    generic_kernel/svc/svc_process.cpp
-    generic_kernel/svc/svc_process.cpp
-    generic_kernel/svc/svc_process.h
-    generic_kernel/kernel.cpp
-    generic_kernel/kernel.h
-    generic_kernel/user_space.cpp
-    generic_kernel/user_space.h
-    generic_kernel/address_space.cpp
-    generic_kernel/address_space.h
-    generic_kernel/memory_nx.cpp
-    generic_kernel/memory_nx.h
-    generic_kernel/os_allocator.cpp
-    generic_kernel/os_allocator.h
-    generic_kernel/tracker.cpp
-    generic_kernel/tracker.h
-    generic_kernel/constants.h
+    nxk/base/auto_types.h
+    nxk/base/kauto_object.cpp
+    nxk/base/kauto_object.h
+    nxk/base/k_tls_page.cpp
+    nxk/base/k_tls_page.h
+    nxk/base/k_recursive_lock.cpp
+    nxk/base/k_recursive_lock.h
+    nxk/base/k_process_handle_table.cpp
+    nxk/base/k_process_handle_table.h
+    nxk/memory/k_slab_heap.cpp
+    nxk/memory/k_slab_heap.h
+    nxk/types/kprocess.cpp
+    nxk/types/kprocess.h
+    nxk/types/kthread.cpp
+    nxk/types/kthread.h
+    nxk/types/kshared_memory.cpp
+    nxk/types/kshared_memory.h
+    nxk/svc/svc_types.h
+    nxk/svc/svc_process.cpp
+    nxk/svc/svc_process.cpp
+    nxk/svc/svc_process.h
+    nxk/kernel.cpp
+    nxk/kernel.h
+    nxk/user_space.cpp
+    nxk/user_space.h
+    nxk/address_space.cpp
+    nxk/address_space.h
+    nxk/memory_nx.cpp
+    nxk/memory_nx.h
+    nxk/os_allocator.cpp
+    nxk/os_allocator.h
+    nxk/tracker.cpp
+    nxk/tracker.h
+    nxk/constants.h
     loader/app_loader.cpp
     loader/app_loader.h
     loader/eshop_title.cpp

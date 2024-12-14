@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Plusnx::GenericKernel {
+namespace Plusnx::Nxk {
     class Kernel;
 }
 
@@ -10,14 +10,14 @@ namespace Plusnx::Cpu {
 
     class KernelTask {
     public:
-        KernelTask(GenericKernel::Kernel& _kernel) : kernel(_kernel) {}
+        KernelTask(Nxk::Kernel& _kernel) : kernel(_kernel) {}
 
         bool CheckForActivation(const CoreContainer& multicore);
         void DeactivateCore(CoreContainer& multicore) const;
         void DeactivateCore() const;
         bool Run() const;
 
-        GenericKernel::Kernel& kernel;
+        Nxk::Kernel& kernel;
         u64 activated{};
     };
 }

@@ -1,6 +1,6 @@
 #include <print>
 
-#include <generic_kernel/svc/svc_types.h>
+#include <nxk/svc/svc_types.h>
 #include <sys_fs/meta_program.h>
 namespace Plusnx::SysFs {
     std::pair<Range<u32>, Range<u32>> CreateThreadInfoRange(const u32 value) {
@@ -23,7 +23,7 @@ namespace Plusnx::SysFs {
         titleNpdm = NpdmHeader {
             .flags = NpdmHeader::Flags {
                 .is64BitInstruction = true,
-                .addressSpace = GenericKernel::AddressSpaceType::AddressSpace64Bit
+                .addressSpace = Nxk::AddressSpaceType::AddressSpace64Bit
             },
             .mainThreadPriority = ThreadPriority,
             .defaultCoreId = MainThreadCore,
@@ -108,14 +108,14 @@ namespace Plusnx::SysFs {
         std::print("Memory reserved for the system: {}\n", GetReadableSize(titleNpdm.systemResourceSize));
     }
 
-    void MetaProgram::Populate(GenericKernel::Svc::CreateProcessParameter& creation) const {
+    void MetaProgram::Populate(Nxk::Svc::CreateProcessParameter& creation) const {
         std::strncpy(creation.name.data(), titleNpdm.titleName.data(), creation.name.size());
-        creation.category = GenericKernel::Svc::ProcessCategory::RegularTitle;
+        creation.category = Nxk::Svc::ProcessCategory::RegularTitle;
 
         if (const auto value = titleId)
             creation.titleId = *value;
 
-        creation.systemResourceNumPages = titleNpdm.systemResourceSize / GenericKernel::SwitchPageSize;
+        creation.systemResourceNumPages = titleNpdm.systemResourceSize / Nxk::SwitchPageSize;
         creation.is64BitInstruction = titleNpdm.flags.is64BitInstruction;
         creation.addressType = titleNpdm.flags.addressSpace;
         creation.isApplication = true;

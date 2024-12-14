@@ -1,6 +1,6 @@
 #pragma once
 
-#include <generic_kernel/types/kshared_memory.h>
+#include <nxk/types/kshared_memory.h>
 #include <input/controller_types.h>
 
 #include <core/context.h>
@@ -13,9 +13,9 @@ namespace Plusnx::Input {
         void Initialize(std::unique_ptr<FrontendUserControllerDriver>&& controller);
 
         std::unique_ptr<FrontendUserControllerDriver> joycon;
-        std::shared_ptr<GenericKernel::Types::KProcess> process;
+        std::shared_ptr<Nxk::Types::KProcess> process;
     private:
-        std::unique_ptr<GenericKernel::Types::KSharedMemory> kHid;
+        std::unique_ptr<Nxk::Types::KSharedMemory> kHid;
         HidMemoryLayout* hid{nullptr};
     };
 }

@@ -1,5 +1,5 @@
-#include <generic_kernel/kernel.h>
-#include <generic_kernel/types/kprocess.h>
+#include <nxk/kernel.h>
+#include <nxk/types/kprocess.h>
 
 #include <cpu/core_container.h>
 #include <cpu/kernel_task.h>

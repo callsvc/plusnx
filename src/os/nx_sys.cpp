@@ -1,10 +1,10 @@
-#include <generic_kernel/user_space.h>
-#include <generic_kernel/svc/svc_types.h>
+#include <nxk/user_space.h>
+#include <nxk/svc/svc_types.h>
 
 #include <os/make_loader.h>
 #include <os/nx_sys.h>
 namespace Plusnx::Os {
-    using AddrType = GenericKernel::AddressSpaceType;
+    using AddrType = Nxk::AddressSpaceType;
 
     void NxSys::CheckNpdmPresence() const {
         const auto exefs{application->GetNpdm()};
@@ -19,7 +19,7 @@ namespace Plusnx::Os {
     }
 
     void NxSys::PopulateProcessParameters(const SysFs::MetaProgram& npdm) const {
-        GenericKernel::Svc::CreateProcessParameter creation{};
+        Nxk::Svc::CreateProcessParameter creation{};
         npdm.Populate(creation);
 
         const auto& process{context->process};
@@ -52,7 +52,7 @@ namespace Plusnx::Os {
             const auto& npdm{process->npdm};
 #if 1
             if (context->configs->ence)
-                context->configs->ence = npdm.addressType == GenericKernel::AddressSpaceType::AddressSpace64Bit;
+                context->configs->ence = npdm.addressType == Nxk::AddressSpaceType::AddressSpace64Bit;
             assert(npdm.addressType == AddrType::AddressSpace64Bit);
             npdm.DisplayBinaryInformation();
 

@@ -9,7 +9,7 @@
 #include <services/settings/languages.h>
 
 // Kernel-related types
-#include <generic_kernel/types/kprocess.h>
+#include <nxk/types/kprocess.h>
 
 #include <core/process_qol.h>
 namespace Plusnx::Os {
@@ -42,11 +42,11 @@ namespace Plusnx::Core {
         Services::Settings::LanguageType language{};
         std::optional<GameInformation> details;
 
-        std::shared_ptr<GenericKernel::Kernel> kernel;
+        std::shared_ptr<Nxk::Kernel> kernel;
         std::shared_ptr<Os::NxSys> nxOs;
 
         // The main kernel object, necessary to run applications,
         // must live as long as the Application() class is still alive
-        std::shared_ptr<GenericKernel::Types::KProcess> process;
+        std::shared_ptr<Nxk::Types::KProcess> process;
     };
 }

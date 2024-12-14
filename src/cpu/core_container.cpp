@@ -3,7 +3,7 @@
 
 #include <cpu/core_container.h>
 
-#include <generic_kernel/kernel.h>
+#include <nxk/kernel.h>
 
 namespace Plusnx::Cpu {
     using namespace std::chrono_literals;

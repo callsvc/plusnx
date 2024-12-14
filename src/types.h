@@ -19,8 +19,6 @@ namespace Plusnx {
     using u8 = std::uint8_t;
     using i8 = std::int8_t;
 
-    void ActivateTrap();
-
     template<typename T> requires(std::is_integral_v<T>)
     class Range {
     public:
@@ -75,6 +73,7 @@ namespace Plusnx {
         return value;
     }
 
+    void ActivateTrap();
     bool IsWaylandPresent();
     std::string GetSdlVersion();
     std::string GetOsErrorString();

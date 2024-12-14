@@ -3,7 +3,7 @@
 #include <sys_fs/fs_types.h>
 #include <sys_fs/streamed_file.h>
 
-#include <generic_kernel/address_space.h>
+#include <nxk/address_space.h>
 #include <security/key_types.h>
 namespace Plusnx::SysFs {
 #pragma pack(push, 1)
@@ -19,7 +19,7 @@ namespace Plusnx::SysFs {
 
         struct Flags {
             u32 is64BitInstruction : 1 = {};
-            GenericKernel::AddressSpaceType addressSpace : 3 = {};
+            Nxk::AddressSpaceType addressSpace : 3 = {};
             u32 optimizeMemoryAllocation : 1 = {};
             u32 disableDeviceAsMerge : 1 = {};
             u32 enableAliasRegionExtraSize : 1 = {};
@@ -78,9 +78,9 @@ namespace Plusnx::SysFs {
 
         void DisplayBinaryInformation() const;
 
-        void Populate(GenericKernel::Svc::CreateProcessParameter& creation) const;
+        void Populate(Nxk::Svc::CreateProcessParameter& creation) const;
 
-        GenericKernel::AddressSpaceType addressType{};
+        Nxk::AddressSpaceType addressType{};
         std::optional<std::string> title;
         std::optional<u64> titleId;
 

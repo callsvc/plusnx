@@ -14,7 +14,7 @@ namespace Plusnx::Cpu {
 
     class CoreContainer {
     public:
-        CoreContainer(GenericKernel::Kernel& creator) : kernel(creator) {}
+        CoreContainer(Nxk::Kernel& creator) : kernel(creator) {}
         void RunThread(const std::stop_token& stop);
 
         void Initialize();
@@ -27,6 +27,6 @@ namespace Plusnx::Cpu {
         std::optional<std::jthread> thread;
         std::optional<KernelTask> dealer;
 
-        GenericKernel::Kernel& kernel;
+        Nxk::Kernel& kernel;
     };
 }

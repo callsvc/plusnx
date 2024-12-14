@@ -66,14 +66,14 @@ namespace Plusnx::Loader {
         if (const auto [base, size] = nsoHolder.LoadProgramImage(process, startsAddr, files, false); base && size) {
             assert(base + size == startsAddr);
 
-            process->creation->codeNumPages = size / GenericKernel::SwitchPageSize;
+            process->creation->codeNumPages = size / Nxk::SwitchPageSize;
         }
 
         process->mm->CreateProcessMemory(process);
 
         startsAddr = process->creation->codeAddr;
         if (const auto [entryPoint, allocatedSize] = nsoHolder.LoadProgramImage(process, startsAddr, files); allocatedSize) {
-            assert(process->creation->codeNumPages * GenericKernel::SwitchPageSize == allocatedSize);
+            assert(process->creation->codeNumPages * Nxk::SwitchPageSize == allocatedSize);
             process->entry = reinterpret_cast<void*>(process->mm->code.data() + entryPoint);
             return ProcessLoadResult{entryPoint, allocatedSize};
         }

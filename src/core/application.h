@@ -2,7 +2,7 @@
 #include <memory>
 #include <core/games_lists.h>
 #include <video/graphics_types.h>
-#include <generic_kernel/types/kprocess.h>
+#include <nxk/types/kprocess.h>
 
 #include <core/process_qol.h>
 namespace Plusnx::Os {

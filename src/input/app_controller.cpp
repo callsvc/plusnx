@@ -2,7 +2,7 @@
 #include <input/app_controller.h>
 
 namespace Plusnx::Input {
-    AppController::AppController(const std::shared_ptr<Core::Context>& context) : process(context->process), kHid(std::make_unique<GenericKernel::Types::KSharedMemory>(*context->kernel)) {
+    AppController::AppController(const std::shared_ptr<Core::Context>& context) : process(context->process), kHid(std::make_unique<Nxk::Types::KSharedMemory>(*context->kernel)) {
         pthread_setname_np(pthread_self(), "Input Thread");
         hid = reinterpret_cast<HidMemoryLayout*>(kHid->Allocate(nullptr, sizeof(HidMemoryLayout), process));
     }
