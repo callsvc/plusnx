@@ -94,6 +94,5 @@ namespace Plusnx::SysFs {
         std::map<u32, bool> allowedSvc;
         std::pair<Range<u32>, Range<u32>> priorities;
 
-        static std::map<u32, std::string_view> svcList;
     };
 }

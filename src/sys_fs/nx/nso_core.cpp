@@ -55,9 +55,9 @@ namespace Plusnx::SysFs::Nx {
             sdks.emplace_back(sdkMatches->str());
 
         if (sdks.size()) {
-            std::print("SDK Libraries: ");
+            std::print("SDK Libraries:");
             for (const auto& sdk : sdks)
-                std::print("{} ", sdk);
+                std::print(" {}", sdk);
 
             std::println();
         }

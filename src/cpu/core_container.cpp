@@ -41,5 +41,7 @@ namespace Plusnx::Cpu {
         state = CoreState::Stopped;
         state.notify_one();
         thread->request_stop();
+
+        thread->join();
     }
 }

@@ -1,4 +1,5 @@
 #include <print>
+#include <ranges>
 
 #include <nxk/svc/svc_types.h>
 #include <sys_fs/meta_program.h>
@@ -35,8 +36,162 @@ namespace Plusnx::SysFs {
         std::construct_at(&priorities, CreateThreadInfoRange(ThreadInfo >> 4));
 
     }
+    static std::string_view GetSvcName(const u32 number) {
+        static std::map<u32, std::string_view> svcList;
 
-    constexpr std::array metaMagics{
+        static bool svcListInitialized{};
+
+        if (!svcListInitialized) {
+            svcList.clear();
+            constexpr std::array callableCall{
+                "",
+                "SetHeapSize",
+                "SetMemoryPermission",
+                "SetMemoryAttribute",
+                "MapMemory",
+                "UnmapMemory",
+                "QueryMemory",
+                "ExitProcess",
+                "CreateThread",
+                "StartThread",
+                "ExitThread",
+                "SleepThread",
+                "GetThreadPriority",
+                "SetThreadPriority",
+                "GetThreadCoreMask",
+                "SetThreadCoreMask",
+                "GetCurrentProcessorNumber",
+                "SignalEvent",
+                "ClearEvent",
+                "MapSharedMemory",
+                "UnmapSharedMemory",
+                "CreateTransferMemory",
+                "CloseHandle",
+                "ResetSignal",
+                "WaitSynchronization",
+                "CancelSynchronization",
+                "ArbitrateLock",
+                "ArbitrateUnlock",
+                "WaitProcessWideKeyAtomic",
+                "SignalProcessWideKey",
+                "GetSystemTick",
+                "ConnectToNamedPort",
+                "SendSyncRequestLight",
+                "SendSyncRequest",
+                "SendSyncRequestWithUserBuffer",
+                "SendAsyncRequestWithUserBuffer",
+                "GetProcessId",
+                "GetThreadId",
+                "Break",
+                "OutputDebugString",
+                "ReturnFromException",
+                "GetInfo",
+                "FlushEntireDataCache",
+                "FlushDataCache",
+                "MapPhysicalMemory",
+                "UnmapPhysicalMemory",
+                "GetFutureThreadInfo", // GetDebugFutureThreadInfo, 6.0.0+
+                "GetLastThreadInfo",
+                "GetResourceLimitLimitValue",
+                "GetResourceLimitCurrentValue",
+                "SetThreadActivity",
+                "GetThreadContext3",
+                "WaitForAddress",
+                "SignalToAddress",
+                "SynchronizePreemptionState",
+                "GetResourceLimitPeakValue",
+                "",
+                "",
+                "CreateIoPool",
+                "CreateIoRegion",
+                "",
+                "KernelDebug", // [4.0.0+]
+                "ChangeKernelTraceState",
+                "",
+                "CreateSession",
+                "AcceptSession",
+                "ReplyAndReceiveLight",
+                "ReplyAndReceive",
+                "ReplyAndReceiveWithUserBuffer",
+                "CreateEvent",
+                "MapIoRegion",
+                "UnmapIoRegion",
+                "MapPhysicalMemoryUnsafe",
+                "UnmapPhysicalMemoryUnsafe",
+                "SetUnsafeLimit",
+                "CreateCodeMemory",
+                "ControlCodeMemory",
+                "SleepSystem",
+                "ReadWriteRegister",
+                "SetProcessActivity",
+                "CreateSharedMemory",
+                "MapTransferMemory",
+                "UnmapTransferMemory",
+                "CreateInterruptEvent",
+                "QueryPhysicalAddress",
+                "QueryMemoryMapping", // QueryIoMapping, 10.0.0+
+                "CreateDeviceAddressSpace",
+                "AttachDeviceAddressSpace",
+                "DetachDeviceAddressSpace",
+                "MapDeviceAddressSpaceByForce",
+                "MapDeviceAddressSpaceAligned",
+                "MapDeviceAddressSpace",
+                "UnmapDeviceAddressSpace",
+                "InvalidateProcessDataCache",
+                "StoreProcessDataCache",
+                "FlushProcessDataCache",
+                "DebugActiveProcess",
+                "BreakDebugProcess",
+                "TerminateDebugProcess",
+                "GetDebugEvent",
+                "ContinueDebugEvent",
+                "GetProcessList",
+                "GetThreadList",
+                "GetDebugThreadContext",
+                "SetDebugThreadContext",
+                "QueryDebugProcessMemory",
+                "ReadDebugProcessMemory",
+                "WriteDebugProcessMemory",
+                "SetHardwareBreakPoint",
+                "GetDebugThreadParam",
+                "",
+                "GetSystemInfo",
+                "CreatePort",
+                "ManageNamedPort",
+                "ConnectToPort",
+                "SetProcessMemoryPermission",
+                "MapProcessMemory",
+                "UnmapProcessMemory",
+                "QueryProcessMemory",
+                "MapProcessCodeMemory",
+                "UnmapProcessCodeMemory",
+                "CreateProcess",
+                "StartProcess",
+                "TerminateProcess",
+                "GetProcessInfo",
+                "CreateResourceLimit",
+                "SetResourceLimitLimitValue",
+                "CallSecureMonitor",
+            };
+
+            for (const auto& [index, callTitle] : std::views::enumerate(callableCall)) {
+                if (std::string_view{callTitle}.empty())
+                    continue;
+                svcList.emplace(index, callTitle);
+            }
+
+            svcList.emplace(0x90, "MapInsecurePhysicalMemory"); // [15.0.0+]
+            svcList.emplace(0x91, "UnmapInsecurePhysicalMemory");
+
+            svcListInitialized = true;
+        }
+
+        if (svcList.contains(number))
+            return svcList[number];
+        return {};
+    }
+
+    constexpr std::array metaMagicValues{
         ConstMagic<u32>("META"),
         ConstMagic<u32>("ACID"),
         ConstMagic<u32>("ACI0")
@@ -47,7 +202,7 @@ namespace Plusnx::SysFs {
 
         if (metaFile->Read(titleNpdm) != sizeof(titleNpdm))
             throw runtime_exception("Cannot read NPDM content");
-        assert(titleNpdm.magic == metaMagics[0]);
+        assert(titleNpdm.magic == metaMagicValues.front());
 
         title.emplace(titleNpdm.titleName.data());
 
@@ -64,7 +219,7 @@ namespace Plusnx::SysFs {
 
         AcidHeader acid;
         if (metaFile->Read(acid) == sizeof(acid)) {
-            assert(acid.magic == metaMagics[1]);
+            assert(acid.magic == metaMagicValues[1]);
             if (acid.sec[KernelCapability].size)
                 CaptureAllKacValues(acid.sec[KernelCapability]);
 
@@ -72,7 +227,7 @@ namespace Plusnx::SysFs {
         }
         Aci0Header aci0;
         if (metaFile->Read(aci0) == sizeof(aci0)) {
-            assert(aci0.magic == metaMagics[2]);
+            assert(aci0.magic == metaMagicValues.back());
 
             if (aci0.sec[KernelCapability].size)
                 CaptureAllKacValues(aci0.sec[KernelCapability]);
@@ -97,11 +252,13 @@ namespace Plusnx::SysFs {
         std::print("Title Name: {}\n", *title);
 
         u32 count{};
+        std::println("System call in use:");
         for (const auto& [number, enable] : allowedSvc) {
             if (enable)
                 count++;
-            if (svcList.contains(number) && enable)
-                std::print("System call in use: {}\n", svcList.at(number));
+
+            if (const auto syscall{GetSvcName(number)}; syscall.size())
+                std::print("{}: {}\n", syscall, enable ? "Enabled" : "Disabled");
         }
 
         std::print("Count of allowed system calls: {}\n", count);
@@ -150,10 +307,14 @@ namespace Plusnx::SysFs {
                 default: {}
             }
         }
+#if 0 // It was difficult to find a title with syscall descriptors
+        allowedSvc.emplace(0, true);
+        allowedSvc.emplace(1, true);
+        allowedSvc.emplace(2, false);
+        allowedSvc.emplace(10, false);
+        allowedSvc.emplace(11, false);
+        allowedSvc.emplace(18, true);
+#endif
     }
 
-    std::map<u32, std::string_view> MetaProgram::svcList{
-        {0x01, "SetHeapSize"},
-        {0x02, "SetMemoryPermission"}
-    };
 }

@@ -74,7 +74,7 @@ namespace Plusnx::Nxk {
             std::memcpy(memory, source, code.size());
 
             nxmemory->Protect(memory, code.size(), flags);
-#if 1
+#if 0
             if (type == ProgramCodeType::Text)
                 nxmemory->tracker->ContainsCode(addr, code.size());
             else if (type == ProgramCodeType::Ro)
