@@ -45,6 +45,7 @@ namespace Plusnx::SysFs::Nx {
         void Load(const std::shared_ptr<Nxk::Types::KProcess>& process, u64& address, bool hasArguments = true, bool allocate = true);
 
         std::optional<std::string> moduleName;
+        std::vector<u8> program;
     private:
         bool IsSectionCompressed(Loader::SectionType type) const;
         bool HashableSection(Loader::SectionType type) const;
@@ -56,7 +57,6 @@ namespace Plusnx::SysFs::Nx {
         FileBackingPtr backing;
 
         NsoHeader content;
-        std::vector<u8> program;
 
         std::span<u8> textSection;
         std::span<u8> roSection;

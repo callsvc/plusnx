@@ -31,7 +31,7 @@ namespace Plusnx::Nxk {
                 return {};
 
             auto content{mapsFile.GetChars(1024 * 8)};
-            std::string_view line{content.data(), strlen(content.data())};
+            std::string_view line{content.data(), content.size()};
             u64 nextLine{};
             do {
                 if (line.contains("[stack]")) {
@@ -55,18 +55,14 @@ namespace Plusnx::Nxk {
         blocks.emplace(guest->end().base(), KMemoryBlockInfo{});
     }
 
-    u8* MemoryNx::Allocate(u8* addr, u8* physical, const u64 size, const MemoryType type) {
-        assert(addr >= guest->data() && addr < guest->end().base());
+    u8* MemoryNx::Allocate(u8* addr, u8* physical, u64 size, const MemoryType type) {
+        // https://github.com/strato-emu/strato/blob/master/app/src/main/cpp/skyline/kernel/memory.cpp#L21
+        std::scoped_lock guard(lock);
+        if (!(addr >= guest->data() && addr < guest->end().base()))
+            return {};
 
-        u8* result{};
         auto firstOf{blocks.lower_bound(addr)};
         auto lastOf{blocks.lower_bound(addr + size)};
-        if (const auto it{blocks.upper_bound(addr)}; it != lastOf) {
-            lastOf = it;
-        }
-
-        if (tracker->Contains(physical, size))
-            throw std::bad_alloc();
 
         if (firstOf->first > addr)
             --firstOf;
@@ -80,27 +76,34 @@ namespace Plusnx::Nxk {
         auto blockFirst{firstOf->second};
         auto blockLast{lastOf->second};
 
-        bool reprotectIsNeeded{};
+        bool reprotectIsNeeded{blockFirst.state != type};
+        size = boost::alignment::align_up(size, SwitchPageSize);
+        u8* result{nullptr};
 
-        if (firstOf == lastOf) {
+        if (firstOf == lastOf && type != MemoryType::Alias) {
             if (firstOf->first == addr && firstOf->second.state == type)
                 return firstOf->first;
 
-            blockFirst.size -= size;
-            blocks.insert_or_assign(firstOf->first, blockFirst);
-            blockLast.size = size;
-            blocks.insert_or_assign(firstOf->first + size, blockLast);
+            auto* firstAddr{firstOf->first};
+            blockFirst.size = addr - firstOf->first;
+            blocks.insert_or_assign(firstAddr, blockFirst);
+            blockLast.size = (lastOf->first + blockLast.size) - (addr + size);
+            blocks.insert_or_assign(firstAddr + size, blockLast);
 
-            result = {};
-        } else if (firstOf->first + size < lastOf->first && allocatable) {
+            blocks.insert_or_assign(addr, KMemoryBlockInfo{physical, size, type, MemoryProtection::Read | MemoryProtection::Write});
+            if (blockFirst.state != MemoryType::Free)
+                result = addr;
+
+        } else if (firstOf->first + size < lastOf->first && allocatable && type != MemoryType::Alias) {
             if (blockFirst.size > size) {
                 blockFirst.size -= size;
+
+                // ReSharper disable once CppDFAUnusedValue
+                result = firstOf->first;
 
                 blocks.insert_or_assign(firstOf->first, blockFirst);
                 blockFirst.base += size;
                 blocks.insert_or_assign(firstOf->first + size, blockFirst);
-
-                result = firstOf->first;
 
                 reprotectIsNeeded = true;
             }
@@ -108,20 +111,35 @@ namespace Plusnx::Nxk {
                 reprotectIsNeeded = true;
 
             result = firstOf->first;
-        } else if (blockFirst.size + blockLast.size > size && allocatable) {
-            assert(lastOf->second.base == firstOf->first + blockFirst.size);
-            firstOf->second.size += lastOf->second.size;
+        } else if (blockFirst.size + blockLast.size >= size && allocatable && type != MemoryType::Alias) {
+            if (firstOf->first + blockFirst.size != lastOf->first) {
+                auto eraseFirst{std::next(firstOf)};
+                while (eraseFirst->first != lastOf->first) {
+                    auto _first{eraseFirst++};
+                    if (_first->second.state != type)
+                        reprotectIsNeeded = true;
+                }
+                if (std::next(firstOf) != lastOf)
+                    blocks.erase(std::next(firstOf), lastOf);
+                else
+                    blocks.erase(lastOf);
+            } else {
+                assert(lastOf->second.base == firstOf->first + blockFirst.size);
+                firstOf->second.size += lastOf->second.size;
+
+                blocks.erase(lastOf);
+            }
+            result = firstOf->first;
 
             if (blockFirst.state.value != blockLast.state.value)
                 reprotectIsNeeded = true;
-            result = firstOf->first;
-            blocks.erase(lastOf);
         }
 
         if (!result) {
-            blockFirst = KMemoryBlockInfo{
-                physical, size, type, MemoryProtection::Read | MemoryProtection::Write
-            };
+            if (tracker->Contains(physical, size))
+                throw std::bad_alloc();
+
+            blockFirst = KMemoryBlockInfo{physical, size, type, MemoryProtection::Read | MemoryProtection::Write};
             assert(tracker->Allocate(physical, size) != nullptr);
 
             const auto offset{static_cast<u64>(physical - back->data())};
@@ -147,7 +165,6 @@ namespace Plusnx::Nxk {
         }
 
         auto flat{flatmap.begin()};
-
         const auto resetCachedMap = [&] {
             for (; flat != flatmap.end(); ++flat) {
                 if (addr >= flat->base && flat->base + size < addr)
@@ -159,15 +176,15 @@ namespace Plusnx::Nxk {
         if (resetCachedMap) {
             flatmap.clear();
         }
-
         return result;
     }
 
     bool MemoryNx::Reserve(u8* addr, u8* physical, const u64 size) {
         std::scoped_lock guard(lock);
-
         const auto [base, _] = SearchBlock(addr);
-        if (base || tracker->Contains(physical, size))
+        if (base)
+            return {};
+        if (tracker->Contains(physical, size))
             return {};
 
         const auto* result{Allocate(addr, physical, size, MemoryType::Alias)};
@@ -175,7 +192,7 @@ namespace Plusnx::Nxk {
     }
 
     bool MemoryNx::Protect(u8* addr, u64 size, const u32 protection) {
-
+        std::scoped_lock guard(lock);
         const auto [_, block] = SearchBlock(addr);
         if (!block)
             return {};
@@ -193,6 +210,7 @@ namespace Plusnx::Nxk {
     }
 
     bool MemoryNx::Free(u8* addr, u64 size) {
+        std::scoped_lock guard(lock);
         const auto [base, block] = SearchBlock(addr);
         if (!base || !block)
             return {};
@@ -200,21 +218,24 @@ namespace Plusnx::Nxk {
         size = boost::alignment::align_up(size, SwitchPageSize);
         assert(IsAligned(size));
 
+        bool splitBlocks{};
+        auto copyBlock{*block};
         if (size != block->size) {
             // Split the block into two, preserving the upper block if the size does not fill the reserved space
-            auto copyBlock{*block};
             copyBlock.size = block->size - size;
             copyBlock.base += size;
 
             block->size -= copyBlock.size;
 
-            blocks.insert_or_assign(addr + size, copyBlock);
+            splitBlocks = true;
         }
         block->oldState = block->state;
         block->state = MemoryType::Free;
 
         FreePages(base, size);
         tracker->Free(block->base);
+        if (splitBlocks)
+            blocks.insert_or_assign(addr + size, copyBlock);
 
         return true;
     }
@@ -246,6 +267,7 @@ namespace Plusnx::Nxk {
     }
 
     std::pair<u8*, KMemoryBlockInfo*> MemoryNx::SearchBlock(u8* addr) {
+        std::scoped_lock guard(lock);
         for (const auto& [_vaddr, block] : flatmap) {
             if (_vaddr != addr)
                 continue;

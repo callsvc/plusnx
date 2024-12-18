@@ -23,6 +23,12 @@ namespace Plusnx::Nxk::Memory {
 
         auto* tlsBase{kernel.user->tlsIo.begin().base() + object};
         auto* backBase{kernel.nxmemory->back->data() + object};
+        static bool tlsReserved{false};
+        [[unlikely]] if (!tlsReserved) {
+            kernel.nxmemory->Reserve(tlsBase, backBase, itemSize * slotObjects.size() + 1);
+            tlsReserved = true;
+        }
+
         kernel.nxmemory->Allocate(tlsBase, backBase, itemSize, MemoryType::ThreadLocal);
         std::memset(tlsBase, 0, itemSize);
 

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <boost/container/flat_map.hpp>
+#include <mutex>
+#include <map>
+
 #include <boost/container/small_vector.hpp>
 #include <fmt/format.h>
 
@@ -97,13 +99,12 @@ namespace Plusnx::Nxk {
         std::optional<std::span<u8>> back;
         std::optional<Tracker> tracker;
     private:
+        std::map<u8*, KMemoryBlockInfo> blocks;
 
-        // https://www.boost.org/doc/libs/1_62_0/doc/html/container/non_standard_containers.html#container.non_standard_containers.flat_xxx
-        boost::container::flat_map<u8*, KMemoryBlockInfo> blocks;
         boost::container::small_vector<FlatMap, 10> flatmap;
 
         i32 sharedFd{-1};
-        std::mutex lock;
+        std::recursive_mutex lock;
         Kernel& kernel;
     };
 }

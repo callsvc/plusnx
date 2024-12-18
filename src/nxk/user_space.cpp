@@ -52,7 +52,7 @@ namespace Plusnx::Nxk {
     void UserSpace::InitSelfTest() const {
         auto* guest{nxmemory->guest->data() + 0x10000};
         auto* base{nxmemory->back->data() + 0x20000};
-        auto* memory{nxmemory->Allocate(guest, base, 4, MemoryType::Alias)};
+        auto* memory{nxmemory->Allocate(guest, base, 4, MemoryType::Shared)};
 
         Write32(guest, 0x41414141);
         assert(Read32(base) == 0x41414141);

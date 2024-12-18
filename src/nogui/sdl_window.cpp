@@ -7,7 +7,7 @@ namespace Plusnx::NoGui {
 
     SdlWindow::SdlWindow(const i32 flags) {
         const auto sdlFlags{flags | DefaultWindowFlags};
-        assert(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0);
+        assert(SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) == 0);
         if (!(flags & SDL_WINDOW_VULKAN) && !(flags & SDL_WINDOW_OPENGL))
             throw runtime_exception("No valid backend was specified");
 

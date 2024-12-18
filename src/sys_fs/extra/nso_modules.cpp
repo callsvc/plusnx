@@ -46,6 +46,22 @@ namespace Plusnx::SysFs::Extra {
         }();
 
         if (allocate && modules.size()) {
+            assert(modules.size() > 2);
+            auto* processCode{process->kernel.user->code.data() + modules.begin()->first};
+            auto* baseCode{process->kernel.nxmemory->back->data() + modules.begin()->first};
+
+            const auto size = [&] -> u64 {
+                if (const auto lastSdk{std::prev(modules.end())}; lastSdk != modules.end()) {
+                    auto finish{lastSdk->first + lastSdk->second->program.size()};
+                    [[assume(finish > 0)]];
+                    finish -= modules.begin()->first;
+                    return finish;
+                }
+                return {};
+            }();
+
+            process->kernel.nxmemory->Reserve(processCode, baseCode, size);
+
             for (const auto& [loaderOffset, executable] : modules) {
                 u64 ldrOffset{loaderOffset};
                 executable->Load(process, ldrOffset, linkerAddress == ldrOffset);

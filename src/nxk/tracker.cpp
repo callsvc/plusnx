@@ -42,7 +42,6 @@ namespace Plusnx::Nxk {
 
         const auto [size, _] = mapper[pointer];
         if (const auto first{mapper.begin()}; first != mapper.end() && size) {
-            [[assume(size > 0)]];
             first->second.size += size;
         }
         commited -= size;
@@ -56,7 +55,7 @@ namespace Plusnx::Nxk {
             return {};
 
         auto block{mapper.lower_bound(pointer)};
-        while (block->first > pointer || block != mapper.begin())
+        while (block->first > pointer && block != mapper.begin())
             --block;
         if (!block->second.allocated)
             return {};
@@ -65,15 +64,16 @@ namespace Plusnx::Nxk {
             if (block->first + block->second.size > pointer)
                 return 1;
 
-        return block->second.size >= size ? 2 : 1;
+        return block->second.size == size ? 2 : 1;
     }
 
     std::vector<std::string> Tracker::Strings(u8* pointer, u64 size) const {
         std::vector<std::string> result;
         result.reserve(30);
 
-        if (!mapper.contains(pointer))
+        if (!Contains(pointer, size)) {
             return {};
+        }
 
         const auto* src{reinterpret_cast<const char*>(pointer)};
         constexpr auto MinimumStringLength{6};
@@ -105,7 +105,7 @@ namespace Plusnx::Nxk {
     }
 
     bool Tracker::ContainsCode(u8* pointer, const u64 size) const {
-        if (!mapper.contains(pointer)) {
+        if (!Contains(pointer, size)) {
             return {};
         }
         constexpr auto MinimalCoherence{8};

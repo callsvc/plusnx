@@ -82,15 +82,16 @@ namespace Plusnx::Nxk::Types {
             auto* stackRegion{kernel.user->stack.data()};
             const KMemoryBlockInfo* block{};
             do {
-                if (block)
+                if (block && block->state == MemoryType::Stack)
                     stackRegion += block->size;
-                if (const auto [base, kBlock] = kernel.nxmemory->SearchBlock(stackRegion); kBlock)
+                if (const auto [base, kBlock] = kernel.nxmemory->SearchBlock(stackRegion); kBlock) {
                     block = kBlock;
-                else
+                } else {
                     throw runtime_exception("The kernel did not reserve the stack space for the process");
+                }
 
-            } while (block->state != MemoryType::Stack);
-            kernel.nxmemory->Allocate(block->base, block->base, stackSize, MemoryType::Stack);
+            } while (block->state != MemoryType::Alias);
+            kernel.nxmemory->Allocate(stackRegion, block->base, stackSize, MemoryType::Stack);
             return stackRegion + stackSize;
         }();
 

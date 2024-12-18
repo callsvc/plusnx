@@ -1,12 +1,10 @@
+#include <boost/align/align_up.hpp>
 #include <nxk/types/kprocess.h>
 #include <nxk/address_space.h>
-
-#include <boost/align/align_up.hpp>
 
 #if !defined(NATIVE_CODE_EXECUTION)
 #define NATIVE_CODE_EXECUTION 0
 #endif
-
 namespace Plusnx::Nxk {
     u32 GetHostBitsCount(AddressSpaceType type) {
 #if NATIVE_CODE_EXECUTION
