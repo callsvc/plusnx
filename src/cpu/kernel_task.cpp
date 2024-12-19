@@ -4,52 +4,64 @@
 #include <cpu/core_blob.h>
 #include <cpu/kernel_task.h>
 namespace Plusnx::Cpu {
-    bool KernelTask::CheckForActivation(const CoreBlob& multicore) const {
-        if (multicore.state != CoreState::Running)
-            multicore.state.wait(CoreState::Waiting);
 
-        if (!kernel.corePid.contains(multicore.cpuid))
+    void TaskableCoreContext::WaitForAvailability() {
+        std::unique_lock guard(lock);
+
+        if (!running)
+            barrier.wait(guard);
+        waiting = false;
+        running = true;
+    }
+    void TaskableCoreContext::Enabled(const bool enable) {
+        std::scoped_lock guard(lock);
+
+        if (!enable) {
+            running = false;
+            waiting = true;
+            barrier.notify_one();
+        } else {
+            barrier.notify_one();
+        }
+    }
+
+    bool KernelTask::CheckForActivation() const {
+        context.WaitForAvailability();
+
+        if (!kernel.corePid.contains(context.cpusched))
             return false;
 
         return true;
     }
 
-    bool KernelTask::PreemptAndRun() const {
+    bool KernelTask::PreemptAndRun() {
         const auto process{kernel.GetCurrentProcess()};
         bool hosMainThread{};
+
+        if (inserted && !kernel.scheduler->IsCoreEnabled(context.cpusched)) {
+            return {};
+        }
 
         [[unlikely]] if (process->threads.empty()) {
             process->CreateThread();
             hosMainThread = true;
         }
 
-        auto RunTaskLoop = [&] {
-            if (!kernel.scheduler->IsCoreEnabled(cpusched)) {
-                DeactivateCore();
-                return;
-            }
-            if (const auto thread{kernel.scheduler->PreemptForCore(cpusched)}) {
-                thread->Run(); // This is our starting point
-                kernel.scheduler->RemoveThread(thread); // Let's remove it just to break the application, since we don't have much to execute for now
-            } else {
-                DeactivateCore();
-            }
-        };
-
-        [[unlikely]] if (hosMainThread) {
-            const auto thread{process->threads.front()};
-            if (const auto firstThread{process->handles.GetThread(thread)}) {
-                kernel.scheduler->AddThread(firstThread, cpusched);
-                RunTaskLoop();
-                RunTaskLoop(); // We'll be destroyed before the loop executes again
-            }
+        if (const auto thread{kernel.scheduler->PreemptForCore(context.cpusched)}; !hosMainThread) {
+            thread->Run(); // This is our starting point
+            kernel.scheduler->RemoveThread(thread); // Let's remove it just to break the application, since we don't have much to execute for now
+            inserted = false;
         } else {
-            RunTaskLoop();
+            const auto hos{process->threads.front()};
+            if (const auto firstThread{process->handles.GetThread(hos)}) {
+                kernel.scheduler->AddThread(firstThread, context.cpusched);
+                inserted = true;
+            }
         }
-        return true; // Revalidate the current core again
+        return inserted; // Revalidate the current core again
     }
 
-    void KernelTask::DeactivateCore() const {
+    void KernelTask::DeactivateCore() {
         const auto process{kernel.GetCurrentProcess()};
         for (const auto aliveThr : process->threads) {
             if (auto thread{process->handles.GetThread(aliveThr)}) {
@@ -57,10 +69,9 @@ namespace Plusnx::Cpu {
                 kernel.scheduler->RemoveThread(thread);
             }
         }
-        kernel.corePid.erase(cpusched);
-    }
-    void KernelTask::DeactivateCore(CoreBlob& multicore) const {
-        multicore.state = CoreState::Stopped;
-        DeactivateCore();
+        context.Enabled(false);
+        kernel.corePid.erase(context.cpusched);
+
+        inserted = false;
     }
 }

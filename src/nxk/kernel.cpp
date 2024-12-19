@@ -5,7 +5,7 @@
 namespace Plusnx::Nxk {
     Kernel::Kernel() {
         for (u32 core{}; core < Cpu::TotalCoresCount; core++) {
-            cpuCores[core].emplace(*this);
+            cpuCores[core].emplace(core, *this);
             cpuCores[core]->Initialize();
         }
 
@@ -53,18 +53,14 @@ namespace Plusnx::Nxk {
 
         for (const auto& process : listProc) {
             const auto numCore{process->npdm.titleNpdm.defaultCoreId};
-            auto& targetCore{cpuCores[numCore]};
-
             if (process->pid != pid)
                 continue;
 
             assert(process->threads.empty());
-            assert(targetCore->state == Cpu::CoreState::Waiting);
 
-            core = targetCore->cpuid;
+            core = cpuCores[numCore]->cpusched;
             corePid.emplace(core, pid);
-            targetCore->state = Cpu::CoreState::Running;
-            targetCore->state.notify_one();
+            cpuCores[numCore]->Enabled(true);
         }
         return core;
     }

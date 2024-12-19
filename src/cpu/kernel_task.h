@@ -1,22 +1,36 @@
 #pragma once
 
+#include <condition_variable>
 #include <types.h>
 namespace Plusnx::Nxk {
     class Kernel;
 }
 namespace Plusnx::Cpu {
-    class CoreBlob;
+    class TaskableCoreContext {
+    public:
+        TaskableCoreContext(const u64 _id) : cpusched(_id) {}
+        void Enabled(bool enable);
+        void WaitForAvailability();
+
+        u64 cpusched{};
+    private:
+        std::mutex lock;
+        std::condition_variable barrier;
+        bool waiting{false};
+        bool running{false};
+    };
 
     class KernelTask {
     public:
-        KernelTask(Nxk::Kernel& _kernel, const u64 cpu) : kernel(_kernel), cpusched(cpu) {}
+        KernelTask(TaskableCoreContext& ctx, Nxk::Kernel& _kernel) : kernel(_kernel), context(ctx) {}
 
-        bool CheckForActivation(const CoreBlob& multicore) const;
-        void DeactivateCore(CoreBlob& multicore) const;
-        void DeactivateCore() const;
-        bool PreemptAndRun() const;
+        bool CheckForActivation() const;
+        void DeactivateCore();
+        bool PreemptAndRun();
 
+        bool inserted{false};
+    private:
         Nxk::Kernel& kernel;
-        u64 cpusched{};
+        TaskableCoreContext& context;
     };
 }
