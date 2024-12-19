@@ -18,6 +18,8 @@ namespace Plusnx::Nxk {
                 nice(0);
         }
 
+        scheduler.emplace(*this);
+
         nxmemory = std::make_unique<MemoryNx>(*this);
         user = std::make_unique<UserSpace>(nxmemory);
         slabHeap = std::make_unique<Memory::KSlabHeap>(*this, UserSlabBase, UserSlabHeapItemSize, UserSlabHeapSize);
@@ -59,7 +61,7 @@ namespace Plusnx::Nxk {
             assert(process->threads.empty());
             assert(targetCore->state == Cpu::CoreState::Waiting);
 
-            core = targetCore->coreId;
+            core = targetCore->cpuid;
             corePid.emplace(core, pid);
             targetCore->state = Cpu::CoreState::Running;
             targetCore->state.notify_one();

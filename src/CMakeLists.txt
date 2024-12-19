@@ -98,8 +98,8 @@ target_sources(plusnx-core PUBLIC
     core/configs.h
     core/process_qol.cpp
     core/process_qol.h
-    cpu/core_container.cpp
-    cpu/core_container.h
+    cpu/core_blob.cpp
+    cpu/core_blob.h
     cpu/features.cpp
     cpu/features.h
     cpu/coroutine.cpp
@@ -141,6 +141,8 @@ target_sources(plusnx-core PUBLIC
     nxk/tracker.cpp
     nxk/tracker.h
     nxk/constants.h
+    nxk/scheduler_preemptive.cpp
+    nxk/scheduler_preemptive.h
     loader/app_loader.cpp
     loader/app_loader.h
     loader/eshop_title.cpp

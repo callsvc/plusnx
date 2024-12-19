@@ -1,23 +1,22 @@
 #pragma once
 
+#include <types.h>
 namespace Plusnx::Nxk {
     class Kernel;
 }
-
-#include <types.h>
 namespace Plusnx::Cpu {
-    class CoreContainer;
+    class CoreBlob;
 
     class KernelTask {
     public:
-        KernelTask(Nxk::Kernel& _kernel) : kernel(_kernel) {}
+        KernelTask(Nxk::Kernel& _kernel, const u64 cpu) : kernel(_kernel), cpusched(cpu) {}
 
-        bool CheckForActivation(const CoreContainer& multicore);
-        void DeactivateCore(CoreContainer& multicore) const;
+        bool CheckForActivation(const CoreBlob& multicore) const;
+        void DeactivateCore(CoreBlob& multicore) const;
         void DeactivateCore() const;
-        bool Run() const;
+        bool PreemptAndRun() const;
 
         Nxk::Kernel& kernel;
-        u64 activated{};
+        u64 cpusched{};
     };
 }

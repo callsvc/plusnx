@@ -12,9 +12,9 @@ namespace Plusnx::Cpu {
         Stopped,
     };
 
-    class CoreContainer {
+    class CoreBlob {
     public:
-        CoreContainer(Nxk::Kernel& creator) : kernel(creator) {}
+        CoreBlob(Nxk::Kernel& _kernel) : kernel(_kernel) {}
         void RunThread(const std::stop_token& stop);
 
         void Initialize();
@@ -22,10 +22,10 @@ namespace Plusnx::Cpu {
         void Destroy();
 
         std::atomic<CoreState> state;
-        u64 coreId{};
+        u64 cpuid{};
     private:
         std::optional<std::jthread> thread;
-        std::optional<KernelTask> dealer;
+        std::optional<KernelTask> coreTask;
 
         Nxk::Kernel& kernel;
     };

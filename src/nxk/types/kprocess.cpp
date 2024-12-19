@@ -4,9 +4,7 @@
 #include <nxk/types/kprocess.h>
 #include <nxk/base/k_recursive_lock.h>
 namespace Plusnx::Nxk::Types {
-    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), handles(kernel), mm(kernel.user) {
-    }
-
+    KProcess::KProcess(Kernel& kernel) : KSynchronizationObject(kernel, Base::KAutoType::KProcess), handles(kernel), mm(kernel.user) {}
     void KProcess::Initialize() {
         pid = kernel.CreateProcessId();
     }
@@ -14,7 +12,7 @@ namespace Plusnx::Nxk::Types {
     void KProcess::Destroy() {
         for (const auto thread : threads) {
             if (const auto handle{handles.GetThread(thread)})
-                handle->Stop();
+                handle->Kill();
         }
 
         partialTlsSlots.clear();

@@ -38,9 +38,7 @@ namespace Plusnx::SysFs {
     }
     static std::string_view GetSvcName(const u32 number) {
         static std::map<u32, std::string_view> svcList;
-
         static bool svcListInitialized{};
-
         if (!svcListInitialized) {
             svcList.clear();
             constexpr std::array callableCall{
@@ -179,10 +177,8 @@ namespace Plusnx::SysFs {
                     continue;
                 svcList.emplace(index, callTitle);
             }
-
             svcList.emplace(0x90, "MapInsecurePhysicalMemory"); // [15.0.0+]
             svcList.emplace(0x91, "UnmapInsecurePhysicalMemory");
-
             svcListInitialized = true;
         }
 
@@ -191,11 +187,7 @@ namespace Plusnx::SysFs {
         return {};
     }
 
-    constexpr std::array metaMagicValues{
-        ConstMagic<u32>("META"),
-        ConstMagic<u32>("ACID"),
-        ConstMagic<u32>("ACI0")
-    };
+    constexpr std::array metaMagicValues{ConstMagic<u32>("META"), ConstMagic<u32>("ACID"), ConstMagic<u32>("ACI0")};
 
     MetaProgram::MetaProgram(const FileBackingPtr& npdm) :
         metaFile(std::make_unique<StreamedFile>(npdm)) {

@@ -23,7 +23,7 @@ namespace Plusnx::Platform {
 }
 namespace Plusnx::Core {
 
-    struct Context {
+    struct Context : std::enable_shared_from_this<Context> {
         Context();
 
         void Initialize(const std::shared_ptr<Context>& context);

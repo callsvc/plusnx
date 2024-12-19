@@ -5,8 +5,9 @@
 #include <list>
 #include <atomic>
 
-#include <cpu/core_container.h>
+#include <cpu/core_blob.h>
 #include <nxk/user_space.h>
+#include <nxk/scheduler_preemptive.h>
 #include <nxk/memory/k_slab_heap.h>
 namespace Plusnx::Nxk {
     namespace Types {
@@ -32,10 +33,11 @@ namespace Plusnx::Nxk {
         std::unique_ptr<Memory::KSlabHeap> slabHeap;
 
         std::map<u64, u64> corePid;
+        std::optional<SchedulerPreemptive> scheduler;
     private:
         std::atomic<u64> processId, threadId;
 
-        std::array<std::optional<Cpu::CoreContainer>, Cpu::TotalCoresCount> cpuCores;
+        std::array<std::optional<Cpu::CoreBlob>, Cpu::TotalCoresCount> cpuCores;
         std::list<std::shared_ptr<Types::KProcess>> listProc;
     };
 

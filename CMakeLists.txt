@@ -4,7 +4,7 @@ project(plusnx)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(PLUSNX_ENABLE_ASAN "Enable memory sanitizer for the entire program (performance impact)" ON)
+option(PLUSNX_ENABLE_ASAN "Enable memory sanitizer for the entire program (performance impact)" OFF)
 option(PLUSNX_DISABLE_FAST_OPTION "Disable the -0fast optimization option" ON)
 option(PLUSNX_ENABLE_LLVM "Enable LLVM to aid debugging" OFF)
 

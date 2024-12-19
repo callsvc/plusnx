@@ -1,3 +1,4 @@
+#include <security/keyring.h>
 #include <platform/hostx1.h>
 #include <core/context.h>
 
@@ -15,6 +16,7 @@ namespace Plusnx::Core {
 
     void Context::Initialize(const std::shared_ptr<Context>& context) {
         assets = std::make_shared<SysFs::Assets>(context);
+        keys = std::make_shared<Security::Keyring>(shared_from_this());
 
         configs->Initialize(assets->GetPlusnxFilename(DirectoryType::ConfigFile));
         configs->ExportConfigs(assets->GetPlusnxFilename(DirectoryType::ConfigFileBackup));

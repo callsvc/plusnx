@@ -17,7 +17,6 @@ namespace Plusnx::Core {
         std::print("New application started on core {} with PID {}\n", sched_getcpu(), getpid());
 
         context->Initialize(context);
-        context->keys = std::make_shared<Security::Keyring>(context);
 
         games = std::make_unique<GamesLists>(context->assets->games);
         games->Initialize();
