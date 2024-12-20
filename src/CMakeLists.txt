@@ -9,8 +9,8 @@ target_include_directories(plusnx-core PUBLIC
 
 target_sources(plusnx-core PUBLIC
     armored/arm_types.h
-    armored/code_blocks.cpp
-    armored/code_blocks.h
+    armored/readable_text_block.cpp
+    armored/readable_text_block.h
     armored/cpu_context.cpp
     armored/cpu_context.h
     armored/jit_context.cpp
@@ -26,6 +26,10 @@ target_sources(plusnx-core PUBLIC
     armored/frontend/arm64_translator.h
     armored/frontend/mach_arm64_disas.cpp
     armored/frontend/mach_arm64_disas.h
+    armored/ir/ir_constructor.cpp
+    armored/ir/ir_constructor.h
+    armored/ir/ir_types.h
+    armored/ir/ir_types.cpp
     audio/output_device.cpp
     audio/output_device.h
     audio/input_device.cpp

@@ -6,7 +6,11 @@ namespace Plusnx::Armored::Backend {
         lastInstructionSize = 4; // Always 4
     }
 
+    void Arm64EmitterContext::Compile([[maybe_unused]] const std::list<std::unique_ptr<Ir::IrDescriptor>>& list) {
+        std::terminate();
+    }
+
     void Arm64EmitterContext::EmitNop() {
-        WriteI<u32>(std::to_underlying(Frontend::OpcodeArm64::NoOperation));
+        WriteInstruction<u32>(std::to_underlying(Frontend::OpcodeArm64::NoOperation));
     }
 }

@@ -25,8 +25,8 @@ namespace Plusnx::Armored::Frontend {
 
         std::span instruction{reinterpret_cast<u8*>(&code), sizeof(code)};
         result.resize_and_overwrite(0x40, [&](char* buffer, const u64 size) {
-            const auto sizeUsed{LLVMDisasmInstruction(LLVMDisasmContextRef{context}, instruction.data(), instruction.size(), program, buffer, size)};
-            program += sizeUsed;
+            const auto sizeUsed{LLVMDisasmInstruction(LLVMDisasmContextRef{context}, instruction.data(), instruction.size(), pc64, buffer, size)};
+            pc64 += sizeUsed;
             return !sizeUsed ? 0UZ : std::strlen(buffer);
         });
 

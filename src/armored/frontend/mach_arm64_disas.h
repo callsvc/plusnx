@@ -21,7 +21,7 @@ namespace Plusnx::Armored::Frontend {
         ~MachArm64Disas();
         std::string to_string(u32 code);
 
-        u64 program{};
+        u64 pc64{};
         void* context{nullptr};
     };
 }

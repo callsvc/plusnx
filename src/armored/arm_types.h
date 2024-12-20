@@ -10,7 +10,7 @@ namespace Plusnx::Armored {
     };
     struct ArmRegistersContext {
         union {
-            std::array<Arm64Register, 28> gprs;
+            std::array<Arm64Register, 0x1C> gprs;
             Arm64Register r0, r1, r2, r3, r4, r5, r6, r7, r8;
         };
 

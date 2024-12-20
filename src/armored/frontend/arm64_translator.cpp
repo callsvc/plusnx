@@ -12,4 +12,18 @@ namespace Plusnx::Armored::Frontend {
             return 2;
         return 4;
     }
+
+    void Arm64Translator::Translate(const u8* pc, u64 count) {
+        for (const auto& irDescriptor : irsList) {
+            if (pc >= irDescriptor->a64pcVma.data() &&
+                pc < irDescriptor->a64pcVma.end().base())
+                return;
+        }
+        auto descriptor{std::make_unique<Ir::IrDescriptor>(pc, count)};
+        for (; count-- > 0; pc += 4) {
+            descriptor->list.Nop(pc);
+        }
+
+        irsList.emplace_back(std::move(descriptor));
+    }
 }

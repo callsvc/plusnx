@@ -7,27 +7,27 @@ namespace Plusnx::Armored {
         class EmitterGenerator;
     }
     // Special class to allocate all pages required by the JIT
-    enum class CodeBlockStatus {
+    enum class TextStatus {
         Success,
         MemoryMappingFailed
     };
-    enum class CodeBlockProtectionStatus {
+    enum class TextProtectionStatus {
         Enable,
         Disable
     };
 
-    class CodeBlocks {
+    class ReadableTextBlock {
     public:
-        CodeBlocks(const std::shared_ptr<Backend::EmitterGenerator>& generator);
+        ReadableTextBlock(const std::shared_ptr<Backend::EmitterGenerator>& generator);
         void Initialize(u64 code);
-        ~CodeBlocks();
+        ~ReadableTextBlock();
 
         void Expand(u64 pages);
-        void Protect(u8* begin, const u8* end, CodeBlockProtectionStatus action) const;
+        void Protect(u8* begin, const u8* end, TextProtectionStatus action) const;
 
-        u8* exec{nullptr};
+        u8* text{nullptr};
         u64 size{};
-        CodeBlockStatus status{};
+        TextStatus status{};
 
     private:
         std::shared_ptr<Backend::EmitterGenerator> emitter;
