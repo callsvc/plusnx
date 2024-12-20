@@ -23,8 +23,8 @@ namespace Plusnx::Nxk {
 
     class UserSpace {
     public:
-        UserSpace(std::unique_ptr<MemoryNx>& guest) : nxmemory(guest) {
-        }
+        UserSpace(std::unique_ptr<MemoryNx>& guest) : nxmemory(guest) {}
+
         void CreateProcessMemory(const std::shared_ptr<Types::KProcess>& process);
         void MapProgramCode(ProgramCodeType type, u8* vaddr, u8* addr, const std::span<u8>& code);
 

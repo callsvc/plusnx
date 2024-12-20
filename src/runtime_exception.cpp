@@ -1,7 +1,7 @@
+#include <ranges>
 #include <cxxabi.h>
 #include <execinfo.h>
 
-#include <ranges>
 #include <runtime_exception.h>
 #include <types.h>
 namespace Plusnx {
@@ -31,9 +31,11 @@ namespace Plusnx {
     constexpr auto SymbolNameSize{0x50};
     void runtime_exception::PrintPrettyMessage() const {
         for (const auto& function : GetStackTrace()) {
-            std::print("{}\n", function);
+            std::println("{}", function);
         }
-        std::print("Call stack dump completed successfully\n");
+
+        std::println("Call stack dump completed successfully");
+
 #if PLUSNX_GUI_SDL2
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "An exception was thrown", runtime_error::what(), nullptr);
 #endif
@@ -55,14 +57,12 @@ namespace Plusnx {
             }
             auto function{symbols.find(*symbol)->second};
             u64 length{};
-            {
-                const auto content{function.begin() + function.find_first_of('(') + 1};
-                const auto addrPrefix{function.find_last_of('+')};
-                function[addrPrefix] = '\0';
+            const auto content{function.begin() + function.find_first_of('(') + 1};
+            const auto addrPrefix{function.find_last_of('+')};
+            function[addrPrefix] = '\0';
 
-                DemangleFunctionName(&*content, demangle, length);
-                function[addrPrefix] = '+';
-            }
+            DemangleFunctionName(&*content, demangle, length);
+            function[addrPrefix] = '+';
 
             if (length) {
                 if (length > SymbolNameSize)

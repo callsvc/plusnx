@@ -9,23 +9,12 @@ namespace Plusnx::Armored {
         if (code)
             Expand(code / sysconf(_SC_PAGE_SIZE));
 
-        Protect(exec, exec + code, CodeBlockProtectionStatus::Disable);
+        Protect(exec, &exec[code], CodeBlockProtectionStatus::Disable);
         const u64 instructions{code / emitter->backing->GetInstructionSize(true)};
-
-        for (u64 slot{}; instructions % 8 == 0 && slot < instructions; slot += 8) {
-            emitter->EmitNop();
-            emitter->EmitNop();
-
-            emitter->EmitNop();
-            emitter->EmitNop();
-
-            emitter->EmitNop();
-            emitter->EmitNop();
-
-            emitter->EmitNop();
+        for (u64 slot{}; slot < instructions; slot++) {
             emitter->EmitNop();
         }
-        Protect(exec, exec + code, CodeBlockProtectionStatus::Enable);
+        Protect(exec, &exec[code], CodeBlockProtectionStatus::Enable);
     }
 
     CodeBlocks::~CodeBlocks() {

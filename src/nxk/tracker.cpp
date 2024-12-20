@@ -1,3 +1,4 @@
+#include <fstream>
 #include <armored/frontend/mach_arm64_disas.h>
 #include <sys_fs/fsys/regular_file.h>
 
@@ -96,10 +97,13 @@ namespace Plusnx::Nxk {
             rate = {};
         }
 #if 1
-        std::println("Some strings captured from the data region:");
+    if (std::fstream strings{"user/strings.txt", std::ios::out | std::ios::app}) {
+        strings << std::format("Some strings captured from the data region:\n\n");
         for (const auto& string : result) {
-            std::println("{}", string);
+            strings << std::format("{}\n", string);
         }
+        strings.flush();
+    }
 #endif
         return result;
     }
