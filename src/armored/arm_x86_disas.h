@@ -1,8 +1,9 @@
 #pragma once
 
 #include <boost/container/small_vector.hpp>
-#include <types.h>
+#include <capstone/capstone.h>
 
+#include <types.h>
 namespace Plusnx::Armored {
     enum class DisasFlavourType {
         Arm64,
@@ -11,22 +12,24 @@ namespace Plusnx::Armored {
     };
     class ArmX86Disas {
     public:
-        ArmX86Disas(DisasFlavourType flavour);
+        ArmX86Disas(DisasFlavourType flavour, bool half = false);
         ~ArmX86Disas();
-        std::string to_string(const std::span<u8>& instruction);
+        std::vector<std::string> to_string(const std::span<u8>& code);
+
         std::string to_string(const u32 code) {
-            boost::container::small_vector<u8, 4> backing;
+            boost::container::small_vector<u8, 4> backing(4);
             std::memcpy(backing.data(), &code, sizeof(code));
-            return to_string(std::span(backing));
+            if (const auto result{to_string(std::span(backing))}; !result.empty())
+                return result.front();
+            return {};
         }
 
-        operator bool() const {
-            return context != nullptr;
-        }
+        operator bool() const;
 
-        u64 pc64{};
+        u64 relativePc{};
         bool thumb{false};
-        void* context{nullptr};
+
+        csh handle{};
         DisasFlavourType type;
     };
 }

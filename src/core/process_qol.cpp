@@ -8,7 +8,7 @@ namespace Plusnx::Core {
         const std::string& pathname{database};
         constexpr auto traits{SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE};
         if (sqlite3_open_v2(pathname.data(), &db, traits, nullptr) != SQLITE_OK)
-            throw runtime_exception(sqlite3_errmsg(db));
+            throw exception(sqlite3_errmsg(db));
 
         assert(sqlite3_prepare_v2(db, "CREATE TABLE IF NOT EXISTS Played(Id INTEGER PRIMARY KEY, SessionText TEXT)", -1, &stmt, nullptr) == SQLITE_OK);
 

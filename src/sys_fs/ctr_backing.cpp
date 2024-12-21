@@ -45,7 +45,7 @@ namespace Plusnx::SysFs {
 
     u64 CtrBacking::WriteImpl(const void* input, const u64 size, const u64 offset) {
         if (!encrypt || mode != FileMode::Write)
-            throw runtime_exception("This CTR bank is not writable");
+            throw exception("This CTR bank is not writable");
         assert(offset % 16 == 0);
         UpdateNonce(offset + file.offset);
 

@@ -12,7 +12,7 @@ namespace Plusnx::Security {
 
         assert(mbedtls_cipher_info_get_key_bitlen(info) == size * 8);
         if (const auto result = mbedtls_cipher_setkey(&cortex, key, size * 8, decrypt ? MBEDTLS_DECRYPT : MBEDTLS_ENCRYPT))
-            throw runtime_exception(GetMbedError(result));
+            throw exception(GetMbedError(result));
     }
     CipherCast::~CipherCast() {
         mbedtls_cipher_reset(&cortex);

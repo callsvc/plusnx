@@ -25,7 +25,7 @@ namespace Plusnx::SysFs::FSys {
             if (mode == FileMode::Write)
                 return O_RDWR;
 
-            throw runtime_exception("Invalid file mode");
+            throw exception("Invalid file mode");
         }();
         descriptor = open(path.c_str(), parameter);
         if (descriptor < 2)
@@ -73,7 +73,7 @@ namespace Plusnx::SysFs::FSys {
 
             if (static_cast<u64>(result) < stride) {
                 if (result <= 0 && errno)
-                    throw runtime_exception("Failed to read {} bytes from descriptor {}, error description: {}", size, descriptor, GetOsErrorString());
+                    throw exception("Failed to read {} bytes from descriptor {}, error description: {}", size, descriptor, GetOsErrorString());
                 break;
             }
         }
@@ -88,7 +88,7 @@ namespace Plusnx::SysFs::FSys {
         if (GetSize() < final && mode != FileMode::Read && expandable) {
             if (fallocate64(descriptor, 0, offset, final) != 0)
                 if (errno)
-                    throw runtime_exception(GetOsErrorString());
+                    throw exception(GetOsErrorString());
         }
 
         return pwrite64(descriptor, input, size, offset);

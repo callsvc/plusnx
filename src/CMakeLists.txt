@@ -206,13 +206,11 @@ target_sources(plusnx PRIVATE
 )
 
 target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt tsl::robin_map)
-if(PLUSNX_ENABLE_LLVM)
+if(PLUSNX_ENABLE_CAPSTONE)
     target_sources(plusnx-core PRIVATE
         armored/arm_x86_disas.cpp
     )
-    target_include_directories(plusnx-core PRIVATE ${LLVM_INCLUDE_DIRS})
-    target_link_directories(plusnx-core PRIVATE ${LLVM_LIBRARY_DIRS})
-    target_link_libraries(plusnx-core PRIVATE ${LLVM_LIBRARIES})
+    target_link_libraries(plusnx-core PRIVATE capstone::capstone)
 else()
     target_sources(plusnx-core PRIVATE armored/arm_x86_nullable.cpp)
 endif()

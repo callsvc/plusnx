@@ -1,11 +1,12 @@
 #pragma once
 
+#include <thread>
 #include <armored/arm_types.h>
 namespace Plusnx::Armored {
     class CpuContext {
     public:
         CpuContext();
-        u64 ccid;
+        u64 identifier;
         std::span<const u8> vaddr64pointer{}; // Where in main memory (in pages) the current PC is pointing to
 
         ArmRegistersContext ctx; // All machine registers
@@ -14,5 +15,6 @@ namespace Plusnx::Armored {
         Arm64Register fpsr{};
 
         HostRegistersContext host;
+        std::thread::id owner;
     };
 }

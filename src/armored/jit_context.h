@@ -22,18 +22,18 @@ namespace Plusnx::Armored {
 
     class JitContext {
     public:
-        virtual ~JitContext() = default;
+        virtual ~JitContext();
 
         JitContext(GuestCpuType guest);
         void AddCpu(CpuContext& core, AttachOp attaching);
 
         void AddTicks(u64 count);
-        u64 Run(u64 count = 0, u64 index = 0);
-        CpuContext GetCpu(u64 index) const;
+        u64 Run(u64 count = 0, u64 id = 0);
+        std::optional<CpuContext> GetCpu(u64 index) const;
 
         GuestCpuType type;
 
-        std::span<const u8> vmap{};
+        std::span<const u8> vmainmap{};
         u64 ticks{};
 
     protected:

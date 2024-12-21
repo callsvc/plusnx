@@ -23,7 +23,7 @@ namespace Plusnx::Armored::Frontend {
         for (; count-- > 0; pc += 4) {
             u32 instruction{};
             std::memcpy(&instruction, pc, sizeof(4));
-            std::println("Converting instruction: {}", armDism.to_string(instruction));
+            std::println("(Converting instruction) {}", armDism.to_string(instruction));
             descriptor->Nop(pc);
         }
 

@@ -5,7 +5,7 @@
 #include <runtime_exception.h>
 #include <types.h>
 namespace Plusnx {
-    inline void GetCallStack(std::vector<void*>& tracer, std::map<void*, std::string>& symbols) {
+    static void GetCallStack(std::vector<void*>& tracer, std::map<void*, std::string>& symbols) {
         // Android lacks a native function to read the call stack, so we need to implement it ourselves
         tracer.resize(backtrace(tracer.data(), tracer.size()));
         const auto strings{backtrace_symbols(tracer.data(), tracer.size())};
@@ -29,7 +29,7 @@ namespace Plusnx {
     }
 
     constexpr auto SymbolNameSize{0x50};
-    void runtime_exception::PrintPrettyMessage() const {
+    void exception::PrintPrettyMessage() const {
         for (const auto& function : GetStackTrace()) {
             std::println("{}", function);
         }
@@ -41,7 +41,7 @@ namespace Plusnx {
 #endif
     }
 
-    std::vector<std::string> runtime_exception::GetStackTrace() {
+    std::vector<std::string> exception::GetStackTrace() {
         std::vector<std::string> result;
 
         std::vector<void*> tracer(32);

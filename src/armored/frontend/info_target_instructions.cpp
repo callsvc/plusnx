@@ -6,7 +6,7 @@ namespace Plusnx::Armored::Frontend {
         static ArmX86Disas cpuDisas(DisasFlavourType::Arm64);
 
         if (const auto instruction{cpuDisas.to_string(code)}; !instruction.empty()) {
-            std::println(" {:X} : {} ", code, instruction);
+            std::println("{:X} -> {}", code, instruction);
             return true;
         }
         if (cpuDisas)

@@ -3,18 +3,26 @@
 
 #include <armored/backend/emitter_interface.h>
 #include <armored/cpu_context.h>
+
 namespace Plusnx::Armored {
     class ReadableTextBlock;
 }
 
 namespace Plusnx::Armored::Backend {
+    struct EmitterThreadContext {
+        std::optional<CpuContext> cpuCtx;
+        std::shared_ptr<ReadableTextBlock> segment;
+        u8* next{nullptr};
+        std::span<const u8> reflect{};
+    };
+
     class EmitterGenerator {
     public:
         explicit EmitterGenerator(const std::shared_ptr<EmitterInterface>& interface) : backing(interface) {}
         virtual ~EmitterGenerator() = default;
 
-        void PushCpuContext(CpuContext& core, const std::shared_ptr<ReadableTextBlock>& from, u64 size);
-        void PopCpuContext(const CpuContext& core);
+        void Activate(const CpuContext& core, const std::shared_ptr<ReadableTextBlock>& textbl, u64 size);
+        std::shared_ptr<EmitterThreadContext> GetThreadCtx();
 
         void WriteInstruction(const std::span<u8>& instruction);
 
@@ -28,18 +36,15 @@ namespace Plusnx::Armored::Backend {
 
         u64 Execute() const;
 
-        u8* mapping{};
+        void ResetBuffer();
+
         u64 lastInstructionSize{1}; // Assuming the first instruction is a single-byte NOP
-        std::weak_ptr<ReadableTextBlock> blocks;
         std::shared_ptr<EmitterInterface> backing;
 
-        std::vector<std::pair<CpuContext, std::shared_ptr<ReadableTextBlock>>> cpus;
+        std::map<u64, std::shared_ptr<EmitterThreadContext>> cpus;
 
         virtual void EmitNop() = 0;
     private:
-        void Advance();
-
-        // Stores the pointer at its current position relative to the block it belongs to
-        std::map<u8*, std::shared_ptr<ReadableTextBlock>> contexts;
+        void Advance(const std::shared_ptr<EmitterThreadContext>& context) const;
     };
 }

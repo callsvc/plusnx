@@ -85,7 +85,7 @@ namespace Plusnx::Nxk::Types {
                 if (const auto [base, kBlock] = kernel.nxmemory->SearchBlock(stackRegion); kBlock) {
                     block = kBlock;
                 } else {
-                    throw runtime_exception("The kernel did not reserve the stack space for the process");
+                    throw exception("The kernel did not reserve the stack space for the process");
                 }
 
             } while (block->state != MemoryType::Alias);

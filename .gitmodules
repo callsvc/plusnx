@@ -22,3 +22,6 @@
 [submodule "externals/robin-map"]
 	path = externals/robin-map
 	url = https://github.com/Tessil/robin-map.git
+[submodule "externals/capstone"]
+	path = externals/capstone
+	url = https://github.com/capstone-engine/capstone.git

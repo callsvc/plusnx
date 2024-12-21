@@ -68,7 +68,7 @@ namespace Plusnx::Cpu {
 #endif
         for (const auto& gthread: storage->grths | std::views::values) {
             if (gthread.rng && gthread.state == ReusableState::Running)
-                throw runtime_exception("Coroutine {} is still running", gthread.rng);
+                throw exception("Coroutine {} is still running", gthread.rng);
         }
 
         {

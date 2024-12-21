@@ -23,7 +23,7 @@ namespace Plusnx::Loader {
                 return "32GB";
 
             default:
-                throw runtime_exception("Unknown memory size");
+                throw exception("Unknown memory size");
         }
     }
 

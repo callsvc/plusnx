@@ -30,7 +30,7 @@ namespace Plusnx::NoGui {
     void SdlVulkanBacking::ActivateContext(const vk::Instance& context) {
         if ((instance = context))
             if (SDL_Vulkan_CreateSurface(window, instance, &surface) != SDL_TRUE)
-                throw runtime_exception(SDL_GetError());
+                throw exception(SDL_GetError());
     }
 
     void SdlVulkanBacking::Update() {

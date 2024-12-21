@@ -43,7 +43,7 @@ namespace Plusnx::Nxk::Memory {
         assert(allocated.size());
 
         if (!allocated.contains(object))
-            throw runtime_exception("This object does not belong to the current slab");
+            throw exception("This object does not belong to the current slab");
         {
             slotObjects.emplace_back(allocated[object]);
             allocated.erase(object);

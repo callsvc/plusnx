@@ -15,6 +15,6 @@ namespace Plusnx::Armored::Ir {
         void Nop(const u8* addr);
 
         std::map<const u8*, IrOpcode> irs;
-        std::span<const u8> a64pcVma{};
+        std::span<const u8> a64pcVma{}; // < Indicates where the current CFG was translated from
     };
 }

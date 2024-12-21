@@ -14,7 +14,7 @@ namespace Plusnx::Os {
             application->type == Loader::AppType::GameFs) {
 
             if (!exefs)
-                throw runtime_exception("The {} does not have a valid ExeFS, preventing it from loading", Loader::GetTypeName(type));
+                throw exception("The {} does not have a valid ExeFS, preventing it from loading", Loader::GetTypeName(type));
         }
     }
 

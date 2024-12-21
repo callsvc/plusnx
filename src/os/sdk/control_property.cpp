@@ -2,7 +2,7 @@
 namespace Plusnx::Os::Sdk {
     ControlProperty::ControlProperty(const SysFs::FileBackingPtr& nacp) {
         if (nacp->Read(content) != sizeof(ControlHeader))
-            throw runtime_exception("Corrupted NACP file, invalid size");
+            throw exception("Corrupted NACP file, invalid size");
 
         languages.reserve(sizeof(u32));
         for (u32 lang{}; lang < Services::Settings::LastIncludedLanguageId; lang++) {

@@ -6,17 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(PLUSNX_ENABLE_ASAN "Enable memory sanitizer for the entire program (performance impact)" OFF)
 option(PLUSNX_DISABLE_FAST_OPTION "Disable the -0fast optimization option" ON)
-option(PLUSNX_ENABLE_LLVM "Enable LLVM to aid debugging" ON)
+option(PLUSNX_ENABLE_CAPSTONE "Enable Capstone to assist with debugging" ON)
+option(PLUSNX_REDUCE_CAPSTONE_SIZE "Enable Capstone's Diet mode" OFF)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -rdynamic")
 set(CMAKE_CXX_FLAGS_RELEASE "-flto=auto -Werror -s")
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-if(PLUSNX_ENABLE_LLVM)
-    find_package(LLVM 16.0 REQUIRED armdesc armdisassembler aarch64desc aarch64disassembler)
-endif()
 
 if(PLUSNX_ENABLE_ASAN)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")

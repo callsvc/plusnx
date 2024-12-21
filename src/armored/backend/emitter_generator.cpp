@@ -1,59 +1,58 @@
+#include <ranges>
 #include <armored/backend/emitter_generator.h>
 
 #include <armored/readable_text_block.h>
 namespace Plusnx::Armored::Backend {
-    void EmitterGenerator::PushCpuContext(CpuContext& core, const std::shared_ptr<ReadableTextBlock>& from, const u64 size) {
-        cpus.emplace_back(core, from);
+    void EmitterGenerator::Activate(
+        const CpuContext& core,
+        const std::shared_ptr<ReadableTextBlock>& textbl,
+        const u64 size) {
 
-        if (!blocks.expired())
-            contexts.emplace(mapping, blocks);
+        const auto number{core.identifier};
 
-        blocks = cpus.back().second;
-        mapping = cpus.back().second->text;
-
-        from->Initialize(size);
-    }
-
-    void EmitterGenerator::PopCpuContext(const CpuContext& core) {
-        auto it{cpus.begin()};
-        for (; it != cpus.end(); ++it) {
-            if (it->first.ccid == core.ccid)
-                break;
+        if (cpus.contains(number)) {
+            if (cpus[number]->cpuCtx->owner == std::this_thread::get_id())
+                cpus.erase(number);
         }
 
-        mapping = [&] {
-            for (const auto& [map, block] : contexts) {
-                if (block == it->second)
-                    mapping = map;
-            }
-            return nullptr;
-        }();
+        cpus.insert_or_assign(number, std::make_shared<EmitterThreadContext>(core, textbl));
+        textbl->Initialize(size);
+    }
 
-        blocks = it->second;
-        cpus.erase(it);
+    std::shared_ptr<EmitterThreadContext> EmitterGenerator::GetThreadCtx() {
+        for (const auto& contexts : std::ranges::views::values(cpus)) {
+            if (contexts->cpuCtx->owner == std::this_thread::get_id())
+                return contexts;
+        }
+        return {};
     }
 
     void EmitterGenerator::WriteInstruction(const std::span<u8>& instruction) {
-        mapping = [&] -> u8* {
-            if (const std::shared_ptr executable{blocks})
-                if (!(mapping >= executable->text && mapping < executable->text + instruction.size()) || !mapping)
-                    mapping = executable->text;
-
-            return mapping;
-        }();
+        const auto context{GetThreadCtx()};
+        if (!context)
+            return;
 
         assert(instruction.size() == backing->GetInstructionSize(true));
-        for (const auto bytes : instruction) {
-            *mapping++ = bytes;
+        for (const auto [index, bytes] : std::views::enumerate(instruction)) {
+            context->next[index] = bytes;
         }
 
-        Advance();
+        Advance(context);
     }
 
     bool EmitterGenerator::IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& is) const {
-        assert(is.size());
-        assert(cpus.size());
-        return false;
+        u64 match{};
+        for (const auto& contexts : std::ranges::views::values(cpus)) {
+            for (const auto& _irs : is) {
+                if (contexts->reflect.data() == _irs->irs.begin()->first)
+                    match++;
+
+                const auto lastIrs{std::prev(_irs->irs.end())};
+                if (contexts->reflect.end().base() == lastIrs->first + 4)
+                    break;
+            }
+        }
+        return match == is.size();
     }
 
     u64 EmitterGenerator::Execute() const {
@@ -61,7 +60,20 @@ namespace Plusnx::Armored::Backend {
         return {};
     }
 
-    void EmitterGenerator::Advance() {
-        mapping += backing->GetInstructionSize(true);
+    void EmitterGenerator::ResetBuffer() {
+        const auto context{GetThreadCtx()};
+        if (!context)
+            return;
+        const auto* last{context->next};
+        context->next = context->segment->text;
+        assert(context->next != last);
+    }
+
+    void EmitterGenerator::Advance(const std::shared_ptr<EmitterThreadContext>& context) const {
+        context->next += backing->GetInstructionSize(true);
+        const auto* end{context->segment->text + context->segment->size};
+        if (context->next >= end) {
+            context->segment->Expand();
+        }
     }
 }

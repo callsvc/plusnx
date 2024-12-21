@@ -1,4 +1,5 @@
 
+#include <ranges>
 #include <armored/backend/x86_64_emitter_context.h>
 #include <armored/frontend/info_target_instructions.h>
 #include <armored/frontend/arm64_translator.h>
@@ -8,7 +9,7 @@ namespace Plusnx::Armored {
     JitContext::JitContext(const GuestCpuType guest) {
         type = guest;
         if (type == GuestCpuType::Arm32) {
-            throw runtime_exception("The JIT for ARM32 has not been implemented yet");
+            throw exception("The JIT for ARM32 has not been implemented yet");
         }
 
         if (type == GuestCpuType::Arm64) {
@@ -21,6 +22,19 @@ namespace Plusnx::Armored {
 
         std::print("Host CPU assigned to JIT {}, CPU rank: {}\n", caps.brand, caps.GetCpuRank());
     }
+
+    JitContext::~JitContext() {
+        // Removes redundancies and dependencies among shared objects
+        if (jitter->backing)
+            jitter->backing.reset();
+        {
+            [[maybe_unused]] auto&& _jitter{std::move(jitter)};
+            _jitter->cpus.clear();
+            blocks.clear();
+        }
+        assert(platform.use_count() == 1);
+    }
+
     void JitContext::SetGuestMemory(const std::vector<u8>& vector) {
         assert(vector.size() >= 4);
         if (type == GuestCpuType::Arm64) {
@@ -28,38 +42,46 @@ namespace Plusnx::Armored {
             std::memcpy(&first, vector.data(), sizeof(u32));
             assert(Frontend::IsArm64Code(first));
         }
-        vmap = std::span(vector);
+        vmainmap = std::span(vector);
     }
 
     void JitContext::AddCpu(CpuContext& core, const AttachOp attaching) {
         if (attaching == AttachOp::AttachMainVma) {
-            core.vaddr64pointer = vmap;
+            core.vaddr64pointer = vmainmap;
         }
 
-        if (blocks.contains(core.ccid)) {
-            std::println("The current context already exists");
-            return;
+        if (blocks.contains(core.identifier)) {
+            throw exception("The current context already exists");
         }
 
         if (const auto firstBlk{std::make_shared<ReadableTextBlock>(jitter)}) {
-            jitter->PushCpuContext(core, firstBlk, jitParams.codeSectionSize);
-            blocks.emplace(core.ccid, firstBlk);
+            jitter->Activate(core, firstBlk, jitParams.codeSectionSize);
+            blocks.emplace(core.identifier, firstBlk);
         }
     }
-
     void JitContext::AddTicks(const u64 count) {
-        ticks = count;
+        ticks += count;
     }
-
-    u64 JitContext::Run(const u64 count, const u64 index) {
+    u64 JitContext::Run(const u64 count, const u64 id) {
         if (count)
             AddTicks(count);
-        if (jitter->cpus.size() < index)
+        if (jitter->cpus.empty())
             return {};
-        const auto cpuIt{jitter->cpus.begin() + index};
+        const auto eThr = [&] -> std::shared_ptr<Backend::EmitterThreadContext> {
+            for (const auto& contexts : std::ranges::views::values(jitter->cpus)) {
+                if (id && contexts->cpuCtx->identifier == id)
+                    return contexts;
+                if (const auto threadCtx{jitter->GetThreadCtx()}; threadCtx && !id)
+                    return threadCtx;
+            }
+            return nullptr;
+        }();
+        if (eThr == nullptr)
+            return {};
 
         const u64 result = [&] {
-            platform->Translate(&cpuIt->first.vaddr64pointer[cpuIt->first.ctx.pc.X], count);
+            platform->Translate(&eThr->cpuCtx->vaddr64pointer[eThr->cpuCtx->ctx.pc.X], count);
+
             if (!jitter->IsCompiled(platform->GetList())) {
                 jitter->Compile(platform->GetList());
             }
@@ -69,11 +91,13 @@ namespace Plusnx::Armored {
         return !result ? count : result;
     }
 
-    CpuContext JitContext::GetCpu(const u64 index) const {
+    std::optional<CpuContext> JitContext::GetCpu(const u64 index) const {
         if (jitter->cpus.size() < index)
             return {};
-        auto cpuIt{jitter->cpus.begin()};
-        cpuIt += index;
-        return cpuIt->first;
+        for (const auto& [_index, cpuPair] : std::views::enumerate(jitter->cpus)) {
+            if (static_cast<u64>(_index) == index)
+                return cpuPair.second->cpuCtx;
+        }
+        return {};
     }
 }

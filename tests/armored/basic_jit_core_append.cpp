@@ -54,8 +54,8 @@ int main() {
     Plusnx::Armored::CpuContext cpu;
     context.AddCpu(cpu, Plusnx::Armored::AttachOp::AttachMainVma);
 
-    assert(context.Run(std::size(BasicA64Loop) - 1) > 8);
+    assert(context.Run(std::size(BasicA64Loop)) > 8);
 
     const auto primary{context.GetCpu(0)};
-    return primary.ctx.r0.W != 254;
+    return primary->ctx.r0.W != 254;
 }

@@ -32,7 +32,7 @@ namespace Plusnx::Security {
             if (const auto keyFile{provider->OpenSystemFile(SysFs::RootId, keyPath)})
                 ReadKeysPairs(keyFile, type);
             if ((type == KeyType::Production && prods.empty()) || (type == KeyType::Title && titles.empty())) {
-                throw runtime_exception("{} key not found", tag);
+                throw exception("{} key not found", tag);
             }
         };
         ReadKeys("prod.keys", KeyType::Production, "Production");
