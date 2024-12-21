@@ -11,5 +11,9 @@ namespace Plusnx::Armored::Ir {
     public:
         std::string to_string() const;
         IrOpcode type;
+
+        operator bool() const {
+            return type != IrOpcode::None;
+        }
     };
 }

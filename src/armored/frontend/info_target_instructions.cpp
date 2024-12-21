@@ -1,13 +1,15 @@
 
-#include <armored/frontend/mach_arm64_disas.h>
+#include <armored/arm_x86_disas.h>
+#include <armored/frontend/info_target_instructions.h>
 namespace Plusnx::Armored::Frontend {
     bool IsArm64Code(const u32 code) {
-        static MachArm64Disas object;
-        if (const auto instruction{object.to_string(code)}; !instruction.empty()) {
+        static ArmX86Disas cpuDisas(DisasFlavourType::Arm64);
+
+        if (const auto instruction{cpuDisas.to_string(code)}; !instruction.empty()) {
             std::println(" {:X} : {} ", code, instruction);
             return true;
         }
-        if (object.context)
+        if (cpuDisas)
             return {};
 
         auto result{true};

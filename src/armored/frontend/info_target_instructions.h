@@ -14,14 +14,4 @@ namespace Plusnx::Armored::Frontend {
 
     bool IsArm64Code(u32 code);
     bool IsArm64FixedInstruction(u32 code);
-
-    class MachArm64Disas {
-    public:
-        MachArm64Disas();
-        ~MachArm64Disas();
-        std::string to_string(u32 code);
-
-        u64 pc64{};
-        void* context{nullptr};
-    };
 }

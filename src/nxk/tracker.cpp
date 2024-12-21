@@ -1,5 +1,5 @@
 #include <fstream>
-#include <armored/frontend/mach_arm64_disas.h>
+#include <armored/frontend/info_target_instructions.h>
 #include <sys_fs/fsys/regular_file.h>
 
 #include <nxk/tracker.h>

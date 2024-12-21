@@ -9,42 +9,48 @@ namespace Plusnx::Armored::Backend {
             contexts.emplace(mapping, blocks);
 
         blocks = cpus.back().second;
-        mapping = {};
+        mapping = cpus.back().second->text;
 
         from->Initialize(size);
     }
 
     void EmitterGenerator::PopCpuContext(const CpuContext& core) {
         auto it{cpus.begin()};
-        for (; it != cpus.end(); ++it)
+        for (; it != cpus.end(); ++it) {
             if (it->first.ccid == core.ccid)
                 break;
-        mapping = [&] -> u64 {
+        }
+
+        mapping = [&] {
             for (const auto& [map, block] : contexts) {
                 if (block == it->second)
                     mapping = map;
             }
-            return {};
+            return nullptr;
         }();
+
         blocks = it->second;
         cpus.erase(it);
     }
 
     void EmitterGenerator::WriteInstruction(const std::span<u8>& instruction) {
-        auto image = [&] -> u8* {
+        mapping = [&] -> u8* {
             if (const std::shared_ptr executable{blocks})
-                return &executable->text[mapping];
-            return {};
+                if (!(mapping >= executable->text && mapping < executable->text + instruction.size()) || !mapping)
+                    mapping = executable->text;
+
+            return mapping;
         }();
+
         assert(instruction.size() == backing->GetInstructionSize(true));
         for (const auto bytes : instruction) {
-            *image++ = bytes;
+            *mapping++ = bytes;
         }
 
         Advance();
     }
 
-    bool EmitterGenerator::IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptor>>& is) const {
+    bool EmitterGenerator::IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& is) const {
         assert(is.size());
         assert(cpus.size());
         return false;

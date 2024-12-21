@@ -15,6 +15,7 @@ target_sources(plusnx-core PUBLIC
     armored/cpu_context.h
     armored/jit_context.cpp
     armored/jit_context.h
+    armored/arm_x86_disas.h
     armored/backend/arm64_emitter_context.cpp
     armored/backend/arm64_emitter_context.h
     armored/backend/x86_64_emitter_context.cpp
@@ -24,10 +25,10 @@ target_sources(plusnx-core PUBLIC
     armored/backend/emitter_interface.h
     armored/frontend/arm64_translator.cpp
     armored/frontend/arm64_translator.h
-    armored/frontend/mach_arm64_disas.cpp
-    armored/frontend/mach_arm64_disas.h
-    armored/ir/ir_constructor.cpp
-    armored/ir/ir_constructor.h
+    armored/frontend/info_target_instructions.cpp
+    armored/frontend/info_target_instructions.h
+    armored/ir/ir_descriptor_flow_graph.cpp
+    armored/ir/ir_descriptor_flow_graph.h
     armored/ir/ir_types.h
     armored/ir/ir_types.cpp
     audio/output_device.cpp
@@ -207,13 +208,13 @@ target_sources(plusnx PRIVATE
 target_link_libraries(plusnx-core PUBLIC Vulkan::Headers Vulkan::Vulkan SDL2 Boost::align Boost::algorithm mbedcrypto toml11::toml11 sqlite3::sqlite3 lz4_static fmt::fmt tsl::robin_map)
 if(PLUSNX_ENABLE_LLVM)
     target_sources(plusnx-core PRIVATE
-        armored/frontend/arm64_disassembler_llvm.cpp
+        armored/arm_x86_disas.cpp
     )
     target_include_directories(plusnx-core PRIVATE ${LLVM_INCLUDE_DIRS})
     target_link_directories(plusnx-core PRIVATE ${LLVM_LIBRARY_DIRS})
     target_link_libraries(plusnx-core PRIVATE ${LLVM_LIBRARIES})
 else()
-    target_sources(plusnx-core PRIVATE armored/frontend/mach_nullable.cpp)
+    target_sources(plusnx-core PRIVATE armored/arm_x86_nullable.cpp)
 endif()
 
 target_link_libraries(plusnx PRIVATE plusnx-core Boost::program_options)

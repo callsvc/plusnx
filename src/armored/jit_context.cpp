@@ -1,6 +1,6 @@
 
 #include <armored/backend/x86_64_emitter_context.h>
-#include <armored/frontend/mach_arm64_disas.h>
+#include <armored/frontend/info_target_instructions.h>
 #include <armored/frontend/arm64_translator.h>
 
 #include <armored/jit_context.h>
@@ -33,8 +33,7 @@ namespace Plusnx::Armored {
 
     void JitContext::AddCpu(CpuContext& core, const AttachOp attaching) {
         if (attaching == AttachOp::AttachMainVma) {
-            core.vaddr = vmap.data();
-            core.vend = vmap.end().base();
+            core.vaddr64pointer = vmap;
         }
 
         if (blocks.contains(core.ccid)) {
@@ -60,7 +59,7 @@ namespace Plusnx::Armored {
         const auto cpuIt{jitter->cpus.begin() + index};
 
         const u64 result = [&] {
-            platform->Translate(cpuIt->first.vaddr + cpuIt->first.ctx.pc.X, count);
+            platform->Translate(&cpuIt->first.vaddr64pointer[cpuIt->first.ctx.pc.X], count);
             if (!jitter->IsCompiled(platform->GetList())) {
                 jitter->Compile(platform->GetList());
             }

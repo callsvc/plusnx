@@ -23,12 +23,12 @@ namespace Plusnx::Armored::Backend {
             WriteInstruction(std::span(reinterpret_cast<u8*>(&instruction), sizeof(T)));
         }
 
-        bool IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptor>>& is) const;
-        virtual void Compile(const std::list<std::unique_ptr<Ir::IrDescriptor>>& list) = 0;
+        bool IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& is) const;
+        virtual void Compile(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& list) = 0;
 
         u64 Execute() const;
 
-        u64 mapping{};
+        u8* mapping{};
         u64 lastInstructionSize{1}; // Assuming the first instruction is a single-byte NOP
         std::weak_ptr<ReadableTextBlock> blocks;
         std::shared_ptr<EmitterInterface> backing;
@@ -39,6 +39,7 @@ namespace Plusnx::Armored::Backend {
     private:
         void Advance();
 
-        std::map<u64, std::shared_ptr<ReadableTextBlock>> contexts;
+        // Stores the pointer at its current position relative to the block it belongs to
+        std::map<u8*, std::shared_ptr<ReadableTextBlock>> contexts;
     };
 }

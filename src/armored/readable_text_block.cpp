@@ -10,14 +10,12 @@ namespace Plusnx::Armored {
             Expand(code / sysconf(_SC_PAGE_SIZE));
         }
 
-        {
-            Protect(text, &text[code], TextProtectionStatus::Disable);
-            const u64 instructions{code / emitter->backing->GetInstructionSize(true)};
-            for (u64 slot{}; slot < instructions; slot++) {
-                emitter->EmitNop();
-            }
-            Protect(text, &text[code], TextProtectionStatus::Enable);
+        Protect(text, &text[code], TextProtectionStatus::Disable);
+        const u64 instructions{code / emitter->backing->GetInstructionSize(true)};
+        for (u64 slot{}; slot < instructions; slot++) {
+            emitter->EmitNop();
         }
+        Protect(text, &text[code], TextProtectionStatus::Enable);
     }
 
     ReadableTextBlock::~ReadableTextBlock() {

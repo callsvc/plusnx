@@ -19,9 +19,12 @@ namespace Plusnx::Armored::Frontend {
                 pc < irDescriptor->a64pcVma.end().base())
                 return;
         }
-        auto descriptor{std::make_unique<Ir::IrDescriptor>(pc, count)};
+        auto descriptor{std::make_unique<Ir::IrDescriptorFlowGraph>(pc, count)};
         for (; count-- > 0; pc += 4) {
-            descriptor->list.Nop(pc);
+            u32 instruction{};
+            std::memcpy(&instruction, pc, sizeof(4));
+            std::println("Converting instruction: {}", armDism.to_string(instruction));
+            descriptor->Nop(pc);
         }
 
         irsList.emplace_back(std::move(descriptor));
