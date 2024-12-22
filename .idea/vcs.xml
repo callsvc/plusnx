@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/externals/Vulkan-Headers" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/externals/capstone" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/externals/fmt" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/externals/lz4" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/externals/mbedtls" vcs="Git" />

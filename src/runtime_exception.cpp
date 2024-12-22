@@ -20,9 +20,6 @@ namespace Plusnx {
 
     inline void DemangleFunctionName(const std::string_view& name, std::string& demangle, u64& length) {
         __cxxabiv1::__cxa_demangle(name.data(), nullptr, &length, nullptr);
-        if (demangle.capacity() < length)
-            demangle.reserve(length);
-
         demangle.resize(length);
         __cxxabiv1::__cxa_demangle(name.data(), demangle.data(), &length, nullptr);
         demangle.resize(std::strlen(demangle.data()));

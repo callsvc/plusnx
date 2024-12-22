@@ -26,7 +26,7 @@ namespace Plusnx::Armored {
 
         operator bool() const;
 
-        u64 relativePc{};
+        u64 relPc{};
         bool thumb{false};
 
         csh handle{};
