@@ -9,9 +9,13 @@ namespace Plusnx::Armored::Frontend {
         Break = 0xD4200000,
         DataMemoryBarrier = 0xD5033FDF,
         DataSyncBarrier = 0xD5033F9F,
-        InstructionSyncBarrier = 0xD5033F5F
+        InstructionSyncBarrier = 0xD5033F5F,
+        Return = 0xD65F03C0, // Fixed instruction using the default register X30
+        DebugRestoreProcess = 0xD6BF03E0,
     };
 
     bool IsArm64Code(u32 code);
     bool IsArm64FixedInstruction(u32 code);
+    bool IrArm64BranchFlavour(u32 code);
+    bool IsArm64Ret(u32 code);
 }

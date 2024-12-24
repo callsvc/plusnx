@@ -67,20 +67,19 @@ namespace Plusnx::Armored {
             AddTicks(count);
         if (jitter->cpus.empty())
             return {};
-        const auto eThr = [&] -> std::shared_ptr<Backend::EmitterThreadContext> {
-            for (const auto& contexts : std::ranges::views::values(jitter->cpus)) {
-                if (id && contexts->cpuCtx->identifier == id)
-                    return contexts;
-                if (const auto threadCtx{jitter->GetThreadCtx()}; threadCtx && !id)
-                    return threadCtx;
-            }
-            return nullptr;
-        }();
-        if (eThr == nullptr)
+
+        std::shared_ptr<Backend::EmitterThreadContext> thread{};
+        for (const auto& context : std::ranges::views::values(jitter->cpus)) {
+            if (id && context->cpuCtx->identifier == id)
+                thread = context;
+            if (const auto threadCtx{jitter->GetThreadCtx()}; threadCtx && !id)
+                thread = context;
+        }
+        if (thread == nullptr)
             return {};
 
         const u64 result = [&] {
-            platform->Translate(&eThr->cpuCtx->vaddr64pointer[eThr->cpuCtx->ctx.pc.X], count);
+            platform->Translate(&thread->cpuCtx->vaddr64pointer[thread->cpuCtx->ctx.pc.X], count);
 
             if (!jitter->IsCompiled(platform->GetList())) {
                 jitter->Compile(platform->GetList());

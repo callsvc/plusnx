@@ -4,11 +4,13 @@
 namespace Plusnx::Armored::Ir {
     enum class IrOpcode {
         None,
-        IrNop
+        IrNop,
+        IrReturn
     };
 
-    class IrType {
+    class IrValue {
     public:
+        IrValue(const IrOpcode opcode) : type(opcode) {}
         std::string to_string() const;
         IrOpcode type;
 

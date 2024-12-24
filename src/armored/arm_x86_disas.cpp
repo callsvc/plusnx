@@ -36,7 +36,7 @@ namespace Plusnx::Armored {
         const auto counter{cs_disasm(handle, code.data(), code.size(), relPc, 0, &stones)};
 
         for (u64 inst{}; inst < counter; ++inst) {
-            auto content{std::format("{:X}:\t{}\t\t{}", stones[inst].address, stones[inst].mnemonic, stones[inst].op_str)};
+            auto content{std::format("{:08X}:\t{}\t\t{}", stones[inst].address, stones[inst].mnemonic, stones[inst].op_str)};
             std::ranges::transform(content, content.begin(), toupper);
             result.emplace_back(std::move(content));
 

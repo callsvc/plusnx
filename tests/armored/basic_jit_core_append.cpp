@@ -2,7 +2,7 @@
 
 #include <armored/arm_types.h>
 #include <armored/jit_context.h>
-constexpr std::array<Plusnx::u64, 26> BasicA64Loop {
+constexpr std::array<Plusnx::u32, 26> BasicA64Loop {
     0xD10043FF, // SUB     SP, SP, #0x10
     0xB9000BFF, // STR     WZR, [SP, #8]
     0xB9000FFF, // STR     WZR, [SP, #12]

@@ -11,7 +11,7 @@ namespace Plusnx::Armored::Backend {
         virtual u64 GetInstructionSize(bool fromHost = false) = 0;
         virtual void Translate(const u8* pc, u64 count) = 0;
 
-        virtual std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& GetList() = 0;
+        virtual std::list<Ir::IrDescriptorFlowGraph>& GetList() = 0;
 
         std::weak_ptr<EmitterGenerator> parent;
     };

@@ -1,9 +1,10 @@
 #pragma once
 #include <list>
 
+#include <boost/container/small_vector.hpp>
+
 #include <armored/backend/emitter_interface.h>
 #include <armored/cpu_context.h>
-
 namespace Plusnx::Armored {
     class ReadableTextBlock;
 }
@@ -31,14 +32,14 @@ namespace Plusnx::Armored::Backend {
             WriteInstruction(std::span(reinterpret_cast<u8*>(&instruction), sizeof(T)));
         }
 
-        bool IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& is) const;
-        virtual void Compile(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& list) = 0;
+        bool IsCompiled(const std::list<Ir::IrDescriptorFlowGraph>& is) const;
+        virtual void Compile(const std::list<Ir::IrDescriptorFlowGraph>& list) = 0;
 
         u64 Execute() const;
 
         void ResetBuffer();
 
-        u64 lastInstructionSize{1}; // Assuming the first instruction is a single-byte NOP
+        boost::container::small_vector<u8, 16> lastInstruction{1}; // Assuming the first instruction is a single-byte NOP
         std::shared_ptr<EmitterInterface> backing;
 
         std::map<u64, std::shared_ptr<EmitterThreadContext>> cpus;

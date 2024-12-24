@@ -3,10 +3,10 @@
 
 namespace Plusnx::Armored::Backend {
     Arm64EmitterContext::Arm64EmitterContext(const std::shared_ptr<EmitterInterface>& interface) : EmitterGenerator(interface) {
-        lastInstructionSize = 4; // Always 4
+        lastInstruction.resize(4); // Always 4
     }
 
-    void Arm64EmitterContext::Compile([[maybe_unused]] const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& list) {
+    void Arm64EmitterContext::Compile([[maybe_unused]] const std::list<Ir::IrDescriptorFlowGraph>& list) {
         std::terminate();
     }
 

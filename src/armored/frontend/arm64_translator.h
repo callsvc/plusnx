@@ -9,13 +9,13 @@ namespace Plusnx::Armored::Frontend {
         u64 GetInstructionSize(bool fromHost) override;
         void Translate(const u8* pc, u64 count) override;
 
-        std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& GetList() override {
+        std::list<Ir::IrDescriptorFlowGraph>& GetList() override {
             return irsList;
         }
 
         bool thumb{false};
 
         ArmX86Disas armDism{DisasFlavourType::Arm64};
-        std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>> irsList;
+        std::list<Ir::IrDescriptorFlowGraph> irsList;
     };
 }

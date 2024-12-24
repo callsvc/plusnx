@@ -40,4 +40,12 @@ namespace Plusnx {
     bool IsEqual(const T& left, const B& right) {
         return std::ranges::equal(left, right);
     }
+
+    template <typename A, typename B>
+    auto CreateSpanType(B* pointer, const std::size_t count) {
+        if constexpr (std::is_const_v<B>) {
+            return std::span<const A>{reinterpret_cast<const A*>(pointer), count};
+        }
+        return std::span<A>{reinterpret_cast<A*>(pointer), count};
+    }
 }

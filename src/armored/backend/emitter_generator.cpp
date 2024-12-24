@@ -36,19 +36,21 @@ namespace Plusnx::Armored::Backend {
         for (const auto [index, bytes] : std::views::enumerate(instruction)) {
             context->next[index] = bytes;
         }
+        if (lastInstruction.size() != instruction.size())
+            lastInstruction.resize(instruction.size());
+        lastInstruction.assign(instruction.begin(), instruction.end());
 
         Advance(context);
     }
 
-    bool EmitterGenerator::IsCompiled(const std::list<std::unique_ptr<Ir::IrDescriptorFlowGraph>>& is) const {
+    bool EmitterGenerator::IsCompiled(const std::list<Ir::IrDescriptorFlowGraph>& is) const {
         u64 match{};
         for (const auto& contexts : std::ranges::views::values(cpus)) {
             for (const auto& _irs : is) {
-                if (contexts->reflect.data() == _irs->irs.begin()->first)
+                if (contexts->reflect.data() == _irs.FirstPc())
                     match++;
 
-                const auto lastIrs{std::prev(_irs->irs.end())};
-                if (contexts->reflect.end().base() == lastIrs->first + 4)
+                if (contexts->reflect.end().base() == _irs.LastPc())
                     break;
             }
         }
