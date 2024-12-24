@@ -19,7 +19,18 @@ void CheckDriversVersion() {
 std::string game;
 po::options_description desc("Plusnx options");
 
+void VerifyExecutionPrivileges() {
+    const auto uid{getuid()};
+    const auto euid{getegid()};
+
+    if (!uid || !euid || uid != euid)
+        std::terminate();
+}
+
 i32 main(const i32 argc, const char** argv) {
+    // We want to ensure that generated files are not created by privileged users
+    VerifyExecutionPrivileges();
+
     auto sdlVkWindow{std::make_shared<NoGui::SdlVulkanBacking>()};
     CheckDriversVersion();
     if (!argc && argv)

@@ -14,9 +14,8 @@ namespace Plusnx::Input {
 
     void AppController::Initialize(std::unique_ptr<FrontendUserControllerDriver>&& controller) {
         joycon = std::move(controller);
-        if (!joycon)
-            return;
-
-        joycon->PickAJoystick();
+        if (joycon) {
+            joycon->PickAJoystick();
+        }
     }
 }
