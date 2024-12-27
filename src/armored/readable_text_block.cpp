@@ -55,7 +55,7 @@ namespace Plusnx::Armored {
             if (!expansion)
                 return;
         }
-        expansion = boost::alignment::align_up(expansion, 4096);
+        expansion = boost::alignment::align_up(expansion, GetPageSize());
 
         const auto* last{text};
         if (!text) {

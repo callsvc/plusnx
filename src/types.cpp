@@ -31,4 +31,12 @@ namespace Plusnx {
         __builtin_trap();
 #endif
     }
+
+    u64 GetPageSize() {
+        const auto config{sysconf(_SC_PAGE_SIZE)};
+        const auto size{getpagesize()};
+        if (config != size)
+            return config;
+        return size;
+    }
 }

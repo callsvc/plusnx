@@ -35,19 +35,18 @@ namespace Plusnx::Nxk::Types {
         };
 
         MapCode(ProgramCodeType::Text, vaddr, std::span(sections[0]));
-        const auto roOffset{boost::alignment::align_up(vaddr + sections[0].size(), 4096)};
+        const auto roOffset{boost::alignment::align_up(vaddr + sections[0].size(), SwitchPageSize)};
         MapCode(ProgramCodeType::Ro, roOffset, std::span(sections[1]));
-        {
-            auto overBssSize{program.size()};
-            for (const auto& section : sections) {
-                overBssSize -= boost::alignment::align_up(section.size(), 4096);
-            }
-            const auto dataOffset{boost::alignment::align_up(roOffset + sections[1].size(), 4096)};
 
-            if (const std::span initialized{sections.back().data(), boost::alignment::align_up(sections.back().size() + overBssSize, 4096)}; initialized.size()) {
-                MapCode(ProgramCodeType::Data, dataOffset, initialized);
-                vaddr = dataOffset + initialized.size();
-            }
+        auto overBssSize{program.size()};
+        for (const auto& section : sections) {
+            overBssSize -= boost::alignment::align_up(section.size(), SwitchPageSize);
+        }
+        const auto dataOffset{boost::alignment::align_up(roOffset + sections[1].size(), SwitchPageSize)};
+
+        if (const std::span initialized{sections.back().data(), boost::alignment::align_up(sections.back().size() + overBssSize, SwitchPageSize)}; initialized.size()) {
+            MapCode(ProgramCodeType::Data, dataOffset, initialized);
+            vaddr = dataOffset + initialized.size();
         }
     }
 

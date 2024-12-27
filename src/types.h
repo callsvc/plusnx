@@ -74,7 +74,10 @@ namespace Plusnx {
     }
 
     void ActivateTrap();
+    u64 GetPageSize();
+
     bool IsWaylandPresent();
+
     std::string GetSdlVersion();
     std::string GetOsErrorString();
 }

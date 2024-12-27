@@ -27,8 +27,9 @@ namespace Plusnx::Core {
         const auto userid{getuid()};
         const auto pwd{getpwuid(userid)};
 
-        std::string result(pwd->pw_gecos);
-        return result;
+        return std::invoke([](const auto* gecos) {
+            return std::string(gecos);
+        }, pwd->pw_gecos);
     }
 
     void ProcessQol::ChangeGame(const GameInformation &game) {

@@ -61,8 +61,9 @@ namespace Plusnx::SysFs::FSys {
         };
         const auto realFile{!ContainsValue(SpecialInvalidSizeFiles, path)};
 
+        static const auto pageSize{GetPageSize()};
         while (copied < size) {
-            const u64 stride{size - copied > 4096 ? 4096 : size - copied};
+            const u64 stride{size - copied > pageSize ? pageSize : size - copied};
             if (realFile && (!stride || copied + stride > GetSize() - offset))
                 return stride;
 

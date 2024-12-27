@@ -26,7 +26,7 @@ namespace Plusnx::Nxk::Base {
             it->object->DecrementReference();
 
             {
-                auto destroyIt{std::move(it->object)};
+                const auto destroyIt{std::move(it->object)};
             }
             it->handle = {};
             if (handleHead != handles.end())

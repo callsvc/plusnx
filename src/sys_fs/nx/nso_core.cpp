@@ -77,7 +77,7 @@ namespace Plusnx::SysFs::Nx {
         }
 
         if (!allocate) {
-            const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, 4096)};
+            const auto completeImageSize{boost::alignment::align_up(program.size() + content.bssSize, Nxk::SwitchPageSize)};
             if (program.size() < completeImageSize) {
                 program.resize(completeImageSize);
                 program.shrink_to_fit();

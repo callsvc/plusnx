@@ -12,7 +12,8 @@ namespace Plusnx::Details {
         VirtualAllocator() noexcept = default;
 
         static auto GetAlignedSize(const u64 count) {
-            return boost::alignment::align_up(count * sizeof(T), 4096);
+            static const auto alignment{GetPageSize()};
+            return boost::alignment::align_up(count * sizeof(T), alignment);
         }
 
         static T* allocate(const std::size_t count) {
