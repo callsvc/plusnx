@@ -51,7 +51,7 @@ namespace Plusnx::SysFs {
     void Assets::ResetDir(FSys::RigidDirectory& directory) const {
         for (const auto& file : directory.ListAllFiles()) {
             provider->RemoveCachedFile(file);
-            directory.UnlikeFile(file);
+            directory.UnlinkFile(file);
         }
     }
 

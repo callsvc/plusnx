@@ -3,6 +3,7 @@
 #include <armored/backend/emitter_interface.h>
 #include <armored/ir/ir_descriptor_flow_graph.h>
 
+#include <armored/frontend/arm64_faster_intrusive_decoder.h>
 namespace Plusnx::Armored::Frontend {
     class Arm64Translator final : public Backend::EmitterInterface {
     public:
@@ -16,6 +17,7 @@ namespace Plusnx::Armored::Frontend {
         bool thumb{false};
 
         ArmX86Disas armDism{DisasFlavourType::Arm64};
+        FasterArm64IntrusiveDecoder farm64idec;
         std::list<Ir::IrDescriptorFlowGraph> irsList;
     };
 }

@@ -32,6 +32,44 @@ namespace Plusnx::SysFs {
         return std::format("{:.4} {}", value, formats[format]);
     }
 
+    // Permanently delete your files
+    void ShredderFile(FSys::RegularFile& file) {
+        u64 stepsCount{0x8};
+
+        if (const auto size{file.GetSize()}; size) {
+            if (size >= 1 * 1024 * 1024 * 1024) // For files larger than 1 GB
+                stepsCount = 0x4;
+        }
+
+        const auto patternReadBackCount{stepsCount / 0x4};
+        std::vector<u8> content(file.GetSize());
+        FSys::RegularFile random{"/dev/urandom"};
+
+        for (u64 step{}; step < stepsCount; step++) {
+            for (u64 pattern{}; pattern < patternReadBackCount; pattern++) {
+                if (!pattern)
+                    random.Read(content.data(), content.size());
+
+                if (pattern % patternReadBackCount == 0) {
+                    file.Write(content.data(), content.size());
+                    file.Read(content.data(), content.size());
+                }
+
+                bool zeroed{};
+                for (u32 pass{}; pass < 2; pass++) {
+                    zeroed = pass == 0;
+                    for (u64 ows{}; ows < pattern; ows++) {
+                        if (!zeroed)
+                            std::memset(content.data(), 0xFF, content.size());
+                        else
+                            std::memset(content.data(), 0, content.size());
+                        file.Write(content.data(), content.size());
+                    }
+                }
+            }
+        }
+    }
+
     void RoDirectoryBacking::ExtractAllFiles(const SysPath& output) {
         const auto cachedFiles{ListAllFiles()};
         std::vector<u8> buffering(8 * 1024 * 1024);

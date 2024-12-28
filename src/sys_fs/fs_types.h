@@ -6,9 +6,13 @@
 #include <types.h>
 
 namespace Plusnx::SysFs {
+    namespace FSys {
+        class RegularFile;
+    }
     using SysPath = std::filesystem::path;
 
     std::string GetReadableSize(u64 size);
+    void ShredderFile(FSys::RegularFile& file);
 
     enum class FileMode {
         Read,
@@ -118,7 +122,7 @@ namespace Plusnx::SysFs {
         DirectoryBacking(const SysPath& path) : RoDirectoryBacking(path) {}
 
         virtual FileBackingPtr CreateFile(const SysPath& file) = 0;
-        virtual void UnlikeFile(const SysPath& file) = 0;
+        virtual void UnlinkFile(const SysPath& file) = 0;
     };
 
     using FileLists = std::map<SysPath, FileBackingPtr>;

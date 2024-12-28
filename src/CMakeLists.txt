@@ -27,6 +27,8 @@ target_sources(plusnx-core PUBLIC
     armored/frontend/arm64_translator.h
     armored/frontend/info_target_instructions.cpp
     armored/frontend/info_target_instructions.h
+    armored/frontend/arm64_faster_intrusive_decoder.cpp
+    armored/frontend/arm64_faster_intrusive_decoder.h
     armored/ir/ir_descriptor_flow_graph.cpp
     armored/ir/ir_descriptor_flow_graph.h
     armored/ir/ir_types.h
@@ -189,6 +191,7 @@ target_sources(plusnx-core PUBLIC
     details/perf_measure.cpp
     details/perf_measure.h
     details/allocators.h
+    details/bits.h
     driver.cpp
     container.h
     runtime_exception.cpp

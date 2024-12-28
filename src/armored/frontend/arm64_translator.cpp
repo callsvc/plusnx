@@ -33,10 +33,14 @@ namespace Plusnx::Armored::Frontend {
 
             std::println("ARM.IR -> {}", armDism.to_string(arm));
 
-            if (IsArm64Ret(arm)) {
-                cfg.Return();
+            if (const auto result{farm64idec.Decode(arm)}) {
+                [[maybe_unused]] const auto instruction{result->type};
             } else {
                 cfg.Nop();
+            }
+
+            if (IsArm64Ret(arm)) {
+                cfg.Return();
             }
 
             if (IrArm64BranchFlavour(arm)) {

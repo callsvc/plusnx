@@ -63,8 +63,12 @@ namespace Plusnx::SysFs::FSys {
         return OpenFile(filepath, FileMode::Write);
     }
 
-    void RigidDirectory::UnlikeFile(const SysPath& file) {
+    void RigidDirectory::UnlinkFile(const SysPath& file) {
         assert(exists(file));
+
+        if (RegularFile _openedFile{file, FileMode::Write})
+            ShredderFile(_openedFile);
+
         std::filesystem::remove(file);
     }
 }

@@ -12,6 +12,6 @@ namespace Plusnx::SysFs::FSys {
         std::shared_ptr<RigidDirectory> CreateSubDirectory(const SysPath& dirname) const;
 
         FileBackingPtr CreateFile(const SysPath& file) override;
-        void UnlikeFile(const SysPath& file) override;
+        void UnlinkFile(const SysPath& file) override;
     };
 }

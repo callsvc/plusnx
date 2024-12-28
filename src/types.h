@@ -26,11 +26,16 @@ namespace Plusnx {
         Range(T _min, T _max) : min(_min), max(_max) {
             assert(min < max);
         }
+        Range(T _max) : min(0), max(_max) {
+            assert(max);
+        }
 
-        std::vector<T> CreateValues(u64 count) {
-            std::vector<T> result;
-            if (!(max - min))
-                return result;
+        constexpr std::vector<T> CreateValues(u64 count = 0) {
+            if constexpr (requires { std::is_unsigned_v<T>; }; max < min)
+                return {};
+            if (max - min < 0)
+                return {};
+            std::vector<T> result{};
             if (count > max - min)
                 result.reserve(count);
             else
@@ -43,7 +48,7 @@ namespace Plusnx {
         operator std::string() const {
             return std::format("{} to {}", min, max);
         }
-    private:
+
         T min{};
         T max{};
     };
