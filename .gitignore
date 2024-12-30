@@ -1,1 +1,5 @@
-cmake-build-*
+cmake-build-debug
+cmake-build-release
+*.o
+.DS_Store
+Thumbs.db

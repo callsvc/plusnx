@@ -22,18 +22,18 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast")
 endif()
 
+set(TOML11_PRECOMPILE ON CACHE BOOL "precompile toml11 library" FORCE)
+
 find_package(Vulkan REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(fmt 11 REQUIRED)
+find_package(toml11 REQUIRED)
 
-add_executable(plusnx)
 add_library(plusnx-core)
+add_executable(plusnx)
 
+add_subdirectory(src)
 add_subdirectory(externals)
 add_subdirectory(tests)
 add_subdirectory(tools)
-
-add_subdirectory(src)
-
-file(COPY ${CMAKE_SOURCE_DIR}/Plusnx.supp DESTINATION ${CMAKE_BINARY_DIR})
-
 
