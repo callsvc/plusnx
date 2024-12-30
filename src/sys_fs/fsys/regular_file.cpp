@@ -1,11 +1,13 @@
 #include <fstream>
 #include <utility>
 
-#include <boost/align/align_up.hpp>
-#include <boost/range/size.hpp>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/sendfile.h>
 #include <unistd.h>
+
+#include <boost/align/align_up.hpp>
+#include <boost/range/size.hpp>
 
 #include <sys_fs/fsys/regular_file.h>
 namespace Plusnx::SysFs::FSys {
@@ -42,6 +44,48 @@ namespace Plusnx::SysFs::FSys {
         fstat64(descriptor, &details);
         assert(details.st_blksize);
         return details.st_size;
+    }
+
+    constexpr auto MaximumFileDuplication{1024};
+    RegularFile RegularFile::Duplicate(const SysPath& create) {
+        const auto pathdup = [&] -> SysPath {
+            if (!create.empty() && !exists(create))
+                return create;
+            for (u64 dupid{}; dupid < MaximumFileDuplication; dupid++) {
+                if (const auto testpath{path / std::format("dup{}", dupid)}; !exists(testpath))
+                    return testpath;
+            }
+            return {};
+        }();
+
+        std::optional<std::vector<u8>> buffer;
+
+        const bool largefile{GetSize() > 1 * 1024 * 1024 * 1024};
+        if (!largefile)
+            buffer.emplace(4 * 1024 * 1024);
+
+        RegularFile result{pathdup, FileMode::Write};
+        if (!result)
+            return {};
+
+        for (u64 count{}; count < GetSize() && !largefile; ) {
+            const auto read{Read(buffer->data(), buffer->size(), count)};
+            if (!read)
+                break;
+            assert(result.Write(buffer->data(), read, count) == read);
+            count += read;
+        }
+        u64 length{GetSize()}, ret{};
+        const auto outdesc{result.descriptor};
+        do {
+            if (!largefile)
+                break;
+            // https://medium.com/swlh/linux-zero-copy-using-sendfile-75d2eb56b39b
+            ret = sendfile(outdesc, descriptor, nullptr, length);
+            length -= ret;
+        } while (length > 0 && ret > 0);
+
+        return result;
     }
 
     u64 RegularFile::ReadImpl(void* output, const u64 size, const u64 offset) {
@@ -92,6 +136,11 @@ namespace Plusnx::SysFs::FSys {
                     throw exception(GetOsErrorString());
         }
 
-        return pwrite64(descriptor, input, size, offset);
+        const auto result{pwrite64(descriptor, input, size, offset)};
+#if _POSIX_SYNCHRONIZED_IO > 0
+        if (result)
+            assert(fdatasync(descriptor) == 0);
+#endif
+        return result;
     }
 }

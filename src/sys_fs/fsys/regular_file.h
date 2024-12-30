@@ -14,6 +14,8 @@ namespace Plusnx::SysFs::FSys {
         }
 
         u64 GetSize() const override;
+
+        RegularFile Duplicate(const SysPath& create = {});
     private:
         u64 ReadImpl(void* output, u64 size, u64 offset) override;
         u64 WriteImpl(const void* input, u64 size, u64 offset) override;
