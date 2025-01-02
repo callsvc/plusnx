@@ -8,9 +8,10 @@ namespace Plusnx::Details {
         ClockStyle
     };
     class PerfMeasure {
-        public:
+    public:
         PerfMeasure(Metrics format, const std::string& titleName = "Ticks");
-        void Stop(double& result, bool output = false);
+        ~PerfMeasure();
+        std::string GetElapsed() const;
 
     private:
         std::string title;
