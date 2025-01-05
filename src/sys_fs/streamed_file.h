@@ -11,7 +11,7 @@ namespace Plusnx::SysFs {
 
     class StreamedFile final : public FileBacking {
     public:
-        StreamedFile(const FileBackingPtr& file, const u64 starts = 0) : FileBacking(file->path), rdPos(starts), wrPos(starts), backing(file) {}
+        StreamedFile(const FileBackingPtr& file, u64 starts = 0, bool advise = {});
 
         u64 GetSize() const override;
         u64 SkipBytes(u64 count = 0, CounterType type = CounterType::Read);

@@ -1,6 +1,25 @@
-#include <sys_fs/streamed_file.h>
+#include <ranges>
+#include <fcntl.h>
 
+#include <sys_fs/fsys/rigid_directory.h>
+#include <sys_fs/streamed_file.h>
 namespace Plusnx::SysFs {
+    StreamedFile::StreamedFile(const FileBackingPtr& file, const u64 starts, const bool advise) : FileBacking(file->path), rdPos(starts), wrPos(starts), backing(file) {
+        const auto descriptor = [&] -> i32 {
+            const FSys::RigidDirectory fds("/proc/self/fd");
+            for (const auto& _opened : fds.ListAllFiles() | std::ranges::views::drop(3)) {
+                auto _path{path};
+                if (is_symlink(_opened))
+                    _path = read_symlink(_opened);
+                if (file->path == _path)
+                    return static_cast<i32>(std::strtoll(_opened.filename().c_str(), nullptr, 10));
+            }
+            return -1;
+        }();
+        if (descriptor != -1 && advise)
+            assert(posix_fadvise(descriptor, starts, GetSize() - starts, POSIX_FADV_SEQUENTIAL) == 0);
+    }
+
     u64 StreamedFile::GetSize() const {
         return backing->GetSize();
     }

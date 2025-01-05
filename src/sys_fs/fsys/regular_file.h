@@ -6,7 +6,7 @@ namespace Plusnx::SysFs::FSys {
     class RegularFile final : public FileBacking {
     public:
         RegularFile() = default;
-        RegularFile(const SysPath& path, FileMode mode = FileMode::Read);
+        RegularFile(const SysPath& path, FileMode mode = FileMode::Read, bool lock = false);
         ~RegularFile() override;
 
         operator bool() const override {

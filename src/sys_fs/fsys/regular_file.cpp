@@ -13,7 +13,7 @@
 namespace Plusnx::SysFs::FSys {
     using Stat64 = struct stat64;
 
-    RegularFile::RegularFile(const SysPath& path, const FileMode mode) : FileBacking(path, mode) {
+    RegularFile::RegularFile(const SysPath& path, const FileMode mode, const bool lock) : FileBacking(path, mode) {
         if (!exists(path)) {
             create_directories(path.parent_path());
             if (auto stream{std::fstream(path, std::ios::out | std::ios::trunc)}) {
@@ -32,9 +32,18 @@ namespace Plusnx::SysFs::FSys {
         descriptor = open(path.c_str(), parameter);
         if (descriptor < 2)
             std::exchange(descriptor, 0);
+
+        if (lock && mode == FileMode::Write)
+            assert(lockf(descriptor, F_LOCK, 0) == 0);
     }
 
     RegularFile::~RegularFile() {
+        Stat64 stat;
+        if (fstat64(descriptor, &stat))
+            if (errno == ENOENT)
+                return;
+        if (lockf(descriptor, F_TEST, 0) >= 0)
+            assert(lockf(descriptor, F_ULOCK, 0) == 0);
         if (descriptor)
             close(descriptor);
     }

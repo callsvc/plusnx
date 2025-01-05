@@ -19,7 +19,7 @@ namespace Plusnx::SysFs::FSys {
         if (mode == FileMode::Read)
             if (!Exists(filepath))
                 return {};
-        return std::make_shared<RegularFile>(filepath, mode);
+        return std::make_shared<RegularFile>(filepath, mode, true);
     }
 
     std::vector<SysPath> RigidDirectory::ListAllFiles() const {
@@ -30,7 +30,7 @@ namespace Plusnx::SysFs::FSys {
                 return;
 
             for (const auto& entry : walker) {
-                if (is_directory(entry)) {
+                if (is_directory(entry) && !is_symlink(entry)) {
                     DiscoverDirectory(entry);
                     continue;
                 }
@@ -66,7 +66,7 @@ namespace Plusnx::SysFs::FSys {
     void RigidDirectory::UnlinkFile(const SysPath& file) {
         assert(exists(file));
 
-        if (RegularFile _openedFile{file, FileMode::Write})
+        if (RegularFile _openedFile{file, FileMode::Write, true})
             ShredderFile(_openedFile);
 
         std::filesystem::remove(file);

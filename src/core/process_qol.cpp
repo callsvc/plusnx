@@ -32,7 +32,7 @@ namespace Plusnx::Core {
         }, pwd->pw_gecos);
     }
 
-    void ProcessQol::ChangeGame(const GameInformation &game) {
+    void ProcessQol::ChangeGame(const GameInformation& game) {
         namespace chr = std::chrono;
         const auto current{std::format("{}", chr::floor<chr::seconds>(chr::system_clock::now()))};
 

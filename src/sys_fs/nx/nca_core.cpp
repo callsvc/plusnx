@@ -223,7 +223,7 @@ namespace Plusnx::SysFs::Nx {
         if (IsEmpty(expected))
             return {};
 
-        const auto stream{std::make_unique<StreamedFile>(backing)};
+        const auto stream{std::make_unique<StreamedFile>(backing, false)};
         if (!stream)
             throw exception("The current NCA does not have valid backing");
 #if 1

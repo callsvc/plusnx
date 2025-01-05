@@ -36,7 +36,7 @@ namespace Plusnx::SysFs::Nx {
         }
 
         if (!modulePath.empty()) {
-            std::print("Module built: {}\n", modulePath);
+            std::println("Module built: {}", modulePath);
             moduleName.emplace(modulePath);
         } else {
             moduleName = backing->path;
@@ -44,14 +44,14 @@ namespace Plusnx::SysFs::Nx {
 
         const boost::regex fsSdkRegex("sdk_version: ([0-9.]*)");
         if (regex_search(readable.data(), matches, fsSdkRegex)) {
-            std::print("FS SDK version: {}\n", matches.str());
+            std::println("FS SDK version: {}", matches.str());
         }
 
         const boost::regex sdkMwRegex("SDK MW[ -~]*");
 
         std::vector<std::string> sdks;
         boost::sregex_iterator sdkMatches(readable.begin(), readable.end(), sdkMwRegex);
-        for (; sdkMatches != decltype(sdkMatches)(); ++sdkMatches)
+        for (; sdkMatches != decltype(sdkMatches){}; ++sdkMatches)
             sdks.emplace_back(sdkMatches->str());
 
         if (sdks.size()) {

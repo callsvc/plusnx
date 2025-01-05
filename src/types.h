@@ -31,17 +31,18 @@ namespace Plusnx {
         }
 
         constexpr std::vector<T> CreateValues(u64 count = 0) {
-            if constexpr (requires { std::is_unsigned_v<T>; }; max < min)
-                return {};
+            if constexpr (requires { std::is_unsigned_v<T>; })
+                if (max < min)
+                    return {};
             if (max - min < 0)
                 return {};
             std::vector<T> result{};
             if (count > max - min)
                 result.reserve(count);
             else
-                result.resize(max - min);
+                result.reserve(max - min);
             for (u64 pos{min}; pos < max; ++pos)
-                result.emplace(pos);
+                result.emplace_back(pos);
             return result;
         }
 

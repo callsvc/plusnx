@@ -89,7 +89,7 @@ i32 main(const i32 argc, const char** argv) {
     app->StopApplication();
 
     {
-        const std::unique_ptr asan{std::move(app)};
+        const std::unique_ptr _application{std::move(app)};
     }
 
     return {};

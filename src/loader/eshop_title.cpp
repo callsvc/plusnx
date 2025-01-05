@@ -110,7 +110,7 @@ namespace Plusnx::Loader {
         const auto files{nsp->GetAllNcas()};
 
         u64 totalBytes{};
-        const Details::PerfMeasure measure{Details::Metrics::Milli};
+        Details::PerfMeasure measure(Details::Metrics::Seconds, titleId);
 
         std::print("Performing a checksum on eligible NCAs...\n");
         for (const auto& nca : files) {
@@ -125,7 +125,8 @@ namespace Plusnx::Loader {
             if (!IsEqual(std::span(result).subspan(0, 16), std::span(expected)))
                 return nca->path;
         }
-        std::println("Verified data size: {} - Execution time: {}", SysFs::GetReadableSize(totalBytes), measure.GetElapsed());
+        if (const auto elapsed{measure.GetElapsed()})
+            std::println("Verified data size: {} - Execution time: {}", SysFs::GetReadableSize(totalBytes), *elapsed);
         return {};
     }
 
