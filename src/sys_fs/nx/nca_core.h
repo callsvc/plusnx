@@ -144,7 +144,7 @@ namespace Plusnx::SysFs::Nx {
         static bool ValidateMagic(u32 magic);
         std::vector<FileBackingPtr> GetBackingFiles(bool partition) const;
         std::vector<std::pair<FsType, FileBackingPtr>> GetBackingFiles() const;
-        bool VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer, u64& readSize) const;
+        bool VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer, u64& readSize);
 
         std::list<FileBackingPtr> romfsList;
         std::list<FileBackingPtr> pfsList;
@@ -163,7 +163,7 @@ namespace Plusnx::SysFs::Nx {
 
         std::optional<Security::CipherCast> cipher;
         const std::shared_ptr<Security::Keyring> keys;
-        const FileBackingPtr backing;
+        FileBackingPtr backing;
 
         NcaHeader content;
         u64 counter{};

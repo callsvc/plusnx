@@ -109,8 +109,8 @@ namespace Plusnx::Core {
         collector.Query();
 
         const auto target{context->assets->GetPlusnxFilename(SysFs::PlusnxDirectoryType::Telemetry)};
-        const auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)};
-        collector.CommitToFile(outputFile);
+        if (auto outputFile{context->provider->CreateSystemFile(SysFs::RootId, target)})
+            collector.CommitToFile(std::move(outputFile));
     }
 
     void Application::StartApplication() const {

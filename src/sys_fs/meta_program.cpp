@@ -189,10 +189,10 @@ namespace Plusnx::SysFs {
 
     constexpr std::array metaMagicValues{ConstMagic<u32>("META"), ConstMagic<u32>("ACID"), ConstMagic<u32>("ACI0")};
 
-    MetaProgram::MetaProgram(const FileBackingPtr& npdm) :
-        metaFile(std::make_unique<StreamedFile>(npdm)) {
+    MetaProgram::MetaProgram(FileBackingPtr&& npdm) :
+        _metaSf(std::make_unique<StreamedFile>(std::move(npdm))) {
 
-        if (metaFile->Read(titleNpdm) != sizeof(titleNpdm))
+        if (_metaSf->Read(titleNpdm) != sizeof(titleNpdm))
             throw exception("Cannot read NPDM content");
         assert(titleNpdm.magic == metaMagicValues.front());
 
@@ -205,20 +205,20 @@ namespace Plusnx::SysFs {
         std::vector<u32> capabilities;
         auto CaptureAllKacValues = [&](const SectionAddr& kernel) {
             assert(!(kernel.size % 4));
-            const auto acidKac{npdm->GetBytes<u32>(kernel.size / sizeof(u32), kernel.offset)};
+            const auto acidKac{_metaSf->GetBytes<u32>(kernel.size / sizeof(u32), kernel.offset)};
             std::ranges::copy(acidKac, std::back_inserter(capabilities));
         };
 
         AcidHeader acid;
-        if (metaFile->Read(acid) == sizeof(acid)) {
+        if (_metaSf->Read(acid) == sizeof(acid)) {
             assert(acid.magic == metaMagicValues[1]);
             if (acid.sec[KernelCapability].size)
                 CaptureAllKacValues(acid.sec[KernelCapability]);
 
-            metaFile->SkipBytes(titleNpdm.aci0.offset - metaFile->GetCursor());
+            _metaSf->SkipBytes(titleNpdm.aci0.offset - _metaSf->GetCursor());
         }
         Aci0Header aci0;
-        if (metaFile->Read(aci0) == sizeof(aci0)) {
+        if (_metaSf->Read(aci0) == sizeof(aci0)) {
             assert(aci0.magic == metaMagicValues.back());
 
             if (aci0.sec[KernelCapability].size)

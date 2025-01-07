@@ -21,7 +21,7 @@ namespace Plusnx::Core {
 
     const auto seeder{"Plusnx Random AES"};
 
-    void TelemetryCollector::CommitToFile(const SysFs::FileBackingPtr& output) const {
+    void TelemetryCollector::CommitToFile(SysFs::FileBackingPtr&& output) const {
         mbedtls_entropy_context ent;
         mbedtls_ctr_drbg_context ctr;
 
@@ -38,7 +38,7 @@ namespace Plusnx::Core {
 
         const auto& visible{strings.str()};
 
-        SysFs::StreamedFile writable(output);
+        SysFs::StreamedFile writable(std::move(output));
         writable << "Data submission file";
         writable.Write(result.data(), result.size());
         writable << visible.size();

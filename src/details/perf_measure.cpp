@@ -40,7 +40,7 @@ namespace Plusnx::Details {
     }
 
     void PerfMeasure::WriteToFile(SysFs::FSys::RigidDirectory& dir) {
-        const SysFs::FileBackingPtr file = [&] {
+        SysFs::FileBackingPtr file = [&] {
             const auto statics{std::format("Statistics-{:016X}.csv", title)};
             if (auto fileStatics{dir.OpenFile(statics, SysFs::FileMode::Write)})
                 return fileStatics;
@@ -49,7 +49,6 @@ namespace Plusnx::Details {
 
         if (!file)
             return;
-        SysFs::StreamedFile writable(file, file->GetSize());
 
         std::vector<char> buffer;
         buffer.reserve(records.size() * 0x40);
@@ -57,8 +56,9 @@ namespace Plusnx::Details {
             fmt::format_to(std::back_inserter(buffer), "sep=,\n");
         }
         for (const auto& [index, _record] : std::ranges::views::enumerate(records)) {
-            fmt::format_to(std::back_inserter(buffer), "{}, {:%D %T}, {},\n", index, _record.first, _record.second.substr(0, 16));
+            fmt::format_to(std::back_inserter(buffer), "{}, {}, {}\n", index, _record.first, _record.second.substr(18));
         }
+        SysFs::StreamedFile writable(std::move(file), file->GetSize());
         writable.PutBytes(buffer);
     }
 

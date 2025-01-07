@@ -4,14 +4,14 @@
 #include <sys_fs/fsys/rigid_directory.h>
 #include <sys_fs/streamed_file.h>
 namespace Plusnx::SysFs {
-    StreamedFile::StreamedFile(const FileBackingPtr& file, const u64 starts, const bool advise) : FileBacking(file->path), rdPos(starts), wrPos(starts), backing(file) {
+    StreamedFile::StreamedFile(FileBackingPtr&& file, const u64 starts, const bool advise) : FileBacking(file->path), _storage(std::move(file)), rdOff(starts), wrOff(starts) {
         const auto descriptor = [&] -> i32 {
             const FSys::RigidDirectory fds("/proc/self/fd");
             for (const auto& _opened : fds.ListAllFiles() | std::ranges::views::drop(3)) {
-                auto _path{path};
-                if (is_symlink(_opened))
+                auto _path{_opened};
+                if (is_symlink(_path))
                     _path = read_symlink(_opened);
-                if (file->path == _path)
+                if (_storage->path == _path)
                     return static_cast<i32>(std::strtoll(_opened.filename().c_str(), nullptr, 10));
             }
             return -1;
@@ -21,18 +21,18 @@ namespace Plusnx::SysFs {
     }
 
     u64 StreamedFile::GetSize() const {
-        return backing->GetSize();
+        return _storage->GetSize();
     }
     u64 StreamedFile::SkipBytes(const u64 count, const CounterType type) {
         if (type == CounterType::Read)
-            return rdPos += count;
+            return rdOff += count;
         if (type == CounterType::Write)
-            return wrPos += count;
+            return wrOff += count;
 
         throw exception("Invalid skip operation");
     }
     u64 StreamedFile::GetCursor(const CounterType type) const {
-        return type == CounterType::Read ? rdPos : wrPos;
+        return type == CounterType::Read ? rdOff : wrOff;
     }
 
     u64 StreamedFile::RemainBytes(const CounterType type) const {
@@ -41,18 +41,23 @@ namespace Plusnx::SysFs {
 
     u64 StreamedFile::ReadImpl(void* output, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
-        if (rdPos + offset > GetSize()) {
+        if (offset)
+            rdOff = offset;
+        if (rdOff + size > GetSize()) {
             throw exception("Offset out");
         }
-        const auto result{backing->Read(output, size, rdPos + offset)};
+        const auto result{_storage->Read(output, size, rdOff)};
 
-        rdPos += result;
+        rdOff += result;
         return result;
     }
     u64 StreamedFile::WriteImpl(const void* input, const u64 size, const u64 offset) {
         std::lock_guard guard(lock);
-        const auto result{backing->Write(input, size, wrPos + offset)};
-        wrPos += result;
-        return result;
+        if (offset)
+            wrOff = offset;
+        const u64 result{wrOff};
+        if (const auto write{_storage->Write(input, size, wrOff)})
+            wrOff += write;
+        return wrOff - result;
     }
 }

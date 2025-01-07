@@ -112,7 +112,7 @@ namespace Plusnx::Loader {
         u64 totalBytes{};
         Details::PerfMeasure measure(Details::Metrics::Seconds, titleId);
 
-        std::print("Performing a checksum on eligible NCAs...\n");
+        std::println("Performing a checksum on eligible NCAs...");
         for (const auto& nca : files) {
             std::array<u8, 16> expected;
             u64 processed{};

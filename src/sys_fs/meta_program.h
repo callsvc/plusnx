@@ -74,7 +74,7 @@ namespace Plusnx::SysFs {
     class MetaProgram {
     public:
         MetaProgram();
-        MetaProgram(const FileBackingPtr& npdm);
+        MetaProgram(FileBackingPtr&& npdm);
 
         void DisplayBinaryInformation() const;
 
@@ -88,7 +88,7 @@ namespace Plusnx::SysFs {
     private:
         void SetKac(const std::vector<u32>& descriptors);
 
-        std::unique_ptr<StreamedFile> metaFile;
+        std::unique_ptr<StreamedFile> _metaSf;
 
 
         std::map<u32, bool> allowedSvc;

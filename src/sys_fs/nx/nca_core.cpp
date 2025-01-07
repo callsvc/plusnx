@@ -211,7 +211,7 @@ namespace Plusnx::SysFs::Nx {
     }
 
 
-    bool NcaCore::VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer, u64& readSize) const {
+    bool NcaCore::VerifyNca(std::array<u8, 0x10>& expected, Security::Checksum& checksum, std::vector<u8>& buffer, u64& readSize) {
         auto filename{backing->path};
         if (GetEntryFormat(filename) == ContainedFormat::Cnmt)
             return {};
@@ -223,24 +223,31 @@ namespace Plusnx::SysFs::Nx {
         if (IsEmpty(expected))
             return {};
 
-        const auto stream{std::make_unique<StreamedFile>(backing, false)};
+        const auto stream{std::make_unique<StreamedFile>(std::move(backing), false)};
         if (!stream)
             throw exception("The current NCA does not have valid backing");
+
+        bool result{true};
+        try {
 #if 1
-        // Skipping files larger than 512MiB for now
-        if (stream->GetSize() > 512 * 1024 * 1024)
-            return {};
+            // Skipping files larger than 512MiB for now
+            if (stream->GetSize() > 512 * 1024 * 1024)
+                throw std::invalid_argument("File too long");
 #endif
 
-        while (auto remain{stream->RemainBytes()}) {
-            if (remain > buffer.size())
-                remain = buffer.size();
-            const auto size{stream->Read(buffer.data(), remain)};
+            while (auto remain{stream->RemainBytes()}) {
+                if (remain > buffer.size())
+                    remain = buffer.size();
+                const auto size{stream->Read(buffer.data(), remain)};
 
-            readSize += size;
-            checksum.Update(buffer.data(), size);
+                readSize += size;
+                checksum.Update(buffer.data(), size);
+            }
+        } catch ([[maybe_unused]] std::exception& except) {
+            result = {};
         }
 
-        return true;
+        backing = stream->_storage;
+        return result;
     }
 }
