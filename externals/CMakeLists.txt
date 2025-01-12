@@ -19,6 +19,7 @@ set(ENABLE_PROGRAMS OFF CACHE BOOL "Build Mbed TLS programs." FORCE)
 set(MBEDTLS_FATAL_WARNINGS OFF CACHE BOOL "Compiler warnings treated as errors" FORCE)
 add_subdirectory(mbedtls)
 
-set(CAPSTONE_BUILD_DIET ${PLUSNX_REDUCE_CAPSTONE_SIZE} CACHE BOOL "Build diet library" FORCE)
-add_subdirectory(capstone)
-
+if(PLUSNX_ENABLE_CAPSTONE)
+    set(CAPSTONE_BUILD_DIET ${PLUSNX_REDUCE_CAPSTONE_SIZE} CACHE BOOL "Build diet library" FORCE)
+    add_subdirectory(capstone)
+endif()

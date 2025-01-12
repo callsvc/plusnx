@@ -11,7 +11,7 @@ option(PLUSNX_REDUCE_CAPSTONE_SIZE "Enable Capstone's Diet mode" OFF)
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -rdynamic")
-set(CMAKE_CXX_FLAGS_RELEASE "-flto=auto -Werror -s")
+set(CMAKE_CXX_FLAGS_RELEASE "-flto=auto -s")
 
 if(PLUSNX_ENABLE_ASAN)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
@@ -23,6 +23,10 @@ else()
 endif()
 
 set(TOML11_PRECOMPILE ON CACHE BOOL "precompile toml11 library" FORCE)
+
+if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(PLUSNX_ENABLE_CAPSTONE OFF CACHE BOOL "Enable Capstone to assist with debugging" FORCE)
+endif()
 
 find_package(Vulkan REQUIRED)
 find_package(SDL2 REQUIRED)
