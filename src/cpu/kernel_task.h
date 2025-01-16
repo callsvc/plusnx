@@ -16,8 +16,8 @@ namespace Plusnx::Cpu {
     private:
         std::mutex lock;
         std::condition_variable barrier;
-        bool waiting{false};
-        bool running{false};
+        bool waiting{};
+        bool running{};
     };
 
     class KernelTask {
@@ -28,7 +28,7 @@ namespace Plusnx::Cpu {
         void DeactivateCore();
         bool PreemptAndRun();
 
-        bool inserted{false};
+        bool inserted{};
     private:
         Nxk::Kernel& kernel;
         TaskableCoreContext& context;

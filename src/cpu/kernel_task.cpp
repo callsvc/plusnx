@@ -8,8 +8,9 @@ namespace Plusnx::Cpu {
     void TaskableCoreContext::WaitForAvailability() {
         std::unique_lock guard(lock);
 
-        if (!running)
+        if (!running) {
             barrier.wait(guard);
+        }
         waiting = false;
         running = true;
     }
@@ -19,17 +20,15 @@ namespace Plusnx::Cpu {
         if (!enable) {
             running = false;
             waiting = true;
-            barrier.notify_one();
-        } else {
-            barrier.notify_one();
         }
+        barrier.notify_one();
     }
 
     bool KernelTask::CheckForActivation() const {
         context.WaitForAvailability();
 
         if (!kernel.corePid.contains(context.cpusched))
-            return false;
+            return {};
 
         return true;
     }
