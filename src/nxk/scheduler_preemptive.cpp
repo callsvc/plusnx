@@ -12,12 +12,12 @@ namespace Plusnx::Nxk {
     }
     std::shared_ptr<Types::KThread> SchedulerPreemptive::PreemptForCore(const u64 cpuid) const {
         if (!ContainsValue(cores, cpuid))
-            return nullptr;
+            return {};
 
         if (const auto thread{threads.front()}) {
             return thread;
         }
-        return nullptr;
+        return {};
     }
 
     void SchedulerPreemptive::RemoveThread(const std::shared_ptr<Types::KThread>& thrShared) {

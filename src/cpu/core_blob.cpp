@@ -31,7 +31,7 @@ namespace Plusnx::Cpu {
 
         coreTask.emplace(*this, kernel);
         assert(stop.stop_possible());
-        while (true) {
+        do {
             if (stop.stop_requested()) {
                 break;
             }
@@ -39,7 +39,7 @@ namespace Plusnx::Cpu {
                 if (!coreTask->PreemptAndRun())
                     break;
             }
-        }
+        } while (true);
 
         coreTask->DeactivateCore();
     }

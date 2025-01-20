@@ -1,4 +1,4 @@
-#include <nxk/base/kauto_object.h>
+#include <nxk/base/k_auto_object.h>
 
 namespace Plusnx::Nxk::Base {
     KAutoObject::KAutoObject(Kernel& generic, const KAutoType type): KBaseType(generic, type) {

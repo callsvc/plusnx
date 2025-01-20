@@ -11,15 +11,12 @@ namespace Plusnx::Cpu {
         if (!running) {
             barrier.wait(guard);
         }
-        waiting = false;
         running = true;
     }
     void TaskableCoreContext::Enabled(const bool enable) {
         std::scoped_lock guard(lock);
-
         if (!enable) {
-            running = false;
-            waiting = true;
+            running = {};
         }
         barrier.notify_one();
     }

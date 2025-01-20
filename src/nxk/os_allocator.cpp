@@ -9,10 +9,8 @@ namespace Plusnx::Nxk {
             return {};
 
         constexpr auto protection{PROT_READ | PROT_WRITE};
-
         constexpr auto isPrivate{MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE};
         constexpr auto backing{MAP_SHARED};
-
         auto mapping = [&] {
             if (descriptor != -1)
                 return backing;
@@ -26,8 +24,6 @@ namespace Plusnx::Nxk {
 
         if (result == MAP_FAILED)
             throw std::bad_alloc();
-
-
         if (!start && descriptor == -1 && size > 1 * 1024 * 1024) {
             madvise(result, size, MADV_HUGEPAGE);
         } else if (!start && size >= SwitchMainSize) {

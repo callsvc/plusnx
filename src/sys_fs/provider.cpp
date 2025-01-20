@@ -67,7 +67,7 @@ namespace Plusnx::SysFs {
     void Provider::RemoveCachedFile(const SysPath& path) const {
         for (const auto& file : cachedFiles) {
             if (file->path.parent_path() == path) {
-                std::print("Must be removed immediately: {}\n", file->GetPath());
+                std::println("Must be removed immediately: {}", file->GetPath());
             }
         }
     }

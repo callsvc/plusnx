@@ -70,8 +70,8 @@ namespace Plusnx::SysFs::Nx {
 
     // https://switchbrew.org/wiki/SVC#CreateProcess
     void NsoCore::Load(const std::shared_ptr<Nxk::Types::KProcess>& process, u64& address, [[maybe_unused]] const bool hasArguments, const bool allocate) {
-        assert(sectionResults.size() == 3);
-        for (const auto& [type, sectionHash] : sectionResults) {
+        assert(sections.size() == 3);
+        for (const auto& [type, sectionHash] : sections) {
             if (!IsEqual(sectionHash, content.hashList[std::to_underlying(type)]))
                 return;
         }
@@ -130,7 +130,7 @@ namespace Plusnx::SysFs::Nx {
             verifier.Update(output.data(), output.size());
             verifier.Finish(result);
         }
-        sectionResults.emplace(type, result);
+        sections.emplace(type, result);
 
     }
 

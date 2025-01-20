@@ -6,7 +6,7 @@
 #include <sys_fs/fsys/regular_file.h>
 
 #if defined(__x86_64__)
-void Plusnx::Cpu::Features::IdentifyCpuType(const std::array<u32, 4> &root) {
+void Plusnx::Cpu::Features::IdentifyCpuType(const std::array<u32, 4>& root) {
     std::string manufacture;
     manufacture.resize(12);
 

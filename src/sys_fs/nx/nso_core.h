@@ -52,7 +52,7 @@ namespace Plusnx::SysFs::Nx {
         void ReadSection(const NsoSection& section, u64 fileSize, std::span<u8>& output);
         Loader::SectionType GetSectionType(const NsoSection& section) const;
 
-        std::map<Loader::SectionType, std::array<u8, 0x20>> sectionResults;
+        std::map<Loader::SectionType, std::array<u8, 0x20>> sections;
 
         FileBackingPtr backing;
 

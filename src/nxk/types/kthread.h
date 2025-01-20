@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nxk/base/kauto_object.h>
+#include <nxk/base/k_auto_object.h>
 #include <nxk/kernel.h>
 namespace Plusnx::Nxk::Types {
     class KThread final : public Base::KSynchronizationObject, public std::enable_shared_from_this<KThread> {

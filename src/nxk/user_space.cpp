@@ -8,7 +8,9 @@ namespace Plusnx::Nxk {
     void UserSpace::CreateProcessMemory(const std::shared_ptr<Types::KProcess>& process) {
         this->type = process->creation->addressType;
 
+        // ReSharper disable once CppTooWideScope
         u64 total{};
+        // ReSharper disable once CppTooWideScope
         u64 size{};
         if (type == AddressSpaceType::AddressSpace64Bit) {
             total = VirtualMemorySpace39::TotalSize;

@@ -115,8 +115,8 @@ target_sources(plusnx-core PUBLIC
     cpu/kernel_task.h
     cpu/unit_types.h
     nxk/base/auto_types.h
-    nxk/base/kauto_object.cpp
-    nxk/base/kauto_object.h
+    nxk/base/k_auto_object.cpp
+    nxk/base/k_auto_object.h
     nxk/base/k_tls_page.cpp
     nxk/base/k_tls_page.h
     nxk/base/k_recursive_lock.cpp

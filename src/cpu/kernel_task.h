@@ -16,7 +16,6 @@ namespace Plusnx::Cpu {
     private:
         std::mutex lock;
         std::condition_variable barrier;
-        bool waiting{};
         bool running{};
     };
 
